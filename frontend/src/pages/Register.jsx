@@ -65,10 +65,10 @@ const Register = () => {
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="name">Nome Completo</Label>
+          <Label htmlFor="name">Nome</Label>
           <Input 
             id="name" 
-            placeholder="Dr. João Silva" 
+            placeholder="João Silva" 
             value={formData.name}
             onChange={handleChange}
             required
