@@ -31,6 +31,19 @@ const Admin = () => {
   const [consultations, setConsultations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Mock Data (Legacy/Simulation) - Restored
+  const mockUsers = [
+    { id: "mock-1", name: "Dr. Silva", email: "silva@meduf.ai", role: "Admin", status: "Ativo", created_at: "2025-01-15T09:30:00" },
+    { id: "mock-2", name: "Dra. Santos", email: "santos@hospital.com", role: "Médico", status: "Ativo", created_at: "2025-02-10T14:15:00" },
+    { id: "mock-3", name: "Dr. Oliveira", email: "oliveira@clinica.com", role: "Médico", status: "Pendente", created_at: "2025-03-05T11:45:00" },
+    { id: "mock-4", name: "Dr. Malicioso", email: "spam@fake.com", role: "Médico", status: "Bloqueado", created_at: "2025-03-01T08:00:00" },
+  ];
+
+  const mockConsultations = [
+    { id: "mock-c1", doctor: "Dr. Silva", patient: { sexo: "Masculino", idade: "45", queixa: "Dor torácica intensa" }, report: { diagnoses: [{ name: "Síndrome Coronariana Aguda" }] }, date: "2025-03-15T10:30:00" },
+    { id: "mock-c2", doctor: "Dra. Santos", patient: { sexo: "Feminino", idade: "32", queixa: "Cefaleia pulsátil" }, report: { diagnoses: [{ name: "Enxaqueca (Migrânea)" }] }, date: "2025-03-15T11:15:00" },
+  ];
+
   // Security Check
   useEffect(() => {
     if (userRole !== 'ADMIN') {
@@ -50,7 +63,10 @@ const Admin = () => {
         api.get('/admin/consultations')
       ]);
       
-      setUsers(usersRes.data);
+      // Combine Real DB Data with Mock Data
+      // We use a Map to avoid duplicates if IDs conflict (though mock IDs are prefixed)
+      const combinedUsers = [...usersRes.data, ...mockUsers];
+      setUsers(combinedUsers);
       
       // Map real consultations to match the structure if needed
       const realConsultations = consultsRes.data.map(c => ({
@@ -59,13 +75,16 @@ const Admin = () => {
         date: c.date || c.created_at 
       }));
 
-      setConsultations(realConsultations);
+      setConsultations([...realConsultations, ...mockConsultations]);
 
     } catch (error) {
       console.error("Error fetching admin data:", error);
-      // Only show toast on initial load failure to avoid spamming
+      // On error, at least show the mock data
+      setUsers(mockUsers);
+      setConsultations(mockConsultations);
+      
       if (isLoading) {
-        toast.error("Erro ao carregar dados do servidor.");
+        toast.error("Erro ao carregar dados do servidor. Mostrando dados locais.");
       }
     } finally {
       setIsLoading(false);
@@ -77,6 +96,19 @@ const Admin = () => {
   }
 
   const handleToggleBlock = async (userId) => {
+    // Handle Mock Users locally
+    if (userId.toString().startsWith('mock-')) {
+      setUsers(users.map(user => {
+        if (user.id === userId) {
+          const newStatus = user.status === 'Bloqueado' ? 'Ativo' : 'Bloqueado';
+          toast.success(`(Simulação) Usuário ${user.name} foi ${newStatus === 'Bloqueado' ? 'bloqueado' : 'desbloqueado'}.`);
+          return { ...user, status: newStatus };
+        }
+        return user;
+      }));
+      return;
+    }
+
     try {
       const response = await api.patch(`/admin/users/${userId}/status`);
       const newStatus = response.data.status;
@@ -95,6 +127,13 @@ const Admin = () => {
   };
 
   const handleDelete = async (userId) => {
+    // Handle Mock Users locally
+    if (userId.toString().startsWith('mock-')) {
+      setUsers(users.filter(user => user.id !== userId));
+      toast.success("(Simulação) Usuário excluído com sucesso.");
+      return;
+    }
+
     try {
       await api.delete(`/admin/users/${userId}`);
       setUsers(users.filter(user => user.id !== userId));
