@@ -16,12 +16,12 @@ export const Header = () => {
     navigate('/login');
   };
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 dark:bg-slate-950/80">
       <div className="container flex h-16 items-center justify-between px-4 md:px-8">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <BrainCircuit className="h-5 w-5" />
           </div>
@@ -32,9 +32,9 @@ export const Header = () => {
         <nav className="flex items-center gap-6 text-sm font-medium">
           <Link 
             to="/" 
-            className={`transition-colors hover:text-foreground hidden md:block ${isActive('/') ? 'text-foreground font-bold' : 'text-foreground/60'}`}
+            className={`transition-colors hover:text-foreground hidden md:block ${isActive('/') && location.pathname === '/' ? 'text-foreground font-bold' : 'text-foreground/60'}`}
           >
-            Dashboard
+            Início
           </Link>
           <Link 
             to="/history" 
