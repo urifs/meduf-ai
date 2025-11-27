@@ -8,11 +8,10 @@ export const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const userName = localStorage.getItem('userName') || 'Dr. Silva';
+  const userRole = localStorage.getItem('userRole'); // Get User Role
 
   const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userName');
+    localStorage.clear(); // Clear all storage including role
     toast.success("Logout realizado com sucesso");
     navigate('/login');
   };
@@ -43,12 +42,16 @@ export const Header = () => {
           >
             Histórico
           </Link>
-          <Link 
-            to="/admin" 
-            className={`transition-colors hover:text-foreground hidden md:block flex items-center gap-1 ${isActive('/admin') ? 'text-foreground font-bold' : 'text-foreground/60'}`}
-          >
-            <Shield className="h-3 w-3" /> Admin
-          </Link>
+          
+          {/* Only show Admin link if userRole is ADMIN */}
+          {userRole === 'ADMIN' && (
+            <Link 
+              to="/admin" 
+              className={`transition-colors hover:text-foreground hidden md:block flex items-center gap-1 ${isActive('/admin') ? 'text-foreground font-bold' : 'text-foreground/60'}`}
+            >
+              <Shield className="h-3 w-3" /> Admin
+            </Link>
+          )}
           
           <div className="flex items-center gap-4 ml-4 pl-4 border-l">
             <div className="flex items-center gap-2">

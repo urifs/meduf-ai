@@ -12,7 +12,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
+    identifier: '', // Changed from email to identifier to accept username
     password: ''
   });
 
@@ -24,13 +24,28 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Mock Authentication
+    // Mock Authentication Logic
     setTimeout(() => {
-      if (formData.email && formData.password) {
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userEmail', formData.email);
-        toast.success("Login realizado com sucesso!");
-        navigate('/');
+      if (formData.identifier && formData.password) {
+        
+        // Check for specific Admin Credentials
+        if (formData.identifier === 'ur1fs' && formData.password === '@Fred1807') {
+          localStorage.setItem('isAuthenticated', 'true');
+          localStorage.setItem('userEmail', 'admin@meduf.ai');
+          localStorage.setItem('userName', 'Administrador (ur1fs)');
+          localStorage.setItem('userRole', 'ADMIN'); // Set Admin Role
+          toast.success("Login de Administrador realizado com sucesso!");
+          navigate('/admin'); // Redirect directly to admin panel
+        } else {
+          // Standard User Login
+          localStorage.setItem('isAuthenticated', 'true');
+          localStorage.setItem('userEmail', formData.identifier.includes('@') ? formData.identifier : `${formData.identifier}@meduf.ai`);
+          localStorage.setItem('userName', 'Dr. Usuário');
+          localStorage.setItem('userRole', 'USER'); // Set Standard Role
+          toast.success("Login realizado com sucesso!");
+          navigate('/');
+        }
+
       } else {
         toast.error("Por favor, preencha todos os campos.");
       }
@@ -45,12 +60,12 @@ const Login = () => {
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="email">Email Profissional</Label>
+          <Label htmlFor="identifier">Email ou Usuário</Label>
           <Input 
-            id="email" 
-            type="email" 
-            placeholder="doutor@hospital.com" 
-            value={formData.email}
+            id="identifier" 
+            type="text" 
+            placeholder="email@exemplo.com ou usuário" 
+            value={formData.identifier}
             onChange={handleChange}
             required
             className="h-11"

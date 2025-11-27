@@ -1,12 +1,28 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Users, Activity, Database, ShieldAlert, Search } from 'lucide-react';
+import { Users, Activity, Database, ShieldAlert, Search, Lock } from 'lucide-react';
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const Admin = () => {
+  const navigate = useNavigate();
+  const userRole = localStorage.getItem('userRole');
+
+  // Security Check
+  useEffect(() => {
+    if (userRole !== 'ADMIN') {
+      navigate('/'); // Redirect non-admins to dashboard
+    }
+  }, [userRole, navigate]);
+
+  if (userRole !== 'ADMIN') {
+    return null; // Prevent flash of content
+  }
+
   // Mock data to simulate a database view
   const mockUsers = [
     { id: 1, name: "Dr. Silva", email: "silva@meduf.ai", role: "Admin", status: "Ativo", joined: "2024-01-15" },
@@ -19,7 +35,7 @@ const Admin = () => {
     id: 999,
     name: localStorage.getItem('userName') || 'Usuário Atual',
     email: localStorage.getItem('userEmail') || 'atual@meduf.ai',
-    role: 'Médico (Você)',
+    role: 'Administrador (Você)',
     status: 'Online',
     joined: 'Hoje'
   };
@@ -33,12 +49,15 @@ const Admin = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-              <Database className="h-8 w-8 text-primary" /> Painel Administrativo
+              <Shield className="h-8 w-8 text-primary" /> Painel Administrativo
             </h1>
             <p className="text-muted-foreground mt-1">
-              Gerenciamento de usuários e monitoramento do sistema (Simulação).
+              Acesso restrito: Gerenciamento de usuários e monitoramento do sistema.
             </p>
           </div>
+          <Badge variant="outline" className="w-fit h-fit py-1 px-3 border-primary text-primary gap-2">
+            <Lock className="h-3 w-3" /> Modo Seguro Ativo
+          </Badge>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3 mb-8">
