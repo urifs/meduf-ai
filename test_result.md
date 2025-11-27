@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the Authentication Flow for Meduf Ai application with login, registration, and logout functionality"
+user_problem_statement: "Test the Registration Flow for Meduf Ai without the CRM field"
 
 frontend:
   - task: "Authentication Route Protection"
