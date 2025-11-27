@@ -1,7 +1,8 @@
 import React from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Activity, Stethoscope, User, FileText, ClipboardList, Pill, AlertCircle, CheckCircle2, BrainCircuit, LogOut, Shield } from 'lucide-react';
+import { Activity, Stethoscope, User, FileText, ClipboardList, Pill, AlertCircle, CheckCircle2, BrainCircuit, LogOut, Shield, Menu } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
 
 export const Header = () => {
@@ -21,6 +22,7 @@ export const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 dark:bg-slate-950/80">
       <div className="container flex h-16 items-center justify-between px-4 md:px-8">
+        {/* Logo Section */}
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <BrainCircuit className="h-5 w-5" />
@@ -29,49 +31,85 @@ export const Header = () => {
             Meduf <span className="text-primary">Ai</span>
           </span>
         </div>
-        <nav className="flex items-center gap-6 text-sm font-medium">
-          <Link 
-            to="/" 
-            className={`transition-colors hover:text-foreground hidden md:block ${isActive('/') && location.pathname === '/' ? 'text-foreground font-bold' : 'text-foreground/60'}`}
-          >
-            Início
-          </Link>
-          <Link 
-            to="/history" 
-            className={`transition-colors hover:text-foreground hidden md:block ${isActive('/history') ? 'text-foreground font-bold' : 'text-foreground/60'}`}
-          >
-            Histórico
-          </Link>
-          
-          {/* Only show Admin link if userRole is ADMIN */}
-          {userRole === 'ADMIN' && (
-            <Link 
-              to="/admin" 
-              className={`transition-colors hover:text-foreground hidden md:block flex items-center gap-1 ${isActive('/admin') ? 'text-foreground font-bold' : 'text-foreground/60'}`}
-            >
-              <Shield className="h-3 w-3" /> Admin
-            </Link>
-          )}
-          
-          <div className="flex items-center gap-4 ml-4 pl-4 border-l">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-full bg-secondary/20 flex items-center justify-center text-secondary-foreground">
-                <User className="h-4 w-4 text-secondary" />
-              </div>
-              <span className="hidden md:inline-block text-xs text-muted-foreground">{userName}</span>
-            </div>
-            
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={handleLogout}
-              className="text-muted-foreground hover:text-destructive"
-              title="Sair"
-            >
-              <LogOut className="h-4 w-4" />
+
+        {/* Hamburger Menu */}
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="md:hidden lg:hidden xl:hidden 2xl:hidden block"> {/* Visible on mobile only? No, user asked for it generally. Let's make it visible always if that's the request, or replace the nav entirely. "deixe todas essas opções em um icone com 3 barras" implies replacing the current nav bar. */}
+               <Menu className="h-6 w-6" />
             </Button>
-          </div>
-        </nav>
+          </SheetTrigger>
+          {/* Actually, the user asked to replace the options. So I should probably hide the desktop nav and show the menu button always, or just use the menu button as the primary nav. Let's assume they want the menu button to be the ONLY way to access these, replacing the horizontal bar. */}
+          
+          <SheetTrigger asChild>
+             <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+             </Button>
+          </SheetTrigger>
+
+          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+            <SheetHeader>
+              <SheetTitle className="flex items-center gap-2">
+                <BrainCircuit className="h-5 w-5 text-primary" />
+                Menu de Navegação
+              </SheetTitle>
+            </SheetHeader>
+            
+            <div className="flex flex-col gap-6 mt-8">
+              {/* User Profile Section in Menu */}
+              <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
+                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <User className="h-5 w-5" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">{userName}</span>
+                  <span className="text-xs text-muted-foreground">{userRole === 'ADMIN' ? 'Administrador' : 'Médico'}</span>
+                </div>
+              </div>
+
+              {/* Navigation Links */}
+              <nav className="flex flex-col gap-2">
+                <Link 
+                  to="/" 
+                  className={`flex items-center gap-2 px-4 py-3 rounded-md transition-colors ${isActive('/') && location.pathname === '/' ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted text-foreground/80'}`}
+                >
+                  <Activity className="h-4 w-4" />
+                  Início
+                </Link>
+                
+                <Link 
+                  to="/history" 
+                  className={`flex items-center gap-2 px-4 py-3 rounded-md transition-colors ${isActive('/history') ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted text-foreground/80'}`}
+                >
+                  <ClipboardList className="h-4 w-4" />
+                  Histórico
+                </Link>
+                
+                {userRole === 'ADMIN' && (
+                  <Link 
+                    to="/admin" 
+                    className={`flex items-center gap-2 px-4 py-3 rounded-md transition-colors ${isActive('/admin') ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted text-foreground/80'}`}
+                  >
+                    <Shield className="h-4 w-4" />
+                    Admin
+                  </Link>
+                )}
+              </nav>
+
+              {/* Logout Button */}
+              <div className="mt-auto pt-4 border-t">
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 gap-2"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sair da Conta
+                </Button>
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
     </header>
   );
