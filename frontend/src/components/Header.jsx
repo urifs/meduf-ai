@@ -35,13 +35,6 @@ export const Header = () => {
         {/* Hamburger Menu */}
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden lg:hidden xl:hidden 2xl:hidden block"> {/* Visible on mobile only? No, user asked for it generally. Let's make it visible always if that's the request, or replace the nav entirely. "deixe todas essas opções em um icone com 3 barras" implies replacing the current nav bar. */}
-               <Menu className="h-6 w-6" />
-            </Button>
-          </SheetTrigger>
-          {/* Actually, the user asked to replace the options. So I should probably hide the desktop nav and show the menu button always, or just use the menu button as the primary nav. Let's assume they want the menu button to be the ONLY way to access these, replacing the horizontal bar. */}
-          
-          <SheetTrigger asChild>
              <Button variant="ghost" size="icon">
                 <Menu className="h-6 w-6" />
              </Button>
