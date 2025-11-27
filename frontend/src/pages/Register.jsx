@@ -14,8 +14,7 @@ const Register = () => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    crm: ''
+    confirmPassword: ''
   });
 
   const handleChange = (e) => {
@@ -55,18 +54,6 @@ const Register = () => {
             id="name" 
             placeholder="Dr. João Silva" 
             value={formData.name}
-            onChange={handleChange}
-            required
-            className="h-11"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="crm">CRM / Registro Profissional</Label>
-          <Input 
-            id="crm" 
-            placeholder="123456-SP" 
-            value={formData.crm}
             onChange={handleChange}
             required
             className="h-11"
