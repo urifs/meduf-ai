@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { AlertTriangle, CheckCircle2, Pill, ClipboardList, BrainCircuit, Copy } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Pill, ClipboardList, BrainCircuit, Copy, Activity } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -15,7 +15,7 @@ export const ClinicalReport = ({ data }) => {
           <BrainCircuit className="h-16 w-16 mx-auto mb-4 opacity-20" />
           <h3 className="text-lg font-medium">Aguardando Dados</h3>
           <p className="text-sm max-w-xs mx-auto mt-2">
-            Preencha o formulário ao lado e clique em "Gerar Análise" para receber o raciocínio clínico da IA.
+            Preencha o formulário ao lado e clique em &quot;Gerar Análise&quot; para receber o raciocínio clínico da IA.
           </p>
         </div>
       </Card>

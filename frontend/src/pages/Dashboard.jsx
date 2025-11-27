@@ -4,6 +4,7 @@ import { PatientForm } from '@/components/PatientForm';
 import { ClinicalReport } from '@/components/ClinicalReport';
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
+import { Activity } from 'lucide-react';
 
 const Dashboard = () => {
   const [reportData, setReportData] = useState(null);
