@@ -23,11 +23,24 @@ const Admin = () => {
     return null; // Prevent flash of content
   }
 
-  // Mock data to simulate a database view
+  // Helper to format date to Brazil/Brasilia time
+  const getBrazilDate = (dateString) => {
+    const date = dateString ? new Date(dateString) : new Date();
+    return new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
+  };
+
+  // Mock data to simulate a database view - Updated to 2025
   const mockUsers = [
-    { id: 1, name: "Dr. Silva", email: "silva@meduf.ai", role: "Admin", status: "Ativo", joined: "2024-01-15" },
-    { id: 2, name: "Dra. Santos", email: "santos@hospital.com", role: "Médico", status: "Ativo", joined: "2024-02-10" },
-    { id: 3, name: "Dr. Oliveira", email: "oliveira@clinica.com", role: "Médico", status: "Pendente", joined: "2024-03-05" },
+    { id: 1, name: "Dr. Silva", email: "silva@meduf.ai", role: "Admin", status: "Ativo", joined: "15/01/2025 09:30" },
+    { id: 2, name: "Dra. Santos", email: "santos@hospital.com", role: "Médico", status: "Ativo", joined: "10/02/2025 14:15" },
+    { id: 3, name: "Dr. Oliveira", email: "oliveira@clinica.com", role: "Médico", status: "Pendente", joined: "05/03/2025 11:45" },
   ];
 
   // Get current user from local storage to add to the list
@@ -37,7 +50,7 @@ const Admin = () => {
     email: localStorage.getItem('userEmail') || 'atual@meduf.ai',
     role: 'Administrador (Você)',
     status: 'Online',
-    joined: 'Hoje'
+    joined: getBrazilDate() // Current date in Brasilia time
   };
 
   const allUsers = [currentUser, ...mockUsers];
@@ -108,7 +121,7 @@ const Admin = () => {
                   <TableHead>Email</TableHead>
                   <TableHead>Função</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Data de Cadastro</TableHead>
+                  <TableHead>Data de Cadastro (Brasília)</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
