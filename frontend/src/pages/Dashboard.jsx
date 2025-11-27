@@ -4,9 +4,12 @@ import { PatientForm } from '@/components/PatientForm';
 import { ClinicalReport } from '@/components/ClinicalReport';
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import { Activity } from 'lucide-react';
+import { Activity, ArrowLeft } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [reportData, setReportData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -135,6 +138,14 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background font-sans">
       <Header />
       <main className="container mx-auto px-4 py-8 md:px-8">
+        <Button 
+          variant="ghost" 
+          className="mb-6 pl-0 hover:pl-2 transition-all" 
+          onClick={() => navigate('/')}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Seleção
+        </Button>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Column: Input */}
           <div className="lg:col-span-5 xl:col-span-4 space-y-6">

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Dashboard from "@/pages/Dashboard";
+import SimpleDashboard from "@/pages/SimpleDashboard";
+import Selection from "@/pages/Selection";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import History from "@/pages/History";
@@ -33,7 +35,23 @@ function App() {
             path="/" 
             element={
               <ProtectedRoute>
+                <Selection />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/detailed" 
+            element={
+              <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/simple" 
+            element={
+              <ProtectedRoute>
+                <SimpleDashboard />
               </ProtectedRoute>
             } 
           />
