@@ -225,8 +225,40 @@ test_plan:
   test_priority: "completed"
   test_summary: "All 7 authentication flow tasks successfully tested and verified. Complete user journey from logout state through registration to dashboard and back to logout working perfectly."
 
+  - task: "Registration Form Without CRM Field"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/Register.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to verify registration form works without CRM field using specific test data: Name: 'Dr. Sem CRM', Email: 'nocrm@meduf.ai', Password: 'password123'"
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED: Registration form successfully works without CRM field. Form contains only Name, Email, Password, and Confirm Password fields. Successfully registered with test data and redirected to dashboard with correct user name display in header."
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.1"
+  test_sequence: 3
+  run_ui: true
+  test_completed: true
+  all_tests_passed: true
+
+test_plan:
+  current_focus: []
+  stuck_tasks: []
+  test_all: false
+  test_priority: "completed"
+  test_summary: "Registration flow without CRM field successfully tested and verified. All 6 steps from review request completed successfully."
+
 agent_communication:
   - agent: "testing"
     message: "Updated test plan for Meduf Ai Authentication Flow testing. All 7 authentication-related tasks need comprehensive verification through Playwright automation following the specific 12-step review request requirements."
   - agent: "testing"
     message: "COMPREHENSIVE AUTHENTICATION TESTING COMPLETED - All 12 steps from review request successfully verified. Authentication flow fully functional: route protection, login page elements, registration navigation, form functionality, dashboard redirect, user display, and logout all working correctly. Mock authentication with localStorage working perfectly."
+  - agent: "testing"
+    message: "REGISTRATION WITHOUT CRM FIELD TESTING COMPLETED - Successfully verified that CRM field has been removed from registration form. All 6 test steps completed: navigation to /register, CRM field absence verification, form filling with specified data, form submission, dashboard redirection, and header user name display all working correctly."
