@@ -4,11 +4,29 @@ import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Users, Activity, Database, ShieldAlert, Search, Lock, Shield, Ban, Trash2, Unlock, Stethoscope, Loader2 } from 'lucide-react';
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { 
+  Users, 
+  Activity, 
+  Shield, 
+  Search, 
+  RefreshCw, 
+  Trash2, 
+  Ban, 
+  Unlock, 
+  MoreHorizontal,
+  FileText,
+  AlertCircle
+} from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +38,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 import api from '@/lib/api';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -27,335 +46,317 @@ import { ptBR } from 'date-fns/locale';
 const Admin = () => {
   const navigate = useNavigate();
   const userRole = localStorage.getItem('userRole');
+  
   const [users, setUsers] = useState([]);
   const [consultations, setConsultations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [lastUpdated, setLastUpdated] = useState(new Date());
 
-  // Mock Data (Legacy/Simulation) - Restored
-  const mockUsers = [
-    { id: "mock-1", name: "Dr. Silva", email: "silva@meduf.ai", role: "Admin", status: "Ativo", created_at: "2025-01-15T09:30:00" },
-    { id: "mock-2", name: "Dra. Santos", email: "santos@hospital.com", role: "Médico", status: "Ativo", created_at: "2025-02-10T14:15:00" },
-    { id: "mock-3", name: "Dr. Oliveira", email: "oliveira@clinica.com", role: "Médico", status: "Pendente", created_at: "2025-03-05T11:45:00" },
-    { id: "mock-4", name: "Dr. Malicioso", email: "spam@fake.com", role: "Médico", status: "Bloqueado", created_at: "2025-03-01T08:00:00" },
-  ];
-
-  const mockConsultations = [
-    { id: "mock-c1", doctor: "Dr. Silva", patient: { sexo: "Masculino", idade: "45", queixa: "Dor torácica intensa" }, report: { diagnoses: [{ name: "Síndrome Coronariana Aguda" }] }, date: "2025-03-15T10:30:00" },
-    { id: "mock-c2", doctor: "Dra. Santos", patient: { sexo: "Feminino", idade: "32", queixa: "Cefaleia pulsátil" }, report: { diagnoses: [{ name: "Enxaqueca (Migrânea)" }] }, date: "2025-03-15T11:15:00" },
-  ];
-
-  // Security Check
+  // --- Authentication Check ---
   useEffect(() => {
     if (userRole !== 'ADMIN') {
-      navigate('/'); // Redirect non-admins to dashboard
+      toast.error("Acesso negado. Área restrita para administradores.");
+      navigate('/'); 
     } else {
-      // Set up polling for real-time updates
       fetchData();
-      const interval = setInterval(fetchData, 5000); // Poll every 5 seconds
-      return () => clearInterval(interval);
     }
   }, [userRole, navigate]);
 
+  // --- Data Fetching ---
   const fetchData = async () => {
+    setIsLoading(true);
     try {
+      // Fetch Users and Consultations in parallel
       const [usersRes, consultsRes] = await Promise.all([
         api.get('/admin/users'),
         api.get('/admin/consultations')
       ]);
-      
-      // Combine Real DB Data with Mock Data
-      // We use a Map to avoid duplicates if IDs conflict (though mock IDs are prefixed)
-      const combinedUsers = [...usersRes.data, ...mockUsers];
-      setUsers(combinedUsers);
-      
-      // Map real consultations to match the structure if needed
-      const realConsultations = consultsRes.data.map(c => ({
-        ...c,
-        // Ensure date field consistency
-        date: c.date || c.created_at 
-      }));
 
-      setConsultations([...realConsultations, ...mockConsultations]);
-
+      setUsers(usersRes.data);
+      setConsultations(consultsRes.data);
+      setLastUpdated(new Date());
+      
     } catch (error) {
-      console.error("Error fetching admin data:", error);
-      // On error, at least show the mock data
-      setUsers(mockUsers);
-      setConsultations(mockConsultations);
-      
-      if (isLoading) {
-        toast.error("Erro ao carregar dados do servidor. Mostrando dados locais.");
-      }
+      console.error("Admin Fetch Error:", error);
+      toast.error("Erro ao conectar com o banco de dados.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (userRole !== 'ADMIN') {
-    return null; // Prevent flash of content
-  }
-
-  const handleToggleBlock = async (userId) => {
-    // Handle Mock Users locally
-    if (userId.toString().startsWith('mock-')) {
-      setUsers(users.map(user => {
-        if (user.id === userId) {
-          const newStatus = user.status === 'Bloqueado' ? 'Ativo' : 'Bloqueado';
-          toast.success(`(Simulação) Usuário ${user.name} foi ${newStatus === 'Bloqueado' ? 'bloqueado' : 'desbloqueado'}.`);
-          return { ...user, status: newStatus };
-        }
-        return user;
-      }));
-      return;
-    }
-
+  // --- Actions ---
+  const handleToggleStatus = async (userId, currentStatus) => {
     try {
       const response = await api.patch(`/admin/users/${userId}/status`);
       const newStatus = response.data.status;
       
-      setUsers(users.map(user => {
-        if (user.id === userId) {
-          return { ...user, status: newStatus };
-        }
-        return user;
-      }));
-      
-      toast.success(`Status do usuário atualizado para: ${newStatus}`);
+      setUsers(users.map(u => u.id === userId ? { ...u, status: newStatus } : u));
+      toast.success(`Usuário ${newStatus === 'Bloqueado' ? 'bloqueado' : 'desbloqueado'} com sucesso.`);
     } catch (error) {
-      toast.error("Erro ao atualizar status do usuário.");
+      toast.error("Falha ao atualizar status.");
     }
   };
 
-  const handleDelete = async (userId) => {
-    // Handle Mock Users locally
-    if (userId.toString().startsWith('mock-')) {
-      setUsers(users.filter(user => user.id !== userId));
-      toast.success("(Simulação) Usuário excluído com sucesso.");
-      return;
-    }
-
+  const handleDeleteUser = async (userId) => {
     try {
       await api.delete(`/admin/users/${userId}`);
-      setUsers(users.filter(user => user.id !== userId));
-      toast.success("Usuário excluído com sucesso.");
+      setUsers(users.filter(u => u.id !== userId));
+      toast.success("Usuário e dados associados excluídos.");
     } catch (error) {
-      toast.error("Erro ao excluir usuário.");
+      toast.error("Falha ao excluir usuário.");
     }
   };
 
-  // Helper to format date
+  // --- Helpers ---
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
+    if (!dateString) return "-";
     try {
-      return format(new Date(dateString), "dd/MM/yyyy HH:mm", { locale: ptBR });
+      return format(new Date(dateString), "dd MMM yyyy, HH:mm", { locale: ptBR });
     } catch (e) {
-      return dateString;
+      return "Data Inválida";
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background font-sans flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Carregando painel administrativo...</p>
-        </div>
-      </div>
-    );
-  }
+  const filteredUsers = users.filter(user => 
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // --- Stats Calculation ---
+  const stats = {
+    totalUsers: users.length,
+    activeUsers: users.filter(u => u.status === 'Ativo').length,
+    totalConsultations: consultations.length,
+  };
+
+  if (userRole !== 'ADMIN') return null;
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <div className="min-h-screen bg-slate-50/50 font-sans">
       <Header />
-      <main className="container mx-auto px-4 py-8 md:px-8">
+      
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-              <Shield className="h-8 w-8 text-primary" /> Painel Administrativo
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Acesso restrito: Gerenciamento de usuários e monitoramento do sistema.
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Painel Administrativo</h1>
+            <p className="text-slate-500 mt-1">
+              Gerenciamento do sistema e monitoramento de usuários.
             </p>
           </div>
-          <Badge variant="outline" className="w-fit h-fit py-1 px-3 border-primary text-primary gap-2">
-            <Lock className="h-3 w-3" /> Modo Seguro Ativo
-          </Badge>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground hidden md:inline-block">
+              Atualizado em: {format(lastUpdated, "HH:mm:ss")}
+            </span>
+            <Button variant="outline" size="sm" onClick={fetchData} disabled={isLoading}>
+              <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+              Atualizar
+            </Button>
+          </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <Card className="border-l-4 border-l-blue-500 shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total de Usuários</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{users.length}</div>
-              <p className="text-xs text-muted-foreground">Cadastrados no sistema</p>
+              <div className="flex items-center justify-between">
+                <div className="text-3xl font-bold">{stats.totalUsers}</div>
+                <Users className="h-8 w-8 text-blue-100" />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {stats.activeUsers} ativos no momento
+              </p>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Análises Realizadas</CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
+
+          <Card className="border-l-4 border-l-green-500 shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Consultas Realizadas</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{consultations.length}</div>
-              <p className="text-xs text-muted-foreground">Total de consultas registradas</p>
+              <div className="flex items-center justify-between">
+                <div className="text-3xl font-bold">{stats.totalConsultations}</div>
+                <Activity className="h-8 w-8 text-green-100" />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Registradas no banco de dados
+              </p>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Status do Sistema</CardTitle>
-              <ShieldAlert className="h-4 w-4 text-green-500" />
+
+          <Card className="border-l-4 border-l-purple-500 shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Status do Banco de Dados</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">Operacional</div>
-              <p className="text-xs text-muted-foreground">Latência média: 45ms</p>
+              <div className="flex items-center justify-between">
+                <div className="text-3xl font-bold text-green-600">Online</div>
+                <Database className="h-8 w-8 text-purple-100" />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Conexão MongoDB estabelecida
+              </p>
             </CardContent>
           </Card>
         </div>
 
-        <Tabs defaultValue="users" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 max-w-[400px] mb-4">
-            <TabsTrigger value="users">Gerenciar Usuários</TabsTrigger>
-            <TabsTrigger value="consultations">Últimas Consultas</TabsTrigger>
-          </TabsList>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           
-          <TabsContent value="users">
-            <Card className="border-none shadow-md bg-card/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle>Usuários Cadastrados</CardTitle>
-                <CardDescription>
-                  Lista de profissionais de saúde com acesso à plataforma.
-                </CardDescription>
+          {/* Users Table (Takes up 2/3 width on large screens) */}
+          <div className="xl:col-span-2 space-y-4">
+            <Card className="shadow-sm">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Gerenciar Usuários</CardTitle>
+                  <CardDescription>Lista completa de contas criadas.</CardDescription>
+                </div>
+                <div className="relative w-64">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input 
+                    placeholder="Buscar nome ou email..." 
+                    className="pl-8"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Nome</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Função</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Data de Cadastro</TableHead>
-                      <TableHead className="text-right">Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {users.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell className="font-medium">{user.name}</TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.role}</TableCell>
-                        <TableCell>
-                          <Badge variant={
-                            user.status === 'Ativo' || user.status === 'Online' ? 'default' : 
-                            user.status === 'Bloqueado' ? 'destructive' : 'secondary'
-                          }>
-                            {user.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{formatDate(user.created_at)}</TableCell>
-                        <TableCell className="text-right">
-                          {user.role !== 'ADMIN' && ( // Prevent actions on admins for safety in this demo
-                            <div className="flex items-center justify-end gap-2">
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                onClick={() => handleToggleBlock(user.id)}
-                                title={user.status === 'Bloqueado' ? "Desbloquear" : "Bloquear"}
-                                className={user.status === 'Bloqueado' ? "text-green-600 hover:text-green-700 hover:bg-green-50" : "text-orange-500 hover:text-orange-600 hover:bg-orange-50"}
-                              >
-                                {user.status === 'Bloqueado' ? <Unlock className="h-4 w-4" /> : <Ban className="h-4 w-4" />}
-                              </Button>
-                              
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="icon" 
-                                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                    title="Excluir Usuário"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-slate-50">
+                        <TableHead>Usuário</TableHead>
+                        <TableHead>Função</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Criado em</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredUsers.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                            Nenhum usuário encontrado.
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        filteredUsers.map((user) => (
+                          <TableRow key={user.id}>
+                            <TableCell>
+                              <div className="flex flex-col">
+                                <span className="font-medium">{user.name}</span>
+                                <span className="text-xs text-muted-foreground">{user.email}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className={user.role === 'ADMIN' ? 'border-purple-200 bg-purple-50 text-purple-700' : 'border-slate-200 bg-slate-50 text-slate-700'}>
+                                {user.role}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Badge className={user.status === 'Ativo' ? 'bg-green-500' : 'bg-red-500'}>
+                                {user.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-xs text-muted-foreground">
+                              {formatDate(user.created_at)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" className="h-8 w-8 p-0">
+                                    <span className="sr-only">Abrir menu</span>
+                                    <MoreHorizontal className="h-4 w-4" />
                                   </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Tem certeza absoluta?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Esta ação não pode ser desfeita. Isso excluirá permanentemente a conta de <b>{user.name}</b> e removerá seus dados de nossos servidores.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleDelete(user.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                      Sim, excluir conta
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            </div>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                                  <DropdownMenuItem onClick={() => handleToggleStatus(user.id, user.status)}>
+                                    {user.status === 'Ativo' ? (
+                                      <><Ban className="mr-2 h-4 w-4" /> Bloquear Acesso</>
+                                    ) : (
+                                      <><Unlock className="mr-2 h-4 w-4" /> Desbloquear</>
+                                    )}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-600">
+                                        <Trash2 className="mr-2 h-4 w-4" /> Excluir Conta
+                                      </DropdownMenuItem>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Excluir usuário permanentemente?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Esta ação não pode ser desfeita. Isso excluirá a conta de <b>{user.name}</b> e todo o histórico de consultas.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleDeleteUser(user.id)} className="bg-red-600 hover:bg-red-700">
+                                          Confirmar Exclusão
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </div>
 
-          <TabsContent value="consultations">
-            <Card className="border-none shadow-md bg-card/50 backdrop-blur-sm">
+          {/* Recent Activity (Takes up 1/3 width) */}
+          <div className="xl:col-span-1 space-y-4">
+            <Card className="shadow-sm h-full">
               <CardHeader>
-                <CardTitle>Consultas Recentes</CardTitle>
-                <CardDescription>
-                  Monitoramento em tempo real das análises realizadas pelos médicos.
-                </CardDescription>
+                <CardTitle>Últimas Consultas</CardTitle>
+                <CardDescription>Atividade recente na plataforma.</CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Data/Hora</TableHead>
-                      <TableHead>Médico Responsável</TableHead>
-                      <TableHead>Paciente</TableHead>
-                      <TableHead>Queixa Principal</TableHead>
-                      <TableHead>Diagnóstico Gerado</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {consultations.map((consult) => (
-                      <TableRow key={consult.id}>
-                        <TableCell className="font-medium text-muted-foreground">
-                          {formatDate(consult.date)}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Stethoscope className="h-4 w-4 text-primary" />
-                            {consult.doctor}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {consult.patient?.sexo || 'N/I'} ({consult.patient?.idade || 'N/I'})
-                        </TableCell>
-                        <TableCell className="max-w-xs truncate" title={consult.patient?.queixa || consult.complaint}>
-                          {consult.patient?.queixa || consult.complaint}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                            {consult.report?.diagnoses?.[0]?.name || consult.diagnosis || 'N/A'}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <div className="space-y-6">
+                  {consultations.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground text-sm">
+                      Nenhuma consulta registrada ainda.
+                    </div>
+                  ) : (
+                    consultations.slice(0, 10).map((consult, i) => (
+                      <div key={i} className="flex items-start gap-4 pb-4 border-b last:border-0 last:pb-0">
+                        <div className="h-9 w-9 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 mt-0.5">
+                          <FileText className="h-4 w-4" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium leading-none">
+                            {consult.diagnosis || "Análise Realizada"}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Dr(a). {consult.doctor}
+                          </p>
+                          <p className="text-xs text-slate-400">
+                            {formatDate(consult.date)}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+          </div>
+
+        </div>
       </main>
     </div>
   );
