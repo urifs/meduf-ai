@@ -4,7 +4,7 @@ import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Users, Activity, Database, ShieldAlert, Search, Lock } from 'lucide-react';
+import { Users, Activity, Database, ShieldAlert, Search, Lock, Shield } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
