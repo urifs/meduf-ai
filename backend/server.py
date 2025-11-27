@@ -15,6 +15,8 @@ MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
 SECRET_KEY = os.environ.get("SECRET_KEY", "supersecretkey123") # In prod, use a real secret
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 # 24 hours
+ADMIN_USER = os.environ.get("ADMIN_USER", "ur1fs")
+ADMIN_PASS = os.environ.get("ADMIN_PASS", "@Fred1807")
 
 # --- Database Setup ---
 client = AsyncIOMotorClient(MONGO_URL)
