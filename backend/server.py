@@ -226,11 +226,6 @@ async def create_consultation(consultation: ConsultationCreate, current_user: Us
     consultation_dict["user_id"] = current_user.id
     consultation_dict["created_at"] = datetime.utcnow()
     
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
-
     result = await consultations_collection.insert_one(consultation_dict)
     return {"id": str(result.inserted_id), "message": "Consultation saved"}
 
@@ -297,10 +292,13 @@ async def get_all_consultations(admin: UserInDB = Depends(get_admin_user)):
         consultations.append({
             "id": str(doc["_id"]),
             "doctor": doctor_name,
-            "patient": f"{doc['patient'].get('sexo', 'N/A')} ({doc['patient'].get('idade', 'N/A')})",
-            "complaint": doc['patient'].get('queixa', 'N/A'),
-            "diagnosis": doc['report']['diagnoses'][0]['name'] if doc['report'].get('diagnoses') else "N/A",
-            "date": doc['created_at']
+            "patient": doc['patient'],
+            "report": doc['report'],
+            "created_at": doc['created_at']
         })
     
     return consultations
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)
