@@ -5,6 +5,7 @@ import Dashboard from "@/pages/Dashboard";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import History from "@/pages/History";
+import Admin from "@/pages/Admin";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -41,6 +42,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <History />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute>
+                <Admin />
               </ProtectedRoute>
             } 
           />

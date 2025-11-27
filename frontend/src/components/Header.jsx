@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Activity, Stethoscope, User, FileText, ClipboardList, Pill, AlertCircle, CheckCircle2, BrainCircuit, LogOut } from 'lucide-react';
+import { Activity, Stethoscope, User, FileText, ClipboardList, Pill, AlertCircle, CheckCircle2, BrainCircuit, LogOut, Shield } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -42,6 +42,12 @@ export const Header = () => {
             className={`transition-colors hover:text-foreground hidden md:block ${isActive('/history') ? 'text-foreground font-bold' : 'text-foreground/60'}`}
           >
             Histórico
+          </Link>
+          <Link 
+            to="/admin" 
+            className={`transition-colors hover:text-foreground hidden md:block flex items-center gap-1 ${isActive('/admin') ? 'text-foreground font-bold' : 'text-foreground/60'}`}
+          >
+            <Shield className="h-3 w-3" /> Admin
           </Link>
           
           <div className="flex items-center gap-4 ml-4 pl-4 border-l">
