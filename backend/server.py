@@ -190,20 +190,20 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     email_query = form_data.username
     
     # Special case for the requested admin credentials if they don't exist yet
-    if form_data.username == "ur1fs" and form_data.password == "@Fred1807":
+    if form_data.username == ADMIN_USER and form_data.password == ADMIN_PASS:
         # Check if admin exists, if not create it on the fly (for demo purposes)
-        admin_user = await users_collection.find_one({"email": "ur1fs"})
+        admin_user = await users_collection.find_one({"email": ADMIN_USER})
         if not admin_user:
-            hashed = get_password_hash("@Fred1807")
+            hashed = get_password_hash(ADMIN_PASS)
             await users_collection.insert_one({
-                "email": "ur1fs",
+                "email": ADMIN_USER,
                 "name": "Administrador",
                 "password_hash": hashed,
                 "role": "ADMIN",
                 "status": "Ativo",
                 "created_at": datetime.utcnow()
             })
-        email_query = "ur1fs"
+        email_query = ADMIN_USER
 
     user = await users_collection.find_one({"email": email_query})
     
