@@ -231,7 +231,8 @@ const Admin = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-slate-50">
-                        <TableHead>Usuário</TableHead>
+                        <TableHead>Nome</TableHead>
+                        <TableHead>Email</TableHead>
                         <TableHead>Função</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Criado em</TableHead>
@@ -241,7 +242,7 @@ const Admin = () => {
                     <TableBody>
                       {filteredUsers.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                          <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                             Nenhum usuário encontrado.
                           </TableCell>
                         </TableRow>
@@ -249,10 +250,10 @@ const Admin = () => {
                         filteredUsers.map((user) => (
                           <TableRow key={user.id}>
                             <TableCell>
-                              <div className="flex flex-col">
-                                <span className="font-medium">{user.name}</span>
-                                <span className="text-xs text-muted-foreground">{user.email}</span>
-                              </div>
+                              <span className="font-medium">{user.name}</span>
+                            </TableCell>
+                            <TableCell>
+                              <span className="text-sm text-muted-foreground">{user.email}</span>
                             </TableCell>
                             <TableCell>
                               <Badge variant="outline" className={user.role === 'ADMIN' ? 'border-purple-200 bg-purple-50 text-purple-700' : 'border-slate-200 bg-slate-50 text-slate-700'}>
