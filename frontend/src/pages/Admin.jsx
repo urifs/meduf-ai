@@ -4,7 +4,7 @@ import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Users, Activity, Database, ShieldAlert, Search, Lock, Shield, Ban, Trash2, Unlock, Stethoscope } from 'lucide-react';
+import { Users, Activity, Database, ShieldAlert, Search, Lock, Shield, Ban, Trash2, Unlock, Stethoscope, Loader2 } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -91,8 +91,23 @@ const Admin = () => {
   // Helper to format date
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
-    return format(new Date(dateString), "dd/MM/yyyy HH:mm", { locale: ptBR });
+    try {
+      return format(new Date(dateString), "dd/MM/yyyy HH:mm", { locale: ptBR });
+    } catch (e) {
+      return dateString;
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background font-sans flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Carregando painel administrativo...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background font-sans">
