@@ -12,15 +12,6 @@ const Selection = () => {
     <div className="min-h-screen bg-background font-sans">
       <Header />
       <main className="container mx-auto px-4 py-16 md:px-8 flex flex-col items-center justify-center min-h-[80vh]">
-        <div className="text-center mb-12 space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground">
-            Como você deseja realizar a análise hoje?
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Escolha o modo de entrada de dados que melhor se adapta ao seu fluxo de trabalho atual.
-          </p>
-        </div>
-
         <div className="grid md:grid-cols-2 gap-8 w-full max-w-4xl">
           {/* Simple Diagnosis Option */}
           <Card 
