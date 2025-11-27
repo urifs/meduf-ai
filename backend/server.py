@@ -226,6 +226,11 @@ async def create_consultation(consultation: ConsultationCreate, current_user: Us
     consultation_dict["user_id"] = current_user.id
     consultation_dict["created_at"] = datetime.utcnow()
     
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)
+
     result = await consultations_collection.insert_one(consultation_dict)
     return {"id": str(result.inserted_id), "message": "Consultation saved"}
 
