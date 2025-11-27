@@ -12,28 +12,45 @@ import { Input } from "@/components/ui/input";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from "sonner";
+import api from '@/lib/api';
 
 const History = () => {
   const [history, setHistory] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedEntry, setSelectedEntry] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const savedHistory = JSON.parse(localStorage.getItem('meduf_history') || '[]');
-    setHistory(savedHistory);
+    fetchHistory();
   }, []);
 
-  const handleDelete = (id, e) => {
+  const fetchHistory = async () => {
+    try {
+      const response = await api.get('/consultations');
+      setHistory(response.data);
+    } catch (error) {
+      console.error("Error fetching history:", error);
+      toast.error("Erro ao carregar histórico.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (id, e) => {
     e.stopPropagation();
-    const updatedHistory = history.filter(item => item.id !== id);
-    setHistory(updatedHistory);
-    localStorage.setItem('meduf_history', JSON.stringify(updatedHistory));
-    toast.success("Registro removido do histórico.");
+    try {
+      await api.delete(`/consultations/${id}`);
+      setHistory(history.filter(item => item.id !== id));
+      toast.success("Registro removido do histórico.");
+    } catch (error) {
+      console.error("Error deleting consultation:", error);
+      toast.error("Erro ao excluir registro.");
+    }
   };
 
   const filteredHistory = history.filter(item => 
-    item.patient.queixa.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.report.diagnoses[0].name.toLowerCase().includes(searchTerm.toLowerCase())
+    (item.patient.queixa && item.patient.queixa.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (item.report.diagnoses && item.report.diagnoses[0].name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -62,7 +79,11 @@ const History = () => {
 
         <Card className="border-none shadow-md bg-card/50 backdrop-blur-sm">
           <CardContent className="p-0">
-            {history.length === 0 ? (
+            {isLoading ? (
+              <div className="text-center py-16">
+                <p className="text-muted-foreground">Carregando histórico...</p>
+              </div>
+            ) : history.length === 0 ? (
               <div className="text-center py-16">
                 <div className="bg-muted/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                   <FileText className="h-8 w-8 text-muted-foreground/50" />
@@ -92,13 +113,13 @@ const History = () => {
                       <TableCell className="font-medium text-muted-foreground">
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4" />
-                          {format(new Date(entry.date), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                          {format(new Date(entry.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col">
                           <span className="font-medium flex items-center gap-1">
-                            <User className="h-3 w-3" /> {entry.patient.sexo}, {entry.patient.idade} anos
+                            <User className="h-3 w-3" /> {entry.patient.sexo || 'N/I'}, {entry.patient.idade || 'N/I'} anos
                           </span>
                         </div>
                       </TableCell>
@@ -122,7 +143,7 @@ const History = () => {
                               <DialogHeader>
                                 <DialogTitle>Detalhes da Análise</DialogTitle>
                                 <DialogDescription>
-                                  Realizada em {format(new Date(entry.date), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR })}
+                                  Realizada em {format(new Date(entry.created_at), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR })}
                                 </DialogDescription>
                               </DialogHeader>
                               

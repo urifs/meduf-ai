@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2, UserPlus } from 'lucide-react';
+import api from '@/lib/api';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -31,15 +32,30 @@ const Register = () => {
 
     setIsLoading(true);
 
-    // Mock Registration
-    setTimeout(() => {
+    try {
+      const response = await api.post('/auth/register', {
+        email: formData.email,
+        name: formData.name,
+        password: formData.password
+      });
+
+      const { access_token, user_name, user_role } = response.data;
+
       localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('userName', formData.name);
-      localStorage.setItem('userEmail', formData.email);
+      localStorage.setItem('token', access_token);
+      localStorage.setItem('userName', user_name);
+      localStorage.setItem('userRole', user_role);
+
       toast.success("Conta criada com sucesso!");
       navigate('/');
+
+    } catch (error) {
+      console.error(error);
+      const msg = error.response?.data?.detail || "Erro ao criar conta. Tente novamente.";
+      toast.error(msg);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Activity, ArrowLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
+import api from '@/lib/api';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -17,9 +18,8 @@ const Dashboard = () => {
     setIsLoading(true);
     setReportData(null);
 
-    // Simulate AI Processing Delay
-    setTimeout(() => {
-      // Mock Logic based on input (Simple keyword matching for demo purposes)
+    // Simulate AI Processing Delay (Mock Logic for now, but saving to DB)
+    setTimeout(async () => {
       
       let mockResponse;
       const complaint = formData.queixa.toLowerCase();
@@ -117,20 +117,22 @@ const Dashboard = () => {
         };
       }
 
-      // Save to History
-      const newEntry = {
-        id: Date.now(),
-        date: new Date().toISOString(),
-        patient: formData,
-        report: mockResponse
-      };
-
-      const existingHistory = JSON.parse(localStorage.getItem('meduf_history') || '[]');
-      localStorage.setItem('meduf_history', JSON.stringify([newEntry, ...existingHistory]));
-
-      setReportData(mockResponse);
-      setIsLoading(false);
-      toast.success("Análise concluída e salva no histórico!");
+      try {
+        // Save to Backend
+        await api.post('/consultations', {
+          patient: formData,
+          report: mockResponse
+        });
+        
+        setReportData(mockResponse);
+        toast.success("Análise concluída e salva no histórico!");
+      } catch (error) {
+        console.error("Error saving consultation:", error);
+        toast.error("Erro ao salvar análise no banco de dados.");
+        setReportData(mockResponse); // Show result anyway
+      } finally {
+        setIsLoading(false);
+      }
     }, 2000);
   };
 

@@ -7,12 +7,13 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Loader2, LogIn } from 'lucide-react';
+import api from '@/lib/api';
 
 const Login = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    identifier: '', // Changed from email to identifier to accept username
+    identifier: '', 
     password: ''
   });
 
@@ -24,33 +25,40 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Mock Authentication Logic
-    setTimeout(() => {
-      if (formData.identifier && formData.password) {
-        
-        // Check for specific Admin Credentials
-        if (formData.identifier === 'ur1fs' && formData.password === '@Fred1807') {
-          localStorage.setItem('isAuthenticated', 'true');
-          localStorage.setItem('userEmail', 'admin@meduf.ai');
-          localStorage.setItem('userName', 'Administrador (ur1fs)');
-          localStorage.setItem('userRole', 'ADMIN'); // Set Admin Role
-          toast.success("Login de Administrador realizado com sucesso!");
-          navigate('/admin'); // Redirect directly to admin panel
-        } else {
-          // Standard User Login
-          localStorage.setItem('isAuthenticated', 'true');
-          localStorage.setItem('userEmail', formData.identifier.includes('@') ? formData.identifier : `${formData.identifier}@meduf.ai`);
-          localStorage.setItem('userName', 'Dr. Usuário');
-          localStorage.setItem('userRole', 'USER'); // Set Standard Role
-          toast.success("Login realizado com sucesso!");
-          navigate('/');
-        }
+    try {
+      // Use FormData for OAuth2PasswordRequestForm expected by FastAPI
+      const params = new URLSearchParams();
+      params.append('username', formData.identifier);
+      params.append('password', formData.password);
 
+      const response = await api.post('/auth/login', params, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+
+      const { access_token, user_name, user_role } = response.data;
+
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('token', access_token);
+      localStorage.setItem('userName', user_name);
+      localStorage.setItem('userRole', user_role);
+      
+      toast.success(`Bem-vindo, ${user_name}!`);
+      
+      if (user_role === 'ADMIN') {
+        navigate('/admin');
       } else {
-        toast.error("Por favor, preencha todos os campos.");
+        navigate('/');
       }
+
+    } catch (error) {
+      console.error(error);
+      const msg = error.response?.data?.detail || "Erro ao realizar login. Verifique suas credenciais.";
+      toast.error(msg);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (

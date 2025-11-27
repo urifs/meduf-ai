@@ -4,7 +4,7 @@ import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Users, Activity, Database, ShieldAlert, Search, Lock, Shield, Ban, Trash2, Unlock, FileText, Stethoscope } from 'lucide-react';
+import { Users, Activity, Database, ShieldAlert, Search, Lock, Shield, Ban, Trash2, Unlock, Stethoscope } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,70 +20,78 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import api from '@/lib/api';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 const Admin = () => {
   const navigate = useNavigate();
   const userRole = localStorage.getItem('userRole');
-
-  // Helper to format date to Brazil/Brasilia time
-  const getBrazilDate = (dateString) => {
-    const date = dateString ? new Date(dateString) : new Date();
-    return new Intl.DateTimeFormat('pt-BR', {
-      timeZone: 'America/Sao_Paulo',
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
-  };
-
-  // Initial Mock Data - Users
-  const initialUsers = [
-    { id: 999, name: localStorage.getItem('userName') || 'Usuário Atual', email: localStorage.getItem('userEmail') || 'atual@meduf.ai', role: 'Administrador (Você)', status: 'Online', joined: getBrazilDate() },
-    { id: 1, name: "Dr. Silva", email: "silva@meduf.ai", role: "Admin", status: "Ativo", joined: "15/01/2025 09:30" },
-    { id: 2, name: "Dra. Santos", email: "santos@hospital.com", role: "Médico", status: "Ativo", joined: "10/02/2025 14:15" },
-    { id: 3, name: "Dr. Oliveira", email: "oliveira@clinica.com", role: "Médico", status: "Pendente", joined: "05/03/2025 11:45" },
-    { id: 4, name: "Dr. Malicioso", email: "spam@fake.com", role: "Médico", status: "Bloqueado", joined: "01/03/2025 08:00" },
-  ];
-
-  // Initial Mock Data - Consultations
-  const mockConsultations = [
-    { id: 101, doctor: "Dr. Silva", patient: "M.A.S (45 anos)", complaint: "Dor torácica intensa", diagnosis: "Síndrome Coronariana Aguda", date: "15/03/2025 10:30" },
-    { id: 102, doctor: "Dra. Santos", patient: "J.P.L (32 anos)", complaint: "Cefaleia pulsátil", diagnosis: "Enxaqueca (Migrânea)", date: "15/03/2025 11:15" },
-    { id: 103, doctor: "Dr. Silva", patient: "R.F.O (67 anos)", complaint: "Falta de ar e edema", diagnosis: "Insuficiência Cardíaca", date: "14/03/2025 16:45" },
-    { id: 104, doctor: "Dr. Oliveira", patient: "A.B.C (22 anos)", complaint: "Dor abdominal FID", diagnosis: "Apendicite Aguda", date: "14/03/2025 09:00" },
-    { id: 105, doctor: "Dr. Malicioso", patient: "TESTE (0 anos)", complaint: "Teste de sistema", diagnosis: "Investigação Clínica Inespecífica", date: "01/03/2025 08:05" },
-  ];
-
-  const [users, setUsers] = useState(initialUsers);
-  const [consultations, setConsultations] = useState(mockConsultations);
+  const [users, setUsers] = useState([]);
+  const [consultations, setConsultations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Security Check
   useEffect(() => {
     if (userRole !== 'ADMIN') {
       navigate('/'); // Redirect non-admins to dashboard
+    } else {
+      fetchData();
     }
   }, [userRole, navigate]);
+
+  const fetchData = async () => {
+    try {
+      const [usersRes, consultsRes] = await Promise.all([
+        api.get('/admin/users'),
+        api.get('/admin/consultations')
+      ]);
+      setUsers(usersRes.data);
+      setConsultations(consultsRes.data);
+    } catch (error) {
+      console.error("Error fetching admin data:", error);
+      toast.error("Erro ao carregar dados administrativos.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (userRole !== 'ADMIN') {
     return null; // Prevent flash of content
   }
 
-  const handleToggleBlock = (userId) => {
-    setUsers(users.map(user => {
-      if (user.id === userId) {
-        const newStatus = user.status === 'Bloqueado' ? 'Ativo' : 'Bloqueado';
-        toast.success(`Usuário ${user.name} foi ${newStatus === 'Bloqueado' ? 'bloqueado' : 'desbloqueado'}.`);
-        return { ...user, status: newStatus };
-      }
-      return user;
-    }));
+  const handleToggleBlock = async (userId) => {
+    try {
+      const response = await api.patch(`/admin/users/${userId}/status`);
+      const newStatus = response.data.status;
+      
+      setUsers(users.map(user => {
+        if (user.id === userId) {
+          return { ...user, status: newStatus };
+        }
+        return user;
+      }));
+      
+      toast.success(`Status do usuário atualizado para: ${newStatus}`);
+    } catch (error) {
+      toast.error("Erro ao atualizar status do usuário.");
+    }
   };
 
-  const handleDelete = (userId) => {
-    setUsers(users.filter(user => user.id !== userId));
-    toast.success("Usuário excluído com sucesso.");
+  const handleDelete = async (userId) => {
+    try {
+      await api.delete(`/admin/users/${userId}`);
+      setUsers(users.filter(user => user.id !== userId));
+      toast.success("Usuário excluído com sucesso.");
+    } catch (error) {
+      toast.error("Erro ao excluir usuário.");
+    }
+  };
+
+  // Helper to format date
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return format(new Date(dateString), "dd/MM/yyyy HH:mm", { locale: ptBR });
   };
 
   return (
@@ -112,7 +120,7 @@ const Admin = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{users.length}</div>
-              <p className="text-xs text-muted-foreground">Atualizado agora</p>
+              <p className="text-xs text-muted-foreground">Cadastrados no sistema</p>
             </CardContent>
           </Card>
           <Card>
@@ -121,8 +129,8 @@ const Admin = () => {
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{consultations.length + 1200}</div>
-              <p className="text-xs text-muted-foreground">+15% em relação ao mês anterior</p>
+              <div className="text-2xl font-bold">{consultations.length}</div>
+              <p className="text-xs text-muted-foreground">Total de consultas registradas</p>
             </CardContent>
           </Card>
           <Card>
@@ -159,7 +167,7 @@ const Admin = () => {
                       <TableHead>Email</TableHead>
                       <TableHead>Função</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Data de Cadastro (Brasília)</TableHead>
+                      <TableHead>Data de Cadastro</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -177,9 +185,9 @@ const Admin = () => {
                             {user.status}
                           </Badge>
                         </TableCell>
-                        <TableCell>{user.joined}</TableCell>
+                        <TableCell>{formatDate(user.created_at)}</TableCell>
                         <TableCell className="text-right">
-                          {user.id !== 999 && ( // Prevent actions on self
+                          {user.role !== 'ADMIN' && ( // Prevent actions on admins for safety in this demo
                             <div className="flex items-center justify-end gap-2">
                               <Button 
                                 variant="ghost" 
@@ -242,7 +250,7 @@ const Admin = () => {
                     <TableRow>
                       <TableHead>Data/Hora</TableHead>
                       <TableHead>Médico Responsável</TableHead>
-                      <TableHead>Paciente (Iniciais)</TableHead>
+                      <TableHead>Paciente</TableHead>
                       <TableHead>Queixa Principal</TableHead>
                       <TableHead>Diagnóstico Gerado</TableHead>
                     </TableRow>
@@ -251,7 +259,7 @@ const Admin = () => {
                     {consultations.map((consult) => (
                       <TableRow key={consult.id}>
                         <TableCell className="font-medium text-muted-foreground">
-                          {consult.date}
+                          {formatDate(consult.date)}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">

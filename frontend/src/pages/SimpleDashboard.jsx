@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
+import api from '@/lib/api';
 
 const SimpleDashboard = () => {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ const SimpleDashboard = () => {
     setReportData(null);
 
     // Simulate AI Processing Delay
-    setTimeout(() => {
+    setTimeout(async () => {
       // Mock Logic based on input
       let mockResponse;
       const text = anamnese.toLowerCase();
@@ -74,24 +75,26 @@ const SimpleDashboard = () => {
         };
       }
 
-      // Save to History (Simplified structure)
-      const newEntry = {
-        id: Date.now(),
-        date: new Date().toISOString(),
-        patient: {
-          idade: "N/I",
-          sexo: "N/I",
-          queixa: anamnese.substring(0, 50) + "..." // Use start of text as complaint
-        },
-        report: mockResponse
-      };
-
-      const existingHistory = JSON.parse(localStorage.getItem('meduf_history') || '[]');
-      localStorage.setItem('meduf_history', JSON.stringify([newEntry, ...existingHistory]));
-
-      setReportData(mockResponse);
-      setIsLoading(false);
-      toast.success("Análise concluída!");
+      try {
+        // Save to Backend
+        await api.post('/consultations', {
+          patient: {
+            idade: "N/I",
+            sexo: "N/I",
+            queixa: anamnese
+          },
+          report: mockResponse
+        });
+        
+        setReportData(mockResponse);
+        toast.success("Análise concluída e salva no histórico!");
+      } catch (error) {
+        console.error("Error saving consultation:", error);
+        toast.error("Erro ao salvar análise no banco de dados.");
+        setReportData(mockResponse);
+      } finally {
+        setIsLoading(false);
+      }
     }, 2000);
   };
 
