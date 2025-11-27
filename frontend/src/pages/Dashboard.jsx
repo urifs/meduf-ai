@@ -17,7 +17,6 @@ const Dashboard = () => {
     // Simulate AI Processing Delay
     setTimeout(() => {
       // Mock Logic based on input (Simple keyword matching for demo purposes)
-      // In a real app, this would send data to the backend
       
       let mockResponse;
       const complaint = formData.queixa.toLowerCase();
@@ -115,9 +114,20 @@ const Dashboard = () => {
         };
       }
 
+      // Save to History
+      const newEntry = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        patient: formData,
+        report: mockResponse
+      };
+
+      const existingHistory = JSON.parse(localStorage.getItem('meduf_history') || '[]');
+      localStorage.setItem('meduf_history', JSON.stringify([newEntry, ...existingHistory]));
+
       setReportData(mockResponse);
       setIsLoading(false);
-      toast.success("Análise concluída com sucesso!");
+      toast.success("Análise concluída e salva no histórico!");
     }, 2000);
   };
 

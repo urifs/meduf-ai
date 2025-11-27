@@ -1,11 +1,12 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Activity, Stethoscope, User, FileText, ClipboardList, Pill, AlertCircle, CheckCircle2, BrainCircuit, LogOut } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const userName = localStorage.getItem('userName') || 'Dr. Silva';
 
   const handleLogout = () => {
@@ -15,6 +16,8 @@ export const Header = () => {
     toast.success("Logout realizado com sucesso");
     navigate('/login');
   };
+
+  const isActive = (path) => location.pathname === path;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 dark:bg-slate-950/80">
@@ -28,8 +31,18 @@ export const Header = () => {
           </span>
         </div>
         <nav className="flex items-center gap-6 text-sm font-medium">
-          <a href="#" className="text-foreground/60 transition-colors hover:text-foreground hidden md:block">Dashboard</a>
-          <a href="#" className="text-foreground/60 transition-colors hover:text-foreground hidden md:block">Histórico</a>
+          <Link 
+            to="/" 
+            className={`transition-colors hover:text-foreground hidden md:block ${isActive('/') ? 'text-foreground font-bold' : 'text-foreground/60'}`}
+          >
+            Dashboard
+          </Link>
+          <Link 
+            to="/history" 
+            className={`transition-colors hover:text-foreground hidden md:block ${isActive('/history') ? 'text-foreground font-bold' : 'text-foreground/60'}`}
+          >
+            Histórico
+          </Link>
           
           <div className="flex items-center gap-4 ml-4 pl-4 border-l">
             <div className="flex items-center gap-2">
