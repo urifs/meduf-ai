@@ -151,7 +151,7 @@ ${data.medications.map(m => `* **${m.name}** - ${m.dosage}\n    * ${m.mechanism}
 
       <Alert variant="destructive" className="bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-900">
         <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
-        <AlertTitle className="text-red-800 dark:text-red-300">Disclaimer Médico</AlertTitle>
+        <AlertTitle className="text-red-800 dark:text-red-300">Aviso Médico</AlertTitle>
         <AlertDescription className="text-red-700/80 dark:text-red-400/80 text-xs">
           Esta é uma ferramenta de auxílio à decisão clínica. A responsabilidade final pelo diagnóstico e prescrição é exclusivamente do médico assistente.
         </AlertDescription>
