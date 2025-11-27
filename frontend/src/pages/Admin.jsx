@@ -4,9 +4,10 @@ import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Users, Activity, Database, ShieldAlert, Search, Lock, Shield, Ban, Trash2, Unlock } from 'lucide-react';
+import { Users, Activity, Database, ShieldAlert, Search, Lock, Shield, Ban, Trash2, Unlock, FileText, Stethoscope } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -37,7 +38,7 @@ const Admin = () => {
     }).format(date);
   };
 
-  // Initial Mock Data
+  // Initial Mock Data - Users
   const initialUsers = [
     { id: 999, name: localStorage.getItem('userName') || 'Usuário Atual', email: localStorage.getItem('userEmail') || 'atual@meduf.ai', role: 'Administrador (Você)', status: 'Online', joined: getBrazilDate() },
     { id: 1, name: "Dr. Silva", email: "silva@meduf.ai", role: "Admin", status: "Ativo", joined: "15/01/2025 09:30" },
@@ -46,7 +47,17 @@ const Admin = () => {
     { id: 4, name: "Dr. Malicioso", email: "spam@fake.com", role: "Médico", status: "Bloqueado", joined: "01/03/2025 08:00" },
   ];
 
+  // Initial Mock Data - Consultations
+  const mockConsultations = [
+    { id: 101, doctor: "Dr. Silva", patient: "M.A.S (45 anos)", complaint: "Dor torácica intensa", diagnosis: "Síndrome Coronariana Aguda", date: "15/03/2025 10:30" },
+    { id: 102, doctor: "Dra. Santos", patient: "J.P.L (32 anos)", complaint: "Cefaleia pulsátil", diagnosis: "Enxaqueca (Migrânea)", date: "15/03/2025 11:15" },
+    { id: 103, doctor: "Dr. Silva", patient: "R.F.O (67 anos)", complaint: "Falta de ar e edema", diagnosis: "Insuficiência Cardíaca", date: "14/03/2025 16:45" },
+    { id: 104, doctor: "Dr. Oliveira", patient: "A.B.C (22 anos)", complaint: "Dor abdominal FID", diagnosis: "Apendicite Aguda", date: "14/03/2025 09:00" },
+    { id: 105, doctor: "Dr. Malicioso", patient: "TESTE (0 anos)", complaint: "Teste de sistema", diagnosis: "Investigação Clínica Inespecífica", date: "01/03/2025 08:05" },
+  ];
+
   const [users, setUsers] = useState(initialUsers);
+  const [consultations, setConsultations] = useState(mockConsultations);
 
   // Security Check
   useEffect(() => {
@@ -110,7 +121,7 @@ const Admin = () => {
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">1,234</div>
+              <div className="text-2xl font-bold">{consultations.length + 1200}</div>
               <p className="text-xs text-muted-foreground">+15% em relação ao mês anterior</p>
             </CardContent>
           </Card>
@@ -126,88 +137,145 @@ const Admin = () => {
           </Card>
         </div>
 
-        <Card className="border-none shadow-md bg-card/50 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle>Usuários Cadastrados</CardTitle>
-            <CardDescription>
-              Lista de profissionais de saúde com acesso à plataforma.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Função</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Data de Cadastro (Brasília)</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium">{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.role}</TableCell>
-                    <TableCell>
-                      <Badge variant={
-                        user.status === 'Ativo' || user.status === 'Online' ? 'default' : 
-                        user.status === 'Bloqueado' ? 'destructive' : 'secondary'
-                      }>
-                        {user.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{user.joined}</TableCell>
-                    <TableCell className="text-right">
-                      {user.id !== 999 && ( // Prevent actions on self
-                        <div className="flex items-center justify-end gap-2">
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            onClick={() => handleToggleBlock(user.id)}
-                            title={user.status === 'Bloqueado' ? "Desbloquear" : "Bloquear"}
-                            className={user.status === 'Bloqueado' ? "text-green-600 hover:text-green-700 hover:bg-green-50" : "text-orange-500 hover:text-orange-600 hover:bg-orange-50"}
-                          >
-                            {user.status === 'Bloqueado' ? <Unlock className="h-4 w-4" /> : <Ban className="h-4 w-4" />}
-                          </Button>
-                          
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
+        <Tabs defaultValue="users" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 max-w-[400px] mb-4">
+            <TabsTrigger value="users">Gerenciar Usuários</TabsTrigger>
+            <TabsTrigger value="consultations">Últimas Consultas</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="users">
+            <Card className="border-none shadow-md bg-card/50 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle>Usuários Cadastrados</CardTitle>
+                <CardDescription>
+                  Lista de profissionais de saúde com acesso à plataforma.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Função</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Data de Cadastro (Brasília)</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {users.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell className="font-medium">{user.name}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>{user.role}</TableCell>
+                        <TableCell>
+                          <Badge variant={
+                            user.status === 'Ativo' || user.status === 'Online' ? 'default' : 
+                            user.status === 'Bloqueado' ? 'destructive' : 'secondary'
+                          }>
+                            {user.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{user.joined}</TableCell>
+                        <TableCell className="text-right">
+                          {user.id !== 999 && ( // Prevent actions on self
+                            <div className="flex items-center justify-end gap-2">
                               <Button 
                                 variant="ghost" 
                                 size="icon" 
-                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                title="Excluir Usuário"
+                                onClick={() => handleToggleBlock(user.id)}
+                                title={user.status === 'Bloqueado' ? "Desbloquear" : "Bloquear"}
+                                className={user.status === 'Bloqueado' ? "text-green-600 hover:text-green-700 hover:bg-green-50" : "text-orange-500 hover:text-orange-600 hover:bg-orange-50"}
                               >
-                                <Trash2 className="h-4 w-4" />
+                                {user.status === 'Bloqueado' ? <Unlock className="h-4 w-4" /> : <Ban className="h-4 w-4" />}
                               </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Tem certeza absoluta?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Esta ação não pode ser desfeita. Isso excluirá permanentemente a conta de <b>{user.name}</b> e removerá seus dados de nossos servidores.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDelete(user.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                  Sim, excluir conta
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                              
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                    title="Excluir Usuário"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Tem certeza absoluta?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Esta ação não pode ser desfeita. Isso excluirá permanentemente a conta de <b>{user.name}</b> e removerá seus dados de nossos servidores.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleDelete(user.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                      Sim, excluir conta
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="consultations">
+            <Card className="border-none shadow-md bg-card/50 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle>Consultas Recentes</CardTitle>
+                <CardDescription>
+                  Monitoramento em tempo real das análises realizadas pelos médicos.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Data/Hora</TableHead>
+                      <TableHead>Médico Responsável</TableHead>
+                      <TableHead>Paciente (Iniciais)</TableHead>
+                      <TableHead>Queixa Principal</TableHead>
+                      <TableHead>Diagnóstico Gerado</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {consultations.map((consult) => (
+                      <TableRow key={consult.id}>
+                        <TableCell className="font-medium text-muted-foreground">
+                          {consult.date}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Stethoscope className="h-4 w-4 text-primary" />
+                            {consult.doctor}
+                          </div>
+                        </TableCell>
+                        <TableCell>{consult.patient}</TableCell>
+                        <TableCell className="max-w-xs truncate" title={consult.complaint}>
+                          {consult.complaint}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                            {consult.diagnosis}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
