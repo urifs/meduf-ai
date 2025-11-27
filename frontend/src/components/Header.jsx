@@ -10,7 +10,7 @@ export const Header = () => {
             <BrainCircuit className="h-5 w-5" />
           </div>
           <span className="text-lg font-semibold tracking-tight text-foreground">
-            MediMind <span className="text-primary">AI</span>
+            Meduf <span className="text-primary">Ai</span>
           </span>
         </div>
         <nav className="flex items-center gap-6 text-sm font-medium">
