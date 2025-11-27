@@ -1,89 +1,301 @@
-from fastapi import FastAPI, APIRouter
-from dotenv import load_dotenv
-from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
 import os
-import logging
-from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
-import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta
+from typing import List, Optional
+from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from pydantic import BaseModel, EmailStr, Field
+from motor.motor_asyncio import AsyncIOMotorClient
+from passlib.context import CryptContext
+from jose import JWTError, jwt
+from bson import ObjectId
 
+# --- Configuration ---
+MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+SECRET_KEY = os.environ.get("SECRET_KEY", "supersecretkey123") # In prod, use a real secret
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 # 24 hours
 
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+# --- Database Setup ---
+client = AsyncIOMotorClient(MONGO_URL)
+db = client.meduf_ai
+users_collection = db.users
+consultations_collection = db.consultations
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+# --- Security ---
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
-# Create the main app without a prefix
+# --- Models ---
+class PyObjectId(ObjectId):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if not ObjectId.is_valid(v):
+            raise ValueError("Invalid objectid")
+        return ObjectId(v)
+
+    @classmethod
+    def __modify_schema__(cls, field_schema):
+        field_schema.update(type="string")
+
+class UserBase(BaseModel):
+    email: EmailStr
+    name: str
+
+class UserCreate(UserBase):
+    password: str
+    crm: Optional[str] = None
+
+class UserInDB(UserBase):
+    id: str = Field(alias="_id")
+    role: str = "USER"
+    status: str = "Ativo"
+    created_at: datetime
+
+    class Config:
+        allow_population_by_field_name = True
+        json_encoders = {ObjectId: str}
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    user_name: str
+    user_role: str
+
+class ConsultationCreate(BaseModel):
+    patient: dict
+    report: dict
+
+class ConsultationInDB(BaseModel):
+    id: str = Field(alias="_id")
+    user_id: str
+    patient: dict
+    report: dict
+    created_at: datetime
+
+    class Config:
+        allow_population_by_field_name = True
+        json_encoders = {ObjectId: str}
+
+# --- Helper Functions ---
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    
+    user = await users_collection.find_one({"email": email})
+    if user is None:
+        raise credentials_exception
+    
+    # Convert ObjectId to string for the model
+    user["_id"] = str(user["_id"])
+    return UserInDB(**user)
+
+async def get_current_active_user(current_user: UserInDB = Depends(get_current_user)):
+    if current_user.status == "Bloqueado":
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+
+async def get_admin_user(current_user: UserInDB = Depends(get_current_active_user)):
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    return current_user
+
+# --- App Setup ---
 app = FastAPI()
-
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
-
-
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-class StatusCheckCreate(BaseModel):
-    client_name: str
-
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
-
-# Include the router in the main app
-app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# --- Routes ---
 
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
+@app.get("/api/")
+async def root():
+    return {"message": "Meduf AI API is running"}
+
+# Auth Routes
+@app.post("/api/auth/register", response_model=Token)
+async def register(user: UserCreate):
+    existing_user = await users_collection.find_one({"email": user.email})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    hashed_password = get_password_hash(user.password)
+    
+    # Check if it's the specific admin user
+    role = "USER"
+    if user.email == "ur1fs" or user.email == "admin@meduf.ai": # Fallback for the specific username requested
+         role = "ADMIN"
+
+    user_dict = {
+        "email": user.email,
+        "name": user.name,
+        "password_hash": hashed_password,
+        "role": role,
+        "status": "Ativo",
+        "created_at": datetime.utcnow()
+    }
+    
+    result = await users_collection.insert_one(user_dict)
+    
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.email, "role": role}, expires_delta=access_token_expires
+    )
+    
+    return {"access_token": access_token, "token_type": "bearer", "user_name": user.name, "user_role": role}
+
+@app.post("/api/auth/login", response_model=Token)
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    # Allow login with username 'ur1fs' specifically mapped to admin
+    email_query = form_data.username
+    
+    # Special case for the requested admin credentials if they don't exist yet
+    if form_data.username == "ur1fs" and form_data.password == "@Fred1807":
+        # Check if admin exists, if not create it on the fly (for demo purposes)
+        admin_user = await users_collection.find_one({"email": "ur1fs"})
+        if not admin_user:
+            hashed = get_password_hash("@Fred1807")
+            await users_collection.insert_one({
+                "email": "ur1fs",
+                "name": "Administrador",
+                "password_hash": hashed,
+                "role": "ADMIN",
+                "status": "Ativo",
+                "created_at": datetime.utcnow()
+            })
+        email_query = "ur1fs"
+
+    user = await users_collection.find_one({"email": email_query})
+    
+    if not user or not verify_password(form_data.password, user["password_hash"]):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    if user.get("status") == "Bloqueado":
+         raise HTTPException(status_code=400, detail="User account is blocked")
+
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user["email"], "role": user.get("role", "USER")}, expires_delta=access_token_expires
+    )
+    
+    return {"access_token": access_token, "token_type": "bearer", "user_name": user["name"], "user_role": user.get("role", "USER")}
+
+# Consultation Routes
+@app.post("/api/consultations", response_model=dict)
+async def create_consultation(consultation: ConsultationCreate, current_user: UserInDB = Depends(get_current_active_user)):
+    consultation_dict = consultation.dict()
+    consultation_dict["user_id"] = current_user.id
+    consultation_dict["created_at"] = datetime.utcnow()
+    
+    result = await consultations_collection.insert_one(consultation_dict)
+    return {"id": str(result.inserted_id), "message": "Consultation saved"}
+
+@app.get("/api/consultations", response_model=List[ConsultationInDB])
+async def get_consultations(current_user: UserInDB = Depends(get_current_active_user)):
+    consultations = []
+    cursor = consultations_collection.find({"user_id": current_user.id}).sort("created_at", -1)
+    async for document in cursor:
+        document["_id"] = str(document["_id"])
+        consultations.append(ConsultationInDB(**document))
+    return consultations
+
+@app.delete("/api/consultations/{id}")
+async def delete_consultation(id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    result = await consultations_collection.delete_one({"_id": ObjectId(id), "user_id": current_user.id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Consultation not found")
+    return {"message": "Consultation deleted"}
+
+# Admin Routes
+@app.get("/api/admin/users", response_model=List[UserInDB])
+async def get_all_users(admin: UserInDB = Depends(get_admin_user)):
+    users = []
+    cursor = users_collection.find({}).sort("created_at", -1)
+    async for document in cursor:
+        document["_id"] = str(document["_id"])
+        users.append(UserInDB(**document))
+    return users
+
+@app.patch("/api/admin/users/{id}/status")
+async def toggle_user_status(id: str, admin: UserInDB = Depends(get_admin_user)):
+    user = await users_collection.find_one({"_id": ObjectId(id)})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    new_status = "Bloqueado" if user.get("status") == "Ativo" else "Ativo"
+    await users_collection.update_one({"_id": ObjectId(id)}, {"$set": {"status": new_status}})
+    return {"status": new_status}
+
+@app.delete("/api/admin/users/{id}")
+async def delete_user(id: str, admin: UserInDB = Depends(get_admin_user)):
+    # Delete user
+    result = await users_collection.delete_one({"_id": ObjectId(id)})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Delete user's consultations
+    await consultations_collection.delete_many({"user_id": id})
+    
+    return {"message": "User and associated data deleted"}
+
+@app.get("/api/admin/consultations")
+async def get_all_consultations(admin: UserInDB = Depends(get_admin_user)):
+    # This is a simplified view for the admin dashboard
+    consultations = []
+    # Join with users to get doctor name would be better, but for now we'll fetch recent ones
+    cursor = consultations_collection.find({}).sort("created_at", -1).limit(50)
+    
+    async for doc in cursor:
+        # Fetch doctor name
+        user = await users_collection.find_one({"_id": ObjectId(doc["user_id"])})
+        doctor_name = user["name"] if user else "Unknown"
+        
+        consultations.append({
+            "id": str(doc["_id"]),
+            "doctor": doctor_name,
+            "patient": f"{doc['patient'].get('sexo', 'N/A')} ({doc['patient'].get('idade', 'N/A')})",
+            "complaint": doc['patient'].get('queixa', 'N/A'),
+            "diagnosis": doc['report']['diagnoses'][0]['name'] if doc['report'].get('diagnoses') else "N/A",
+            "date": doc['created_at']
+        })
+    
+    return consultations
