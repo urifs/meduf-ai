@@ -17,7 +17,8 @@ import {
   Unlock, 
   MoreHorizontal,
   FileText,
-  AlertCircle
+  AlertCircle,
+  Database
 } from 'lucide-react';
 import {
   DropdownMenu,
