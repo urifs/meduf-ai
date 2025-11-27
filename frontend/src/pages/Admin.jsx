@@ -54,13 +54,16 @@ const Admin = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
-  // --- Authentication Check ---
+  // --- Authentication Check & Polling ---
   useEffect(() => {
     if (userRole !== 'ADMIN') {
       toast.error("Acesso negado. Área restrita para administradores.");
       navigate('/'); 
     } else {
       fetchData();
+      // Poll every 5 seconds to keep the list updated in real-time
+      const interval = setInterval(fetchData, 5000);
+      return () => clearInterval(interval);
     }
   }, [userRole, navigate]);
 
