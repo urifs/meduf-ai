@@ -31,25 +31,15 @@ const Admin = () => {
   const [consultations, setConsultations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Mock Data (Legacy/Simulation)
-  const mockUsers = [
-    { id: "mock-1", name: "Dr. Silva", email: "silva@meduf.ai", role: "Admin", status: "Ativo", created_at: "2025-01-15T09:30:00" },
-    { id: "mock-2", name: "Dra. Santos", email: "santos@hospital.com", role: "Médico", status: "Ativo", created_at: "2025-02-10T14:15:00" },
-    { id: "mock-3", name: "Dr. Oliveira", email: "oliveira@clinica.com", role: "Médico", status: "Pendente", created_at: "2025-03-05T11:45:00" },
-    { id: "mock-4", name: "Dr. Malicioso", email: "spam@fake.com", role: "Médico", status: "Bloqueado", created_at: "2025-03-01T08:00:00" },
-  ];
-
-  const mockConsultations = [
-    { id: "mock-c1", doctor: "Dr. Silva", patient: { sexo: "Masculino", idade: "45", queixa: "Dor torácica intensa" }, report: { diagnoses: [{ name: "Síndrome Coronariana Aguda" }] }, date: "2025-03-15T10:30:00" },
-    { id: "mock-c2", doctor: "Dra. Santos", patient: { sexo: "Feminino", idade: "32", queixa: "Cefaleia pulsátil" }, report: { diagnoses: [{ name: "Enxaqueca (Migrânea)" }] }, date: "2025-03-15T11:15:00" },
-  ];
-
   // Security Check
   useEffect(() => {
     if (userRole !== 'ADMIN') {
       navigate('/'); // Redirect non-admins to dashboard
     } else {
+      // Set up polling for real-time updates
       fetchData();
+      const interval = setInterval(fetchData, 5000); // Poll every 5 seconds
+      return () => clearInterval(interval);
     }
   }, [userRole, navigate]);
 
@@ -60,25 +50,23 @@ const Admin = () => {
         api.get('/admin/consultations')
       ]);
       
-      // Combine Real DB Data with Mock Data
-      setUsers([...usersRes.data, ...mockUsers]);
+      setUsers(usersRes.data);
       
-      // Map real consultations to match the structure if needed, or just combine
-      // The backend returns a specific structure for admin consultations, let's match it
+      // Map real consultations to match the structure if needed
       const realConsultations = consultsRes.data.map(c => ({
         ...c,
         // Ensure date field consistency
         date: c.date || c.created_at 
       }));
 
-      setConsultations([...realConsultations, ...mockConsultations]);
+      setConsultations(realConsultations);
 
     } catch (error) {
       console.error("Error fetching admin data:", error);
-      toast.error("Erro ao carregar dados do servidor. Mostrando dados locais.");
-      // Fallback to mocks on error
-      setUsers(mockUsers);
-      setConsultations(mockConsultations);
+      // Only show toast on initial load failure to avoid spamming
+      if (isLoading) {
+        toast.error("Erro ao carregar dados do servidor.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -89,20 +77,6 @@ const Admin = () => {
   }
 
   const handleToggleBlock = async (userId) => {
-    // Handle Mock Users locally
-    if (userId.toString().startsWith('mock-')) {
-      setUsers(users.map(user => {
-        if (user.id === userId) {
-          const newStatus = user.status === 'Bloqueado' ? 'Ativo' : 'Bloqueado';
-          toast.success(`(Simulação) Usuário ${user.name} foi ${newStatus === 'Bloqueado' ? 'bloqueado' : 'desbloqueado'}.`);
-          return { ...user, status: newStatus };
-        }
-        return user;
-      }));
-      return;
-    }
-
-    // Handle Real Users via API
     try {
       const response = await api.patch(`/admin/users/${userId}/status`);
       const newStatus = response.data.status;
@@ -121,14 +95,6 @@ const Admin = () => {
   };
 
   const handleDelete = async (userId) => {
-    // Handle Mock Users locally
-    if (userId.toString().startsWith('mock-')) {
-      setUsers(users.filter(user => user.id !== userId));
-      toast.success("(Simulação) Usuário excluído com sucesso.");
-      return;
-    }
-
-    // Handle Real Users via API
     try {
       await api.delete(`/admin/users/${userId}`);
       setUsers(users.filter(user => user.id !== userId));
