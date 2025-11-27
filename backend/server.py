@@ -46,7 +46,7 @@ class PyObjectId(ObjectId):
         field_schema.update(type="string")
 
 class UserBase(BaseModel):
-    email: EmailStr
+    email: str
     name: str
 
 class UserCreate(UserBase):
