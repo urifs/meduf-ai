@@ -18,7 +18,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 # 24 hours
 
 # --- Database Setup ---
 client = AsyncIOMotorClient(MONGO_URL)
-db = client.meduf_ai
+try:
+    db = client.get_default_database()
+except Exception:
+    db = client.meduf_ai
 users_collection = db.users
 consultations_collection = db.consultations
 
