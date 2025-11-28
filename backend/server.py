@@ -379,6 +379,9 @@ async def create_user_admin(user: UserCreate, admin: UserInDB = Depends(get_admi
     # Set expiration date (custom days from now)
     created_at = datetime.utcnow()
     expiration_date = created_at + timedelta(days=user.days_valid)
+    
+    # Generate Session ID
+    session_id = str(uuid.uuid4())
 
     user_dict = {
         "email": user.email,
@@ -387,7 +390,8 @@ async def create_user_admin(user: UserCreate, admin: UserInDB = Depends(get_admi
         "role": user.role,
         "status": "Ativo",
         "created_at": created_at,
-        "expiration_date": expiration_date
+        "expiration_date": expiration_date,
+        "session_id": session_id
     }
     
     result = await users_collection.insert_one(user_dict)
