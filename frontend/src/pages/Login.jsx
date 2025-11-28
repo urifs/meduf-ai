@@ -57,8 +57,26 @@ const Login = () => {
 
     } catch (error) {
       console.error(error);
-      const msg = error.response?.data?.detail || "Erro ao realizar login. Verifique suas credenciais.";
-      toast.error(msg);
+      
+      // Specific Error Handling
+      if (error.response) {
+        const status = error.response.status;
+        const detail = error.response.data?.detail;
+
+        if (status === 404) {
+          toast.error("Usuário não encontrado. Verifique o email ou nome de usuário.");
+        } else if (status === 401) {
+          toast.error("Senha incorreta. Tente novamente.");
+        } else if (status === 403) {
+          toast.error(detail || "Acesso negado.");
+        } else if (status === 400 && detail === "User account is blocked") {
+          toast.error("Esta conta foi bloqueada pelo administrador.");
+        } else {
+          toast.error("Erro ao realizar login. Tente novamente mais tarde.");
+        }
+      } else {
+        toast.error("Erro de conexão. Verifique sua internet.");
+      }
     } finally {
       setIsLoading(false);
     }
