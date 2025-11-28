@@ -288,9 +288,9 @@ async def create_user_admin(user: UserCreate, admin: UserInDB = Depends(get_admi
     
     hashed_password = get_password_hash(user.password)
     
-    # Set expiration date (30 days from now)
+    # Set expiration date (custom days from now)
     created_at = datetime.utcnow()
-    expiration_date = created_at + timedelta(days=30)
+    expiration_date = created_at + timedelta(days=user.days_valid)
 
     user_dict = {
         "email": user.email,
