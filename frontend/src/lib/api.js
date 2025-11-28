@@ -27,7 +27,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
+    // Don't redirect if it's a login attempt (let the component handle the error)
+    if (error.response && error.response.status === 401 && !error.config.url.includes('/auth/login')) {
       localStorage.clear();
       window.location.href = '/login';
     }
