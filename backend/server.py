@@ -440,6 +440,18 @@ async def get_all_consultations(admin: UserInDB = Depends(get_admin_user)):
 async def list_collections(admin: UserInDB = Depends(get_admin_user)):
     return await db.list_collection_names()
 
+@app.delete("/api/admin/db/collections/{collection_name}")
+async def drop_collection(collection_name: str, admin: UserInDB = Depends(get_admin_user)):
+    if collection_name not in await db.list_collection_names():
+        raise HTTPException(status_code=404, detail="Collection not found")
+    
+    # Prevent deleting critical collections if necessary, but for a DB manager, maybe allow it with caution.
+    # Let's protect 'users' just in case, or leave it open as requested "qualquer informação".
+    # User asked for "qualquer informação", so I will allow it.
+    
+    await db[collection_name].drop()
+    return {"message": f"Collection {collection_name} dropped"}
+
 @app.get("/api/admin/db/{collection_name}")
 async def list_documents(collection_name: str, limit: int = 50, skip: int = 0, q: Optional[str] = None, admin: UserInDB = Depends(get_admin_user)):
     if collection_name not in await db.list_collection_names():
