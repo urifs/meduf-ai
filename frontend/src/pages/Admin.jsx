@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -71,13 +71,21 @@ const Admin = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '', days_valid: 30 });
 
-  // --- Legacy/Mock Data (To ensure the panel is never empty during transition) ---
-  const legacyUsers = [
+  // --- Legacy/Mock Data State ---
+  // We use a Ref to keep track of legacy users so the polling interval always sees the latest version
+  // (preventing deleted mock users from reappearing)
+  const [legacyUsers, setLegacyUsers] = useState([
     { id: "legacy-1", name: "Dr. Silva", email: "silva@meduf.ai", role: "Admin", status: "Ativo", created_at: "2025-01-15T09:30:00" },
     { id: "legacy-2", name: "Dra. Santos", email: "santos@hospital.com", role: "Médico", status: "Ativo", created_at: "2025-02-10T14:15:00" },
     { id: "legacy-3", name: "Dr. Oliveira", email: "oliveira@clinica.com", role: "Médico", status: "Pendente", created_at: "2025-03-05T11:45:00" },
     { id: "legacy-4", name: "Dr. Malicioso", email: "spam@fake.com", role: "Médico", status: "Bloqueado", created_at: "2025-03-01T08:00:00" },
-  ];
+  ]);
+  
+  const legacyUsersRef = useRef(legacyUsers);
+
+  useEffect(() => {
+    legacyUsersRef.current = legacyUsers;
+  }, [legacyUsers]);
 
   const legacyConsultations = [
     { id: "legacy-c1", doctor: "Dr. Silva", diagnosis: "Síndrome Coronariana Aguda", date: "2025-03-15T10:30:00" },
@@ -106,9 +114,13 @@ const Admin = () => {
         api.get('/admin/consultations')
       ]);
 
-      // MERGE: Real DB Users + Legacy Mock Users
-      const allUsers = [...usersRes.data, ...legacyUsers];
+      // MERGE: Real DB Users + Current Legacy Users (from Ref)
+      const currentLegacyUsers = legacyUsersRef.current;
+      const allUsers = [...usersRes.data, ...currentLegacyUsers];
+      
+      // Deduplicate by email (Real users take precedence if email matches)
       const uniqueUsers = Array.from(new Map(allUsers.map(item => [item.email, item])).values());
+      
       setUsers(uniqueUsers);
       
       // Merge Consultations
@@ -122,10 +134,13 @@ const Admin = () => {
       
     } catch (error) {
       console.error("Admin Fetch Error:", error);
+      // If API fails, show at least the legacy users
+      setUsers(legacyUsersRef.current);
+      setConsultations(legacyConsultations);
+      
+      // Only show toast if it's the first load, to avoid spamming
       if (users.length === 0) {
-        setUsers(legacyUsers);
-        setConsultations(legacyConsultations);
-        toast.error("Conexão instável. Exibindo dados locais.");
+         toast.error("Conexão instável. Exibindo dados locais.");
       }
     } finally {
       setIsLoading(false);
@@ -153,7 +168,13 @@ const Admin = () => {
     // Handle Legacy Users (Simulation)
     if (userId.toString().startsWith('legacy-')) {
       const newStatus = currentStatus === 'Bloqueado' ? 'Ativo' : 'Bloqueado';
-      setUsers(users.map(u => u.id === userId ? { ...u, status: newStatus } : u));
+      
+      const updatedLegacy = legacyUsers.map(u => u.id === userId ? { ...u, status: newStatus } : u);
+      setLegacyUsers(updatedLegacy);
+      
+      // Optimistic update for the view
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: newStatus } : u));
+      
       toast.success(`(Simulação) Status atualizado para: ${newStatus}`);
       return;
     }
@@ -172,7 +193,12 @@ const Admin = () => {
   const handleDeleteUser = async (userId) => {
     // Handle Legacy Users (Simulation)
     if (userId.toString().startsWith('legacy-')) {
-      setUsers(users.filter(u => u.id !== userId));
+      const updatedLegacy = legacyUsers.filter(u => u.id !== userId);
+      setLegacyUsers(updatedLegacy);
+      
+      // Optimistic update for the view
+      setUsers(prev => prev.filter(u => u.id !== userId));
+      
       toast.success("(Simulação) Usuário excluído.");
       return;
     }
