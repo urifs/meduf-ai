@@ -441,12 +441,35 @@ async def list_collections(admin: UserInDB = Depends(get_admin_user)):
     return await db.list_collection_names()
 
 @app.get("/api/admin/db/{collection_name}")
-async def list_documents(collection_name: str, limit: int = 50, skip: int = 0, admin: UserInDB = Depends(get_admin_user)):
+async def list_documents(collection_name: str, limit: int = 50, skip: int = 0, q: Optional[str] = None, admin: UserInDB = Depends(get_admin_user)):
     if collection_name not in await db.list_collection_names():
         raise HTTPException(status_code=404, detail="Collection not found")
     
     collection = db[collection_name]
-    cursor = collection.find({}).skip(skip).limit(limit).sort("_id", -1)
+    query = {}
+    if q:
+        # 1. Try to parse as direct JSON query
+        try:
+            import json
+            query = json.loads(q)
+        except:
+            # 2. Construct a text/regex search
+            search_conditions = []
+            
+            # ID Match
+            if ObjectId.is_valid(q):
+                search_conditions.append({"_id": ObjectId(q)})
+            
+            # Regex match on common fields
+            regex = {"$regex": q, "$options": "i"}
+            fields_to_search = ["name", "email", "role", "status", "patient.queixa", "patient.sexo", "doctor"]
+            
+            for field in fields_to_search:
+                search_conditions.append({field: regex})
+                
+            query = {"$or": search_conditions}
+
+    cursor = collection.find(query).skip(skip).limit(limit).sort("_id", -1)
     documents = []
     async for doc in cursor:
         # Convert ObjectId and datetime to string/isoformat for JSON serialization
