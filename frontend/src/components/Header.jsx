@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Activity, Stethoscope, User, FileText, ClipboardList, Pill, AlertCircle, CheckCircle2, BrainCircuit, LogOut, Shield, Menu, Clock } from 'lucide-react';
+import { Activity, Stethoscope, User, FileText, ClipboardList, Pill, AlertCircle, CheckCircle2, BrainCircuit, LogOut, Shield, Menu, Clock, Settings } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
@@ -97,6 +97,14 @@ export const Header = () => {
                 >
                   <ClipboardList className="h-4 w-4" />
                   Histórico
+                </Link>
+
+                <Link 
+                  to="/profile" 
+                  className={`flex items-center gap-2 px-4 py-3 rounded-md transition-colors ${isActive('/profile') ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted text-foreground/80'}`}
+                >
+                  <Settings className="h-4 w-4" />
+                  Meu Perfil
                 </Link>
                 
                 {userRole === 'ADMIN' && (
