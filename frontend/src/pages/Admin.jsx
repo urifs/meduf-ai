@@ -71,6 +71,19 @@ const Admin = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '' });
 
+  // --- Legacy/Mock Data (To ensure the panel is never empty during transition) ---
+  const legacyUsers = [
+    { id: "legacy-1", name: "Dr. Silva", email: "silva@meduf.ai", role: "Admin", status: "Ativo", created_at: "2025-01-15T09:30:00" },
+    { id: "legacy-2", name: "Dra. Santos", email: "santos@hospital.com", role: "Médico", status: "Ativo", created_at: "2025-02-10T14:15:00" },
+    { id: "legacy-3", name: "Dr. Oliveira", email: "oliveira@clinica.com", role: "Médico", status: "Pendente", created_at: "2025-03-05T11:45:00" },
+    { id: "legacy-4", name: "Dr. Malicioso", email: "spam@fake.com", role: "Médico", status: "Bloqueado", created_at: "2025-03-01T08:00:00" },
+  ];
+
+  const legacyConsultations = [
+    { id: "legacy-c1", doctor: "Dr. Silva", diagnosis: "Síndrome Coronariana Aguda", date: "2025-03-15T10:30:00" },
+    { id: "legacy-c2", doctor: "Dra. Santos", diagnosis: "Enxaqueca (Migrânea)", date: "2025-03-15T11:15:00" },
+  ];
+
   // --- Authentication Check & Polling ---
   useEffect(() => {
     if (userRole !== 'ADMIN') {
@@ -93,20 +106,26 @@ const Admin = () => {
         api.get('/admin/consultations')
       ]);
 
-      setUsers(usersRes.data);
+      // MERGE: Real DB Users + Legacy Mock Users
+      const allUsers = [...usersRes.data, ...legacyUsers];
+      const uniqueUsers = Array.from(new Map(allUsers.map(item => [item.email, item])).values());
+      setUsers(uniqueUsers);
       
+      // Merge Consultations
       const realConsultations = consultsRes.data.map(c => ({
         ...c,
         date: c.date || c.created_at 
       }));
-      setConsultations(realConsultations);
+      setConsultations([...realConsultations, ...legacyConsultations]);
       
       setLastUpdated(new Date());
       
     } catch (error) {
       console.error("Admin Fetch Error:", error);
       if (users.length === 0) {
-        toast.error("Conexão instável.");
+        setUsers(legacyUsers);
+        setConsultations(legacyConsultations);
+        toast.error("Conexão instável. Exibindo dados locais.");
       }
     } finally {
       setIsLoading(false);
@@ -131,6 +150,14 @@ const Admin = () => {
   };
 
   const handleToggleStatus = async (userId, currentStatus) => {
+    // Handle Legacy Users (Simulation)
+    if (userId.toString().startsWith('legacy-')) {
+      const newStatus = currentStatus === 'Bloqueado' ? 'Ativo' : 'Bloqueado';
+      setUsers(users.map(u => u.id === userId ? { ...u, status: newStatus } : u));
+      toast.success(`(Simulação) Status atualizado para: ${newStatus}`);
+      return;
+    }
+
     try {
       const response = await api.patch(`/admin/users/${userId}/status`);
       const newStatus = response.data.status;
@@ -143,6 +170,13 @@ const Admin = () => {
   };
 
   const handleDeleteUser = async (userId) => {
+    // Handle Legacy Users (Simulation)
+    if (userId.toString().startsWith('legacy-')) {
+      setUsers(users.filter(u => u.id !== userId));
+      toast.success("(Simulação) Usuário excluído.");
+      return;
+    }
+
     try {
       await api.delete(`/admin/users/${userId}`);
       setUsers(users.filter(u => u.id !== userId));
