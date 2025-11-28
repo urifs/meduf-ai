@@ -29,8 +29,10 @@ export const Header = () => {
       const end = new Date(userExpiration);
       
       if (end > now) {
-        const duration = intervalToDuration({ start: now, end: end });
-        setTimeLeft(duration);
+        const totalDays = differenceInDays(end, now);
+        const totalHours = differenceInHours(end, now);
+        const hoursPart = totalHours % 24;
+        setTimeLeft({ days: totalDays, hours: hoursPart });
       } else {
         setTimeLeft({ days: 0, hours: 0 });
       }
