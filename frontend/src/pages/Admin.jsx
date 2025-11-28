@@ -438,6 +438,11 @@ const Admin = () => {
                                 {user.status}
                               </Badge>
                             </TableCell>
+                            <TableCell>
+                              <span className={`text-xs ${getDaysColor(user.expiration_date)}`}>
+                                {getDaysRemaining(user.expiration_date)}
+                              </span>
+                            </TableCell>
                             <TableCell className="text-xs text-muted-foreground">
                               {formatDate(user.created_at)}
                             </TableCell>
