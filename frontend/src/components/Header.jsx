@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Activity, Stethoscope, User, FileText, ClipboardList, Pill, AlertCircle, CheckCircle2, BrainCircuit, LogOut, Shield, Menu, Clock, Settings } from 'lucide-react';
+import { Activity, Stethoscope, User, FileText, ClipboardList, Pill, AlertCircle, CheckCircle2, BrainCircuit, LogOut, Shield, Menu, Clock, Settings, Database } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
@@ -135,13 +135,22 @@ export const Header = () => {
                 </Link>
                 
                 {userRole === 'ADMIN' && (
-                  <Link 
-                    to="/admin" 
-                    className={`flex items-center gap-2 px-4 py-3 rounded-md transition-colors ${isActive('/admin') ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted text-foreground/80'}`}
-                  >
-                    <Shield className="h-4 w-4" />
-                    Admin
-                  </Link>
+                  <>
+                    <Link 
+                      to="/admin" 
+                      className={`flex items-center gap-2 px-4 py-3 rounded-md transition-colors ${isActive('/admin') ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted text-foreground/80'}`}
+                    >
+                      <Shield className="h-4 w-4" />
+                      Admin
+                    </Link>
+                    <Link 
+                      to="/database" 
+                      className={`flex items-center gap-2 px-4 py-3 rounded-md transition-colors ${isActive('/database') ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted text-foreground/80'}`}
+                    >
+                      <Database className="h-4 w-4" />
+                      Banco de Dados
+                    </Link>
+                  </>
                 )}
               </nav>
 
