@@ -4,7 +4,7 @@ import { Activity, Stethoscope, User, FileText, ClipboardList, Pill, AlertCircle
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
-import { differenceInDays, intervalToDuration } from 'date-fns';
+import { differenceInDays, differenceInHours } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export const Header = () => {
