@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,22 +6,25 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { User, Save, Loader2, Camera } from 'lucide-react';
+import { User, Save, Loader2, Camera, Upload } from 'lucide-react';
 import api from '@/lib/api';
 
 const Profile = () => {
   const [user, setUser] = useState({
     name: localStorage.getItem('userName') || '',
-    email: '', // We don't store email in localstorage usually, but we can fetch it or just show name
-    avatar_url: ''
+    avatar_url: localStorage.getItem('userAvatar') || ''
   });
-  const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
-  // Fetch user data on mount (we need a new endpoint for this or just use what we have)
-  // Since we don't have a dedicated "get me" endpoint that returns everything, we might need to rely on localstorage or add one.
-  // Actually, `get_current_active_user` is used as dependency, so we can make a simple endpoint or just update what we can.
-  // Let's assume we can update name and avatar.
+  // Helper to resolve avatar URL
+  const getAvatarUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    // If relative path, prepend backend URL
+    return `${process.env.REACT_APP_BACKEND_URL}${url}`;
+  };
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -32,7 +35,6 @@ const Profile = () => {
         avatar_url: user.avatar_url
       });
       
-      // Update local storage
       localStorage.setItem('userName', response.data.name);
       if (response.data.avatar_url) {
         localStorage.setItem('userAvatar', response.data.avatar_url);
@@ -44,6 +46,43 @@ const Profile = () => {
       toast.error("Erro ao atualizar perfil.");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleFileSelect = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Basic validation
+    if (!file.type.startsWith('image/')) {
+      toast.error("Por favor, selecione um arquivo de imagem.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      toast.error("A imagem deve ter no máximo 5MB.");
+      return;
+    }
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await api.post('/users/me/avatar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      const newAvatarUrl = response.data.avatar_url;
+      setUser(prev => ({ ...prev, avatar_url: newAvatarUrl }));
+      localStorage.setItem('userAvatar', newAvatarUrl);
+      toast.success("Foto de perfil atualizada!");
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Erro ao fazer upload da imagem.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -71,26 +110,47 @@ const Profile = () => {
               <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-8">
                 <div className="relative group">
                   <Avatar className="h-24 w-24 border-2 border-muted">
-                    <AvatarImage src={user.avatar_url} />
+                    <AvatarImage src={getAvatarUrl(user.avatar_url)} className="object-cover" />
                     <AvatarFallback className="text-2xl bg-primary/10 text-primary">
                       {user.name.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                    <Camera className="h-8 w-8 text-white" />
+                  
+                  <div 
+                    className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    {isUploading ? (
+                      <Loader2 className="h-8 w-8 text-white animate-spin" />
+                    ) : (
+                      <Camera className="h-8 w-8 text-white" />
+                    )}
                   </div>
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="hidden" 
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                  />
                 </div>
                 
                 <div className="flex-1 space-y-2 w-full">
-                  <Label htmlFor="avatar_url">URL da Foto de Perfil</Label>
-                  <Input 
-                    id="avatar_url" 
-                    placeholder="https://exemplo.com/foto.jpg" 
-                    value={user.avatar_url}
-                    onChange={(e) => setUser({...user, avatar_url: e.target.value})}
-                  />
+                  <Label>Foto de Perfil</Label>
+                  <div className="flex gap-2">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploading}
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Carregar do Dispositivo
+                    </Button>
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    Cole o link de uma imagem para usar como foto de perfil.
+                    JPG, PNG ou GIF. Máximo 5MB.
                   </p>
                 </div>
               </div>
