@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
 import { differenceInDays, intervalToDuration } from 'date-fns';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -12,7 +13,15 @@ export const Header = () => {
   const userName = localStorage.getItem('userName') || 'Dr. Silva';
   const userRole = localStorage.getItem('userRole');
   const userExpiration = localStorage.getItem('userExpiration');
+  const userAvatar = localStorage.getItem('userAvatar');
   const [timeLeft, setTimeLeft] = useState(null);
+
+  // Helper to resolve avatar URL
+  const getAvatarUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `${process.env.REACT_APP_BACKEND_URL}${url}`;
+  };
 
   useEffect(() => {
     if (userExpiration) {
@@ -76,9 +85,12 @@ export const Header = () => {
             <div className="flex flex-col gap-6 mt-8">
               {/* User Profile Section in Menu */}
               <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  <User className="h-5 w-5" />
-                </div>
+                <Avatar className="h-10 w-10 border border-muted">
+                  <AvatarImage src={getAvatarUrl(userAvatar)} className="object-cover" />
+                  <AvatarFallback className="bg-primary/10 text-primary">
+                    {userName.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">{userName}</span>
                   <span className="text-xs text-muted-foreground">{userRole === 'ADMIN' ? 'Administrador' : 'Médico'}</span>
