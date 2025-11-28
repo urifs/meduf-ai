@@ -53,6 +53,7 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str
     crm: Optional[str] = None
+    days_valid: int = 30
 
 class UserInDB(UserBase):
     id: str = Field(alias="_id")
