@@ -1,18 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Activity, Stethoscope, User, FileText, ClipboardList, Pill, AlertCircle, CheckCircle2, BrainCircuit, LogOut, Shield, Menu } from 'lucide-react';
+import { Activity, Stethoscope, User, FileText, ClipboardList, Pill, AlertCircle, CheckCircle2, BrainCircuit, LogOut, Shield, Menu, Clock } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
+import { differenceInDays } from 'date-fns';
 
 export const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const userName = localStorage.getItem('userName') || 'Dr. Silva';
-  const userRole = localStorage.getItem('userRole'); // Get User Role
+  const userRole = localStorage.getItem('userRole');
+  const userExpiration = localStorage.getItem('userExpiration');
+  const [daysRemaining, setDaysRemaining] = useState(null);
+
+  useEffect(() => {
+    if (userExpiration) {
+      const days = differenceInDays(new Date(userExpiration), new Date());
+      setDaysRemaining(days);
+    }
+  }, [userExpiration]);
 
   const handleLogout = () => {
-    localStorage.clear(); // Clear all storage including role
+    localStorage.clear();
     toast.success("Logout realizado com sucesso");
     navigate('/login');
   };
@@ -59,6 +69,17 @@ export const Header = () => {
                   <span className="text-xs text-muted-foreground">{userRole === 'ADMIN' ? 'Administrador' : 'Médico'}</span>
                 </div>
               </div>
+
+              {/* Expiration Counter */}
+              {daysRemaining !== null && userRole !== 'ADMIN' && (
+                <div className={`flex items-center gap-3 p-3 rounded-lg border ${daysRemaining < 5 ? 'bg-red-50 border-red-200 text-red-700' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>
+                  <Clock className="h-5 w-5" />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-bold">{daysRemaining} dias restantes</span>
+                    <span className="text-xs opacity-80">Sua conta expira em breve</span>
+                  </div>
+                </div>
+              )}
 
               {/* Navigation Links */}
               <nav className="flex flex-col gap-2">

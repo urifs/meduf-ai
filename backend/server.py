@@ -1,4 +1,5 @@
 import os
+import asyncio
 from datetime import datetime, timedelta
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, Depends, status
@@ -58,6 +59,7 @@ class UserInDB(UserBase):
     role: str = "USER"
     status: str = "Ativo"
     created_at: Optional[datetime] = None
+    expiration_date: Optional[datetime] = None
 
     class Config:
         populate_by_name = True
@@ -68,6 +70,7 @@ class Token(BaseModel):
     token_type: str
     user_name: str
     user_role: str
+    expiration_date: Optional[datetime] = None
 
 class ConsultationCreate(BaseModel):
     patient: dict
@@ -133,8 +136,31 @@ async def get_admin_user(current_user: UserInDB = Depends(get_current_active_use
         raise HTTPException(status_code=403, detail="Not authorized")
     return current_user
 
+# --- Background Tasks ---
+async def remove_expired_users():
+    """Background task to remove users whose expiration date has passed."""
+    while True:
+        try:
+            now = datetime.utcnow()
+            # Find users where expiration_date exists and is less than now
+            result = await users_collection.delete_many({
+                "expiration_date": {"$lt": now},
+                "role": {"$ne": "ADMIN"} # Never delete admins automatically
+            })
+            if result.deleted_count > 0:
+                print(f"Cleaned up {result.deleted_count} expired user accounts.")
+        except Exception as e:
+            print(f"Error in cleanup task: {e}")
+        
+        # Run every hour
+        await asyncio.sleep(3600)
+
 # --- App Setup ---
 app = FastAPI()
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(remove_expired_users())
 
 app.add_middleware(
     CORSMiddleware,
@@ -161,8 +187,12 @@ async def register(user: UserCreate):
     
     # Check if it's the specific admin user
     role = "USER"
-    if user.email == "ur1fs" or user.email == "admin@meduf.ai": # Fallback for the specific username requested
+    if user.email == "ur1fs" or user.email == "admin@meduf.ai": 
          role = "ADMIN"
+
+    # Set expiration date (30 days from now)
+    created_at = datetime.utcnow()
+    expiration_date = created_at + timedelta(days=30)
 
     user_dict = {
         "email": user.email,
@@ -170,7 +200,8 @@ async def register(user: UserCreate):
         "password_hash": hashed_password,
         "role": role,
         "status": "Ativo",
-        "created_at": datetime.utcnow()
+        "created_at": created_at,
+        "expiration_date": expiration_date
     }
     
     result = await users_collection.insert_one(user_dict)
@@ -180,16 +211,20 @@ async def register(user: UserCreate):
         data={"sub": user.email, "role": role}, expires_delta=access_token_expires
     )
     
-    return {"access_token": access_token, "token_type": "bearer", "user_name": user.name, "user_role": role}
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer", 
+        "user_name": user.name, 
+        "user_role": role,
+        "expiration_date": expiration_date
+    }
 
 @app.post("/api/auth/login", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    # Allow login with username 'ur1fs' specifically mapped to admin
     email_query = form_data.username
     
-    # Special case for the requested admin credentials if they don't exist yet
+    # Admin fallback creation
     if form_data.username == ADMIN_USER and form_data.password == ADMIN_PASS:
-        # Check if admin exists, if not create it on the fly (for demo purposes)
         admin_user = await users_collection.find_one({"email": ADMIN_USER})
         if not admin_user:
             hashed = get_password_hash(ADMIN_PASS)
@@ -199,7 +234,8 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
                 "password_hash": hashed,
                 "role": "ADMIN",
                 "status": "Ativo",
-                "created_at": datetime.utcnow()
+                "created_at": datetime.utcnow(),
+                "expiration_date": datetime.utcnow() + timedelta(days=3650) # 10 years for admin
             })
         email_query = ADMIN_USER
 
@@ -212,6 +248,15 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             headers={"WWW-Authenticate": "Bearer"},
         )
     
+    # Check Expiration
+    if user.get("expiration_date") and user["expiration_date"] < datetime.utcnow():
+        # Delete expired user immediately if they try to login
+        await users_collection.delete_one({"_id": user["_id"]})
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Sua conta expirou após 30 dias. Por favor, crie uma nova conta."
+        )
+
     if user.get("status") == "Bloqueado":
          raise HTTPException(status_code=400, detail="User account is blocked")
 
@@ -220,7 +265,13 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         data={"sub": user["email"], "role": user.get("role", "USER")}, expires_delta=access_token_expires
     )
     
-    return {"access_token": access_token, "token_type": "bearer", "user_name": user["name"], "user_role": user.get("role", "USER")}
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer", 
+        "user_name": user["name"], 
+        "user_role": user.get("role", "USER"),
+        "expiration_date": user.get("expiration_date")
+    }
 
 # Consultation Routes
 @app.post("/api/consultations", response_model=dict)
