@@ -429,6 +429,80 @@ async def get_all_consultations(admin: UserInDB = Depends(get_admin_user)):
     
     return consultations
 
+# --- Generic Database Manager Routes (Admin Only) ---
+
+@app.get("/api/admin/db/collections")
+async def list_collections(admin: UserInDB = Depends(get_admin_user)):
+    return await db.list_collection_names()
+
+@app.get("/api/admin/db/{collection_name}")
+async def list_documents(collection_name: str, limit: int = 50, skip: int = 0, admin: UserInDB = Depends(get_admin_user)):
+    if collection_name not in await db.list_collection_names():
+        raise HTTPException(status_code=404, detail="Collection not found")
+    
+    collection = db[collection_name]
+    cursor = collection.find({}).skip(skip).limit(limit).sort("_id", -1)
+    documents = []
+    async for doc in cursor:
+        # Convert ObjectId and datetime to string/isoformat for JSON serialization
+        doc["_id"] = str(doc["_id"])
+        for k, v in doc.items():
+            if isinstance(v, datetime):
+                doc[k] = v.isoformat()
+        documents.append(doc)
+    return documents
+
+@app.post("/api/admin/db/{collection_name}")
+async def create_document(collection_name: str, document: dict, admin: UserInDB = Depends(get_admin_user)):
+    if collection_name not in await db.list_collection_names():
+        raise HTTPException(status_code=404, detail="Collection not found")
+    
+    # Remove _id if present to let MongoDB generate it
+    if "_id" in document:
+        del document["_id"]
+        
+    # Convert ISO strings back to datetime if needed? 
+    # For a raw editor, we might just store strings or try to parse standard fields.
+    # Let's keep it simple: store as received (mostly strings/ints/dicts).
+    
+    result = await db[collection_name].insert_one(document)
+    return {"id": str(result.inserted_id), "message": "Document created"}
+
+@app.put("/api/admin/db/{collection_name}/{id}")
+async def update_document(collection_name: str, id: str, document: dict, admin: UserInDB = Depends(get_admin_user)):
+    if collection_name not in await db.list_collection_names():
+        raise HTTPException(status_code=404, detail="Collection not found")
+    
+    try:
+        oid = ObjectId(id)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid ID")
+        
+    if "_id" in document:
+        del document["_id"]
+        
+    result = await db[collection_name].replace_one({"_id": oid}, document)
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Document not found")
+        
+    return {"message": "Document updated"}
+
+@app.delete("/api/admin/db/{collection_name}/{id}")
+async def delete_document(collection_name: str, id: str, admin: UserInDB = Depends(get_admin_user)):
+    if collection_name not in await db.list_collection_names():
+        raise HTTPException(status_code=404, detail="Collection not found")
+        
+    try:
+        oid = ObjectId(id)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid ID")
+        
+    result = await db[collection_name].delete_one({"_id": oid})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Document not found")
+        
+    return {"message": "Document deleted"}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
