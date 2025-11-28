@@ -358,7 +358,7 @@ async def create_user_admin(user: UserCreate, admin: UserInDB = Depends(get_admi
         "email": user.email,
         "name": user.name,
         "password_hash": hashed_password,
-        "role": "USER",
+        "role": user.role,
         "status": "Ativo",
         "created_at": created_at,
         "expiration_date": expiration_date
