@@ -175,6 +175,8 @@ const Admin = () => {
     totalUsers: users.length,
     activeUsers: users.filter(u => u.status === 'Ativo').length,
     totalConsultations: consultations.length,
+    totalAdmins: users.filter(u => u.role === 'ADMIN').length,
+    totalNormalUsers: users.filter(u => u.role === 'USER').length,
   };
 
   if (userRole !== 'ADMIN') return null;
@@ -274,7 +276,7 @@ const Admin = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Card className="border-l-4 border-l-blue-500 shadow-sm">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total de Usuários</CardTitle>
@@ -286,6 +288,21 @@ const Admin = () => {
               </div>
               <p className="text-xs text-muted-foreground mt-1">
                 {stats.activeUsers} ativos no momento
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-l-4 border-l-indigo-500 shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Administradores</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div className="text-3xl font-bold">{stats.totalAdmins}</div>
+                <Shield className="h-8 w-8 text-indigo-100" />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Contas com acesso total
               </p>
             </CardContent>
           </Card>
