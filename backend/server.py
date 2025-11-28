@@ -285,6 +285,45 @@ async def update_user_me(user_update: UserUpdate, current_user: UserInDB = Depen
         return UserInDB(**updated_user)
     return current_user
 
+@app.post("/api/users/me/avatar")
+async def upload_avatar(file: UploadFile = File(...), current_user: UserInDB = Depends(get_current_active_user)):
+    try:
+        # Create uploads directory if it doesn't exist
+        upload_dir = static_path / "uploads"
+        upload_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Generate filename (user_id + extension)
+        file_extension = file.filename.split(".")[-1] if "." in file.filename else "png"
+        filename = f"{current_user.id}.{file_extension}"
+        file_path = upload_dir / filename
+        
+        # Save file
+        with file_path.open("wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+            
+        # Construct URL (assuming app is served at root, but we need the full URL or relative)
+        # Since frontend and backend might be on different ports in dev, but same domain in prod via nginx
+        # We will return a relative path that the frontend can prepend with backend URL if needed
+        # Or better, return the full path if we knew the host. 
+        # Let's return a relative path "/static/uploads/..." and let frontend handle it.
+        # Note: In the Nginx config (if any), /static needs to be routed to backend.
+        # But wait, the frontend connects to /api. 
+        # I mounted /static at root level of FastAPI app. So it is accessible at http://backend:8001/static
+        
+        avatar_url = f"/static/uploads/{filename}"
+        
+        # Update user in DB
+        await users_collection.update_one(
+            {"_id": ObjectId(current_user.id)}, 
+            {"$set": {"avatar_url": avatar_url}}
+        )
+        
+        return {"avatar_url": avatar_url}
+        
+    except Exception as e:
+        print(f"Error uploading file: {e}")
+        raise HTTPException(status_code=500, detail="Could not upload file")
+
 @app.delete("/api/consultations/{id}")
 async def delete_consultation(id: str, current_user: UserInDB = Depends(get_current_active_user)):
     result = await consultations_collection.delete_one({"_id": ObjectId(id), "user_id": current_user.id})
