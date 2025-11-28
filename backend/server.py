@@ -71,6 +71,7 @@ class UserInDB(UserBase):
     status: str = "Ativo"
     created_at: Optional[datetime] = None
     expiration_date: Optional[datetime] = None
+    session_id: Optional[str] = None
 
     class Config:
         populate_by_name = True
