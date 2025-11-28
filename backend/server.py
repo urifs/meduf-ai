@@ -204,10 +204,17 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
     user = await users_collection.find_one({"email": email_query})
     
-    if not user or not verify_password(form_data.password, user["password_hash"]):
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    if not verify_password(form_data.password, user["password_hash"]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="Incorrect password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
