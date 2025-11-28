@@ -18,12 +18,13 @@ const Dashboard = () => {
     setIsLoading(true);
     setReportData(null);
 
-    // Simulate AI Processing Delay (Mock Logic for now, but saving to DB)
+    // Simulate AI Processing Delay
     setTimeout(async () => {
       
       let mockResponse;
       const complaint = formData.queixa.toLowerCase();
 
+      // 1. Cardiac
       if (complaint.includes("dor no peito") || complaint.includes("tórax") || complaint.includes("precordial")) {
         mockResponse = {
           diagnoses: [
@@ -46,24 +47,71 @@ const Dashboard = () => {
             advice: "Manter paciente em repouso absoluto. Jejum até definição diagnóstica. Monitorar sinais vitais a cada 15 minutos."
           },
           medications: [
-            {
-              name: "Ácido Acetilsalicílico (AAS)",
-              dosage: "300mg VO (ataque)",
-              mechanism: "Antiagregante plaquetário. Inibição irreversível da COX-1."
-            },
-            {
-              name: "Nitrato (Isordil)",
-              dosage: "5mg Sublingual (se PAS > 100mmHg)",
-              mechanism: "Vasodilatador coronariano. Alívio sintomático da angina."
-            },
-            {
-              name: "Morfina",
-              dosage: "2-4mg IV (se dor refratária)",
-              mechanism: "Analgesia potente e venodilatação leve. Usar com cautela."
-            }
+            { name: "Ácido Acetilsalicílico (AAS)", dosage: "300mg VO (ataque)", mechanism: "Antiagregante plaquetário" },
+            { name: "Nitrato (Isordil)", dosage: "5mg SL", mechanism: "Vasodilatador coronariano" },
+            { name: "Morfina", dosage: "2-4mg IV", mechanism: "Analgesia potente" }
           ]
         };
-      } else if (complaint.includes("cabeça") || complaint.includes("cefaleia")) {
+      } 
+      // 2. Abdominal / Gastric
+      else if (complaint.includes("barriga") || complaint.includes("abdominal") || complaint.includes("estômago") || complaint.includes("epigastrica") || complaint.includes("epigástrica")) {
+        mockResponse = {
+          diagnoses: [
+            {
+              name: "Gastrite Aguda / Dispepsia",
+              justification: "Dor epigástrica associada a sintomas sistêmicos pode indicar processo inflamatório gástrico."
+            },
+            {
+              name: "Pancreatite Aguda",
+              justification: "Considerar se a dor for intensa, em faixa, irradiando para o dorso."
+            },
+            {
+              name: "Colecistite Aguda",
+              justification: "Se houver dor em hipocôndrio direito ou epigástrio (Sinal de Murphy?)."
+            }
+          ],
+          conduct: {
+            exams: ["Hemograma Completo", "Amilase e Lipase", "Ultrassom de Abdome Total", "TGO/TGP e Bilirrubinas"],
+            procedures: ["Hidratação venosa", "Analgesia escalonada", "Jejum oral temporário"],
+            advice: "Evitar alimentos gordurosos, ácidos ou condimentados. Repouso."
+          },
+          medications: [
+            { name: "Omeprazol", dosage: "40mg IV/VO", mechanism: "Supressão ácida gástrica" },
+            { name: "Buscopan Composto", dosage: "1 ampola IV", mechanism: "Antiespasmódico e analgésico" },
+            { name: "Ondansetrona", dosage: "8mg IV", mechanism: "Antiemético" }
+          ]
+        };
+      }
+      // 3. Respiratory / Infection
+      else if (complaint.includes("febre") || complaint.includes("tosse") || complaint.includes("ar") || complaint.includes("garganta")) {
+        mockResponse = {
+          diagnoses: [
+            {
+              name: "Infecção de Vias Aéreas Superiores (IVAS)",
+              justification: "Quadro febril inespecífico sugere etiologia viral ou bacteriana inicial."
+            },
+            {
+              name: "Pneumonia Adquirida na Comunidade",
+              justification: "Considerar se houver dispneia, tosse produtiva ou ausculta pulmonar alterada."
+            },
+            {
+              name: "Influenza / Covid-19",
+              justification: "Síndrome gripal com febre e sintomas sistêmicos."
+            }
+          ],
+          conduct: {
+            exams: ["Teste Rápido Influenza/Covid", "Raio-X de Tórax (se dispneia)", "Hemograma"],
+            procedures: ["Avaliação de sinais vitais", "Hidratação oral vigorosa"],
+            advice: "Isolamento respiratório se suspeita de Covid. Repouso e hidratação."
+          },
+          medications: [
+            { name: "Dipirona", dosage: "1g 6/6h", mechanism: "Antitérmico e analgésico" },
+            { name: "Xarope Expectorante", dosage: "Conforme necessidade", mechanism: "Sintomático para tosse" }
+          ]
+        };
+      }
+      // 4. Neurological
+      else if (complaint.includes("cabeça") || complaint.includes("cefaleia")) {
         mockResponse = {
           diagnoses: [
             {
@@ -81,25 +129,22 @@ const Dashboard = () => {
             advice: "Evitar gatilhos alimentares. Manter diário de cefaleia."
           },
           medications: [
-            {
-              name: "Dipirona",
-              dosage: "1g IV ou VO",
-              mechanism: "Analgesico não-opioide e antipirético."
-            },
-            {
-              name: "Sumatriptano",
-              dosage: "50mg VO",
-              mechanism: "Agonista seletivo de receptores 5-HT1B/1D. Abortivo de crise enxaquecosa."
-            }
+            { name: "Dipirona", dosage: "1g IV ou VO", mechanism: "Analgesico não-opioide e antipirético." },
+            { name: "Sumatriptano", dosage: "50mg VO", mechanism: "Agonista seletivo de receptores 5-HT1B/1D." }
           ]
         };
-      } else {
-        // Default Generic Response
+      } 
+      // 5. Fallback
+      else {
         mockResponse = {
           diagnoses: [
             {
-              name: "Investigação Clínica Inespecífica",
-              justification: "Sintomas apresentados requerem maior detalhamento ou exames complementares para hipótese precisa."
+              name: "Síndrome Clínica a Esclarecer",
+              justification: "Os sintomas apresentados requerem maior detalhamento ou exames complementares para hipótese precisa."
+            },
+            {
+              name: "Virose Inespecífica",
+              justification: "Diagnóstico de exclusão comum em quadros agudos com sintomas gerais."
             }
           ],
           conduct: {
@@ -108,11 +153,7 @@ const Dashboard = () => {
             advice: "Observação clínica e reavaliação após resultados de exames."
           },
           medications: [
-            {
-              name: "Sintomáticos",
-              dosage: "Conforme necessidade",
-              mechanism: "Tratamento direcionado ao alívio dos sintomas apresentados (dor, febre, náusea)."
-            }
+            { name: "Sintomáticos", dosage: "Conforme necessidade", mechanism: "Tratamento direcionado ao alívio dos sintomas apresentados." }
           ]
         };
       }

@@ -29,48 +29,140 @@ const SimpleDashboard = () => {
 
     // Simulate AI Processing Delay
     setTimeout(async () => {
-      // Mock Logic based on input
+      // Enhanced Mock Logic
       let mockResponse;
       const text = anamnese.toLowerCase();
 
-      if (text.includes("dor no peito") || text.includes("tórax") || text.includes("precordial")) {
+      // 1. Cardiac / Chest Pain
+      if (text.includes("dor no peito") || text.includes("tórax") || text.includes("precordial") || text.includes("infarto")) {
         mockResponse = {
           diagnoses: [
             {
               name: "Síndrome Coronariana Aguda (SCA)",
-              justification: "Sintomas descritos na anamnese livre sugerem quadro isquêmico agudo."
+              justification: "Dor torácica descrita sugere isquemia. Necessário descartar IAM com urgência."
             },
             {
               name: "Dissecção Aórtica",
-              justification: "Diagnóstico diferencial obrigatório em dor torácica."
+              justification: "Diagnóstico diferencial crítico, especialmente se houver hipertensão ou dor transfixante."
+            },
+            {
+              name: "Embolia Pulmonar (TEP)",
+              justification: "Considerar se houver dispneia súbita ou fatores de risco para TVP."
             }
           ],
           conduct: {
-            exams: ["ECG", "Troponina", "RX Tórax"],
-            procedures: ["Monitorização", "MOV"],
-            advice: "Encaminhar para emergência se não estiver em ambiente hospitalar."
+            exams: ["Eletrocardiograma (ECG) 12 derivações", "Troponina I/T", "Raio-X de Tórax", "Dímero-D"],
+            procedures: ["Monitorização cardíaca", "Acesso venoso", "Oximetria"],
+            advice: "Encaminhar para emergência hospitalar imediatamente."
           },
           medications: [
-            { name: "AAS", dosage: "300mg", mechanism: "Antiagregante" },
-            { name: "Isordil", dosage: "5mg SL", mechanism: "Vasodilatador" }
+            { name: "AAS", dosage: "300mg VO", mechanism: "Antiagregante plaquetário" },
+            { name: "Nitrato", dosage: "5mg SL", mechanism: "Vasodilatador (se PAS > 100mmHg)" }
           ]
         };
-      } else {
-        // Default Generic Response
+      } 
+      // 2. Abdominal Pain / Gastric (Matches user example: fever + epigastric pain)
+      else if (text.includes("barriga") || text.includes("abdominal") || text.includes("estômago") || text.includes("epigastrica") || text.includes("epigástrica")) {
         mockResponse = {
           diagnoses: [
             {
-              name: "Análise baseada em Texto Livre",
-              justification: "Hipótese gerada a partir da descrição narrativa do caso."
+              name: "Gastrite Aguda / Dispepsia",
+              justification: "Dor epigástrica associada a sintomas sistêmicos pode indicar processo inflamatório gástrico."
+            },
+            {
+              name: "Pancreatite Aguda",
+              justification: "Considerar se a dor for intensa, em faixa, irradiando para o dorso, especialmente com febre."
+            },
+            {
+              name: "Colecistite Aguda",
+              justification: "Se houver dor em hipocôndrio direito ou epigástrio, associada a febre (Sinal de Murphy?)."
             }
           ],
           conduct: {
-            exams: ["Exames de rotina conforme quadro"],
-            procedures: ["Avaliação física detalhada"],
-            advice: "Complementar anamnese com exame físico."
+            exams: ["Hemograma Completo", "Amilase e Lipase", "Ultrassom de Abdome Total", "TGO/TGP e Bilirrubinas"],
+            procedures: ["Hidratação venosa", "Analgesia escalonada", "Jejum oral temporário"],
+            advice: "Evitar alimentos gordurosos, ácidos ou condimentados. Repouso."
           },
           medications: [
-            { name: "Sintomáticos", dosage: "SN", mechanism: "Alívio de sintomas" }
+            { name: "Inibidor de Bomba de Prótons (Omeprazol)", dosage: "40mg IV/VO", mechanism: "Supressão ácida gástrica" },
+            { name: "Buscopan Composto", dosage: "1 ampola IV", mechanism: "Antiespasmódico e analgésico" },
+            { name: "Ondansetrona", dosage: "8mg IV", mechanism: "Antiemético (se náuseas)" }
+          ]
+        };
+      }
+      // 3. Respiratory / Infection (Fever + Cough etc)
+      else if (text.includes("febre") || text.includes("tosse") || text.includes("ar") || text.includes("garganta")) {
+        mockResponse = {
+          diagnoses: [
+            {
+              name: "Infecção de Vias Aéreas Superiores (IVAS)",
+              justification: "Quadro febril inespecífico sugere etiologia viral ou bacteriana inicial."
+            },
+            {
+              name: "Pneumonia Adquirida na Comunidade",
+              justification: "Considerar se houver dispneia, tosse produtiva ou ausculta pulmonar alterada."
+            },
+            {
+              name: "Influenza / Covid-19",
+              justification: "Síndrome gripal com febre e sintomas sistêmicos."
+            }
+          ],
+          conduct: {
+            exams: ["Teste Rápido Influenza/Covid", "Raio-X de Tórax (se dispneia)", "Hemograma"],
+            procedures: ["Avaliação de sinais vitais", "Hidratação oral vigorosa"],
+            advice: "Isolamento respiratório se suspeita de Covid. Repouso e hidratação."
+          },
+          medications: [
+            { name: "Dipirona", dosage: "1g 6/6h", mechanism: "Antitérmico e analgésico" },
+            { name: "Xarope Expectorante", dosage: "Conforme necessidade", mechanism: "Sintomático para tosse" }
+          ]
+        };
+      }
+      // 4. Neurological / Headache
+      else if (text.includes("cabeça") || text.includes("cefaleia") || text.includes("enxaqueca")) {
+        mockResponse = {
+          diagnoses: [
+            {
+              name: "Cefaleia Tensional",
+              justification: "Dor opressiva, bilateral, intensidade leve a moderada."
+            },
+            {
+              name: "Enxaqueca (Migrânea)",
+              justification: "Dor pulsátil, unilateral, com fotofobia/fonofobia."
+            }
+          ],
+          conduct: {
+            exams: ["Exame neurológico sumário", "Fundo de olho (se sinais de alarme)"],
+            procedures: ["Repouso em local escuro"],
+            advice: "Evitar gatilhos alimentares e estresse."
+          },
+          medications: [
+            { name: "Dipirona", dosage: "1g IV/VO", mechanism: "Analgesia simples" },
+            { name: "Sumatriptano", dosage: "50mg VO", mechanism: "Abortivo de crise de enxaqueca" }
+          ]
+        };
+      }
+      // 5. General / Fallback (ALWAYS returns something now)
+      else {
+        mockResponse = {
+          diagnoses: [
+            {
+              name: "Síndrome Clínica a Esclarecer",
+              justification: "Os sintomas descritos requerem investigação adicional para definição etiológica precisa."
+            },
+            {
+              name: "Virose Inespecífica",
+              justification: "Diagnóstico de exclusão comum em quadros agudos com sintomas gerais."
+            }
+          ],
+          conduct: {
+            exams: ["Hemograma Completo", "PCR (Proteína C Reativa)", "EAS (Urina 1)", "Eletrólitos"],
+            procedures: ["Exame físico completo", "Aferição de sinais vitais"],
+            advice: "Observação domiciliar. Retornar se houver piora do estado geral ou sinais de alarme."
+          },
+          medications: [
+            { name: "Sintomáticos", dosage: "Conforme queixa", mechanism: "Alívio de dor, febre ou náusea" },
+            { name: "Hidratação Oral", dosage: "2-3L/dia", mechanism: "Manutenção da volemia" }
           ]
         };
       }
@@ -87,7 +179,7 @@ const SimpleDashboard = () => {
         });
         
         setReportData(mockResponse);
-        toast.success("Análise concluída e salva no histórico!");
+        toast.success("Análise concluída!");
       } catch (error) {
         console.error("Error saving consultation:", error);
         toast.error("Erro ao salvar análise no banco de dados.");
@@ -129,7 +221,7 @@ const SimpleDashboard = () => {
                     <Label htmlFor="anamnese">Anamnese Completa</Label>
                     <Textarea 
                       id="anamnese" 
-                      placeholder="Ex: Paciente homem, 45 anos, chega com dor no peito há 2 horas..." 
+                      placeholder="Ex: Paciente 38 anos com febre de 38 graus e dor epigástrica..." 
                       className="min-h-[300px] resize-none text-base leading-relaxed"
                       value={anamnese}
                       onChange={(e) => setAnamnese(e.target.value)}
