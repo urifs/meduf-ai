@@ -166,6 +166,10 @@ async def remove_expired_users():
 # --- App Setup ---
 app = FastAPI()
 
+# Mount static files
+static_path = Path(__file__).parent / "static"
+app.mount("/static", StaticFiles(directory=static_path), name="static")
+
 @app.on_event("startup")
 async def startup_event():
     asyncio.create_task(remove_expired_users())
