@@ -8,6 +8,7 @@ import Login from "@/pages/Login";
 import History from "@/pages/History";
 import Admin from "@/pages/Admin";
 import Profile from "@/pages/Profile";
+import DatabaseManager from "@/pages/DatabaseManager";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -75,6 +76,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Admin />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/database" 
+            element={
+              <ProtectedRoute>
+                <DatabaseManager />
               </ProtectedRoute>
             } 
           />
