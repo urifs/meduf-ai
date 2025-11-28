@@ -88,9 +88,11 @@ const Admin = () => {
     if (users.length === 0) setIsLoading(true);
     
     try {
+      // Add timestamp to prevent caching
+      const timestamp = new Date().getTime();
       const [usersRes, consultsRes] = await Promise.all([
-        api.get('/admin/users'),
-        api.get('/admin/consultations')
+        api.get(`/admin/users?t=${timestamp}`),
+        api.get(`/admin/consultations?t=${timestamp}`)
       ]);
 
       // DIRECT MAPPING: No mock data merging. What you see is what is in the DB.
