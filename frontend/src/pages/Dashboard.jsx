@@ -22,23 +22,24 @@ const Dashboard = () => {
     setTimeout(async () => {
       
       let mockResponse;
-      const complaint = formData.queixa.toLowerCase();
+      // Ensure complaint is a string and lowercased
+      const complaint = (formData.queixa || "").toLowerCase();
 
       // 1. Cardiac
-      if (complaint.includes("dor no peito") || complaint.includes("tórax") || complaint.includes("precordial")) {
+      if (complaint.includes("dor no peito") || complaint.includes("tórax") || complaint.includes("precordial") || complaint.includes("infarto") || complaint.includes("coração")) {
         mockResponse = {
           diagnoses: [
             {
               name: "Síndrome Coronariana Aguda (SCA)",
-              justification: "Dor torácica típica, idade > 40 anos, fatores de risco cardiovasculares presentes no histórico."
+              justification: "Dor torácica típica ou atípica em paciente com fatores de risco requer exclusão imediata de isquemia miocárdica."
             },
             {
               name: "Dissecção Aórtica",
               justification: "Diagnóstico diferencial importante em dor torácica aguda, especialmente se houver hipertensão não controlada."
             },
             {
-              name: "Refluxo Gastroesofágico",
-              justification: "Considerar se houver associação com alimentação ou decúbito, mas SCA deve ser descartada primeiro."
+              name: "Doença do Refluxo Gastroesofágico (DRGE)",
+              justification: "Pode mimetizar dor anginosa. Considerar se houver queimação ou relação com alimentação."
             }
           ],
           conduct: {
@@ -47,113 +48,145 @@ const Dashboard = () => {
             advice: "Manter paciente em repouso absoluto. Jejum até definição diagnóstica. Monitorar sinais vitais a cada 15 minutos."
           },
           medications: [
-            { name: "Ácido Acetilsalicílico (AAS)", dosage: "300mg VO (ataque)", mechanism: "Antiagregante plaquetário" },
-            { name: "Nitrato (Isordil)", dosage: "5mg SL", mechanism: "Vasodilatador coronariano" },
-            { name: "Morfina", dosage: "2-4mg IV", mechanism: "Analgesia potente" }
+            { name: "Ácido Acetilsalicílico (AAS)", dosage: "300mg VO (ataque)", mechanism: "Antiagregante plaquetário. Inibição irreversível da COX-1." },
+            { name: "Nitrato (Isordil)", dosage: "5mg Sublingual (se PAS > 100mmHg)", mechanism: "Vasodilatador coronariano. Alívio sintomático da angina." },
+            { name: "Morfina", dosage: "2-4mg IV (se dor refratária)", mechanism: "Analgesia potente e venodilatação leve. Usar com cautela." }
           ]
         };
       } 
       // 2. Abdominal / Gastric
-      else if (complaint.includes("barriga") || complaint.includes("abdominal") || complaint.includes("estômago") || complaint.includes("epigastrica") || complaint.includes("epigástrica")) {
+      else if (complaint.includes("barriga") || complaint.includes("abdominal") || complaint.includes("estômago") || complaint.includes("epigastrica") || complaint.includes("epigástrica") || complaint.includes("fígado") || complaint.includes("intestino")) {
         mockResponse = {
           diagnoses: [
             {
-              name: "Gastrite Aguda / Dispepsia",
-              justification: "Dor epigástrica associada a sintomas sistêmicos pode indicar processo inflamatório gástrico."
+              name: "Gastrite Aguda / Dispepsia Funcional",
+              justification: "Sintomas dispépticos sugerem irritação da mucosa gástrica ou distúrbio de motilidade."
             },
             {
-              name: "Pancreatite Aguda",
-              justification: "Considerar se a dor for intensa, em faixa, irradiando para o dorso."
+              name: "Gastroenterite Aguda (GEA)",
+              justification: "Considerar se houver diarreia, vômitos ou febre associada."
             },
             {
-              name: "Colecistite Aguda",
-              justification: "Se houver dor em hipocôndrio direito ou epigástrio (Sinal de Murphy?)."
+              name: "Abdome Agudo (Apendicite/Colecistite)",
+              justification: "Investigar sinais de irritação peritoneal (Blumberg, Murphy) se a dor for localizada."
             }
           ],
           conduct: {
-            exams: ["Hemograma Completo", "Amilase e Lipase", "Ultrassom de Abdome Total", "TGO/TGP e Bilirrubinas"],
-            procedures: ["Hidratação venosa", "Analgesia escalonada", "Jejum oral temporário"],
-            advice: "Evitar alimentos gordurosos, ácidos ou condimentados. Repouso."
+            exams: ["Hemograma Completo", "PCR", "Amilase/Lipase", "Ultrassom de Abdome (se dor persistente)"],
+            procedures: ["Hidratação venosa se houver sinais de desidratação", "Analgesia"],
+            advice: "Dieta leve e fracionada. Aumentar ingestão hídrica. Evitar irritantes gástricos."
           },
           medications: [
-            { name: "Omeprazol", dosage: "40mg IV/VO", mechanism: "Supressão ácida gástrica" },
-            { name: "Buscopan Composto", dosage: "1 ampola IV", mechanism: "Antiespasmódico e analgésico" },
-            { name: "Ondansetrona", dosage: "8mg IV", mechanism: "Antiemético" }
+            { name: "Omeprazol", dosage: "40mg em jejum", mechanism: "Inibidor de bomba de prótons. Reduz acidez gástrica." },
+            { name: "Escopolamina (Buscopan)", dosage: "10mg 8/8h", mechanism: "Antiespasmódico. Alívio de cólicas." },
+            { name: "Ondansetrona", dosage: "4-8mg 8/8h", mechanism: "Antiemético. Controle de náuseas e vômitos." }
           ]
         };
       }
       // 3. Respiratory / Infection
-      else if (complaint.includes("febre") || complaint.includes("tosse") || complaint.includes("ar") || complaint.includes("garganta")) {
+      else if (complaint.includes("febre") || complaint.includes("tosse") || complaint.includes("ar") || complaint.includes("garganta") || complaint.includes("pulmão") || complaint.includes("respirar")) {
         mockResponse = {
           diagnoses: [
             {
               name: "Infecção de Vias Aéreas Superiores (IVAS)",
-              justification: "Quadro febril inespecífico sugere etiologia viral ou bacteriana inicial."
+              justification: "Quadro compatível com etiologia viral (Resfriado/Gripe) ou bacteriana (Amigdalite/Sinusite)."
             },
             {
-              name: "Pneumonia Adquirida na Comunidade",
-              justification: "Considerar se houver dispneia, tosse produtiva ou ausculta pulmonar alterada."
+              name: "Pneumonia Comunitária",
+              justification: "Suspeitar se houver febre alta, dispneia, taquipneia ou estertores à ausculta."
             },
             {
-              name: "Influenza / Covid-19",
-              justification: "Síndrome gripal com febre e sintomas sistêmicos."
+              name: "Bronquite Aguda",
+              justification: "Tosse persistente com ou sem expectoração, geralmente viral."
             }
           ],
           conduct: {
-            exams: ["Teste Rápido Influenza/Covid", "Raio-X de Tórax (se dispneia)", "Hemograma"],
-            procedures: ["Avaliação de sinais vitais", "Hidratação oral vigorosa"],
-            advice: "Isolamento respiratório se suspeita de Covid. Repouso e hidratação."
+            exams: ["Raio-X de Tórax (se sinais de gravidade)", "Hemograma", "Teste para Influenza/Covid-19"],
+            procedures: ["Oximetria de pulso", "Inalação com broncodilatador se houver sibilos"],
+            advice: "Repouso relativo. Hidratação abundante. Lavagem nasal com soro fisiológico."
           },
           medications: [
-            { name: "Dipirona", dosage: "1g 6/6h", mechanism: "Antitérmico e analgésico" },
-            { name: "Xarope Expectorante", dosage: "Conforme necessidade", mechanism: "Sintomático para tosse" }
+            { name: "Dipirona", dosage: "500mg-1g 6/6h", mechanism: "Antitérmico e analgésico." },
+            { name: "Acebrofilina", dosage: "5-10ml 12/12h", mechanism: "Mucolítico e broncodilatador (sintomático para tosse)." },
+            { name: "Amoxicilina", dosage: "500mg 8/8h (Se indicação bacteriana)", mechanism: "Antibiótico beta-lactâmico." }
           ]
         };
       }
       // 4. Neurological
-      else if (complaint.includes("cabeça") || complaint.includes("cefaleia")) {
+      else if (complaint.includes("cabeça") || complaint.includes("cefaleia") || complaint.includes("enxaqueca") || complaint.includes("tontura")) {
         mockResponse = {
           diagnoses: [
             {
-              name: "Enxaqueca (Migrânea)",
-              justification: "Cefaleia pulsátil, unilateral, associada a fotofobia/fonofobia."
+              name: "Cefaleia Tensional",
+              justification: "Padrão de dor mais comum, geralmente opressiva, bilateral e leve/moderada."
             },
             {
-              name: "Cefaleia Tensional",
-              justification: "Dor em pressão/aperto, bilateral, leve a moderada intensidade."
+              name: "Enxaqueca (Migrânea)",
+              justification: "Dor pulsátil, unilateral, intensidade moderada/forte, com náuseas ou fotofobia."
+            },
+            {
+              name: "Labirintite / Vertigem",
+              justification: "Considerar se a queixa principal for tontura rotatória."
             }
           ],
           conduct: {
-            exams: ["Tomografia de Crânio (se sinais de alarme)", "Exame neurológico completo"],
-            procedures: ["Repouso em ambiente escuro e silencioso"],
-            advice: "Evitar gatilhos alimentares. Manter diário de cefaleia."
+            exams: ["Exame neurológico sumário", "Tomografia de Crânio (apenas se sinais de alarme/red flags)"],
+            procedures: ["Repouso em ambiente calmo e escuro"],
+            advice: "Identificar e evitar gatilhos (alimentos, sono irregular, estresse)."
           },
           medications: [
             { name: "Dipirona", dosage: "1g IV ou VO", mechanism: "Analgesico não-opioide e antipirético." },
-            { name: "Sumatriptano", dosage: "50mg VO", mechanism: "Agonista seletivo de receptores 5-HT1B/1D." }
+            { name: "Sumatriptano", dosage: "50mg VO", mechanism: "Agonista seletivo de receptores 5-HT1B/1D. Abortivo de crise." },
+            { name: "Dimenidrinato", dosage: "50mg 6/6h", mechanism: "Antivertiginoso (se houver tontura)." }
           ]
         };
       } 
-      // 5. Fallback
+      // 5. Musculoskeletal / Pain
+      else if (complaint.includes("dor") || complaint.includes("costas") || complaint.includes("lombar") || complaint.includes("perna") || complaint.includes("braço") || complaint.includes("muscular")) {
+        mockResponse = {
+          diagnoses: [
+            {
+              name: "Lombalgia Mecânica / Dor Muscular",
+              justification: "Dor relacionada a esforço, postura ou trauma leve. Ausência de sinais de compressão radicular."
+            },
+            {
+              name: "Fibromialgia",
+              justification: "Considerar em quadros de dor crônica difusa."
+            }
+          ],
+          conduct: {
+            exams: ["Raio-X de Coluna (se trauma ou red flags)", "Exame físico ortopédico"],
+            procedures: ["Compressa morna local", "Repouso relativo (evitar repouso absoluto prolongado)"],
+            advice: "Correção postural. Evitar carregar peso. Fisioterapia se persistir."
+          },
+          medications: [
+            { name: "Ciclobenzaprina", dosage: "5-10mg à noite", mechanism: "Relaxante muscular central." },
+            { name: "Diclofenaco", dosage: "50mg 8/8h", mechanism: "Anti-inflamatório não esteroidal (AINE)." },
+            { name: "Dipirona", dosage: "1g 6/6h", mechanism: "Analgesia." }
+          ]
+        };
+      }
+      // 6. Universal Fallback (Guaranteed Response)
       else {
         mockResponse = {
           diagnoses: [
             {
-              name: "Síndrome Clínica a Esclarecer",
-              justification: "Os sintomas apresentados requerem maior detalhamento ou exames complementares para hipótese precisa."
+              name: "Investigação Clínica Inicial",
+              justification: "Os sintomas relatados são inespecíficos ou requerem maior detalhamento para uma hipótese diagnóstica precisa. A avaliação clínica presencial é fundamental."
             },
             {
-              name: "Virose Inespecífica",
-              justification: "Diagnóstico de exclusão comum em quadros agudos com sintomas gerais."
+              name: "Síndrome Viral Inespecífica",
+              justification: "Diagnóstico de exclusão frequente em quadros com sintomas gerais (mal-estar, fadiga) sem foco definido."
             }
           ],
           conduct: {
-            exams: ["Hemograma Completo", "PCR", "Ureia e Creatinina", "EAS (Urina Tipo 1)"],
-            procedures: ["Avaliação de sinais vitais", "Hidratação se necessário"],
-            advice: "Observação clínica e reavaliação após resultados de exames."
+            exams: ["Hemograma Completo", "PCR (Proteína C Reativa)", "Glicemia de Jejum", "TSH (se fadiga)", "EAS (Urina Tipo 1)"],
+            procedures: ["Anamnese detalhada (revisão de sistemas)", "Exame físico completo", "Aferição de sinais vitais (PA, FC, Temp, SatO2)"],
+            advice: "Observar evolução dos sintomas por 24-48h. Retornar ao serviço de saúde se houver piora, febre persistente ou surgimento de novos sintomas."
           },
           medications: [
-            { name: "Sintomáticos", dosage: "Conforme necessidade", mechanism: "Tratamento direcionado ao alívio dos sintomas apresentados." }
+            { name: "Sintomáticos", dosage: "Conforme necessidade", mechanism: "Tratamento direcionado ao alívio dos sintomas apresentados (dor, febre, náusea)." },
+            { name: "Polivitamínico", dosage: "1 cp ao dia", mechanism: "Suporte nutricional (se houver suspeita de carência)." }
           ]
         };
       }

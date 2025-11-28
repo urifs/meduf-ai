@@ -34,7 +34,7 @@ const SimpleDashboard = () => {
       const text = anamnese.toLowerCase();
 
       // 1. Cardiac / Chest Pain
-      if (text.includes("dor no peito") || text.includes("tórax") || text.includes("precordial") || text.includes("infarto")) {
+      if (text.includes("dor no peito") || text.includes("tórax") || text.includes("precordial") || text.includes("infarto") || text.includes("coração")) {
         mockResponse = {
           diagnoses: [
             {
@@ -61,8 +61,8 @@ const SimpleDashboard = () => {
           ]
         };
       } 
-      // 2. Abdominal Pain / Gastric (Matches user example: fever + epigastric pain)
-      else if (text.includes("barriga") || text.includes("abdominal") || text.includes("estômago") || text.includes("epigastrica") || text.includes("epigástrica")) {
+      // 2. Abdominal Pain / Gastric
+      else if (text.includes("barriga") || text.includes("abdominal") || text.includes("estômago") || text.includes("epigastrica") || text.includes("epigástrica") || text.includes("fígado") || text.includes("intestino")) {
         mockResponse = {
           diagnoses: [
             {
@@ -90,8 +90,8 @@ const SimpleDashboard = () => {
           ]
         };
       }
-      // 3. Respiratory / Infection (Fever + Cough etc)
-      else if (text.includes("febre") || text.includes("tosse") || text.includes("ar") || text.includes("garganta")) {
+      // 3. Respiratory / Infection
+      else if (text.includes("febre") || text.includes("tosse") || text.includes("ar") || text.includes("garganta") || text.includes("pulmão") || text.includes("respirar")) {
         mockResponse = {
           diagnoses: [
             {
@@ -119,7 +119,7 @@ const SimpleDashboard = () => {
         };
       }
       // 4. Neurological / Headache
-      else if (text.includes("cabeça") || text.includes("cefaleia") || text.includes("enxaqueca")) {
+      else if (text.includes("cabeça") || text.includes("cefaleia") || text.includes("enxaqueca") || text.includes("tontura")) {
         mockResponse = {
           diagnoses: [
             {
@@ -129,6 +129,10 @@ const SimpleDashboard = () => {
             {
               name: "Enxaqueca (Migrânea)",
               justification: "Dor pulsátil, unilateral, com fotofobia/fonofobia."
+            },
+            {
+              name: "Labirintite / Vertigem",
+              justification: "Considerar se a queixa principal for tontura rotatória."
             }
           ],
           conduct: {
@@ -142,27 +146,52 @@ const SimpleDashboard = () => {
           ]
         };
       }
-      // 5. General / Fallback (ALWAYS returns something now)
+      // 5. Musculoskeletal / Pain
+      else if (text.includes("dor") || text.includes("costas") || text.includes("lombar") || text.includes("perna") || text.includes("braço") || text.includes("muscular")) {
+        mockResponse = {
+          diagnoses: [
+            {
+              name: "Lombalgia Mecânica / Dor Muscular",
+              justification: "Dor relacionada a esforço, postura ou trauma leve. Ausência de sinais de compressão radicular."
+            },
+            {
+              name: "Fibromialgia",
+              justification: "Considerar em quadros de dor crônica difusa."
+            }
+          ],
+          conduct: {
+            exams: ["Raio-X de Coluna (se trauma ou red flags)", "Exame físico ortopédico"],
+            procedures: ["Compressa morna local", "Repouso relativo (evitar repouso absoluto prolongado)"],
+            advice: "Correção postural. Evitar carregar peso. Fisioterapia se persistir."
+          },
+          medications: [
+            { name: "Ciclobenzaprina", dosage: "5-10mg à noite", mechanism: "Relaxante muscular central." },
+            { name: "Diclofenaco", dosage: "50mg 8/8h", mechanism: "Anti-inflamatório não esteroidal (AINE)." },
+            { name: "Dipirona", dosage: "1g 6/6h", mechanism: "Analgesia." }
+          ]
+        };
+      }
+      // 6. Universal Fallback (Guaranteed Response)
       else {
         mockResponse = {
           diagnoses: [
             {
-              name: "Síndrome Clínica a Esclarecer",
-              justification: "Os sintomas descritos requerem investigação adicional para definição etiológica precisa."
+              name: "Investigação Clínica Inicial",
+              justification: "Os sintomas relatados são inespecíficos ou requerem maior detalhamento para uma hipótese diagnóstica precisa. A avaliação clínica presencial é fundamental."
             },
             {
-              name: "Virose Inespecífica",
-              justification: "Diagnóstico de exclusão comum em quadros agudos com sintomas gerais."
+              name: "Síndrome Viral Inespecífica",
+              justification: "Diagnóstico de exclusão frequente em quadros com sintomas gerais (mal-estar, fadiga) sem foco definido."
             }
           ],
           conduct: {
-            exams: ["Hemograma Completo", "PCR (Proteína C Reativa)", "EAS (Urina 1)", "Eletrólitos"],
-            procedures: ["Exame físico completo", "Aferição de sinais vitais"],
-            advice: "Observação domiciliar. Retornar se houver piora do estado geral ou sinais de alarme."
+            exams: ["Hemograma Completo", "PCR (Proteína C Reativa)", "Glicemia de Jejum", "TSH (se fadiga)", "EAS (Urina Tipo 1)"],
+            procedures: ["Anamnese detalhada (revisão de sistemas)", "Exame físico completo", "Aferição de sinais vitais (PA, FC, Temp, SatO2)"],
+            advice: "Observar evolução dos sintomas por 24-48h. Retornar ao serviço de saúde se houver piora, febre persistente ou surgimento de novos sintomas."
           },
           medications: [
-            { name: "Sintomáticos", dosage: "Conforme queixa", mechanism: "Alívio de dor, febre ou náusea" },
-            { name: "Hidratação Oral", dosage: "2-3L/dia", mechanism: "Manutenção da volemia" }
+            { name: "Sintomáticos", dosage: "Conforme necessidade", mechanism: "Tratamento direcionado ao alívio dos sintomas apresentados (dor, febre, náusea)." },
+            { name: "Polivitamínico", dosage: "1 cp ao dia", mechanism: "Suporte nutricional (se houver suspeita de carência)." }
           ]
         };
       }
