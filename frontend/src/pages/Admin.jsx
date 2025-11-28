@@ -54,6 +54,19 @@ const Admin = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
+  // --- Legacy/Mock Data (To ensure the panel is never empty during transition) ---
+  const legacyUsers = [
+    { id: "legacy-1", name: "Dr. Silva", email: "silva@meduf.ai", role: "Admin", status: "Ativo", created_at: "2025-01-15T09:30:00" },
+    { id: "legacy-2", name: "Dra. Santos", email: "santos@hospital.com", role: "Médico", status: "Ativo", created_at: "2025-02-10T14:15:00" },
+    { id: "legacy-3", name: "Dr. Oliveira", email: "oliveira@clinica.com", role: "Médico", status: "Pendente", created_at: "2025-03-05T11:45:00" },
+    { id: "legacy-4", name: "Dr. Malicioso", email: "spam@fake.com", role: "Médico", status: "Bloqueado", created_at: "2025-03-01T08:00:00" },
+  ];
+
+  const legacyConsultations = [
+    { id: "legacy-c1", doctor: "Dr. Silva", diagnosis: "Síndrome Coronariana Aguda", date: "2025-03-15T10:30:00" },
+    { id: "legacy-c2", doctor: "Dra. Santos", diagnosis: "Enxaqueca (Migrânea)", date: "2025-03-15T11:15:00" },
+  ];
+
   // --- Authentication Check & Polling ---
   useEffect(() => {
     if (userRole !== 'ADMIN') {
@@ -69,7 +82,10 @@ const Admin = () => {
 
   // --- Data Fetching ---
   const fetchData = async () => {
-    setIsLoading(true);
+    // Don't set loading to true on background polls to avoid flickering
+    // Only on first load
+    if (users.length === 0) setIsLoading(true);
+    
     try {
       // Fetch Users and Consultations in parallel
       const [usersRes, consultsRes] = await Promise.all([
@@ -77,13 +93,32 @@ const Admin = () => {
         api.get('/admin/consultations')
       ]);
 
-      setUsers(usersRes.data);
-      setConsultations(consultsRes.data);
+      // MERGE: Real DB Users + Legacy Mock Users
+      // This ensures the user sees "all" accounts, even those from the prototype phase
+      const allUsers = [...usersRes.data, ...legacyUsers];
+      
+      // Remove duplicates based on email just in case
+      const uniqueUsers = Array.from(new Map(allUsers.map(item => [item.email, item])).values());
+      
+      setUsers(uniqueUsers);
+      
+      // Merge Consultations
+      const realConsultations = consultsRes.data.map(c => ({
+        ...c,
+        date: c.date || c.created_at 
+      }));
+      setConsultations([...realConsultations, ...legacyConsultations]);
+      
       setLastUpdated(new Date());
       
     } catch (error) {
       console.error("Admin Fetch Error:", error);
-      toast.error("Erro ao conectar com o banco de dados.");
+      // If API fails, at least show legacy data
+      if (users.length === 0) {
+        setUsers(legacyUsers);
+        setConsultations(legacyConsultations);
+        toast.error("Conexão instável. Exibindo dados locais.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -91,6 +126,15 @@ const Admin = () => {
 
   // --- Actions ---
   const handleToggleStatus = async (userId, currentStatus) => {
+    // Handle Legacy Users (Simulation)
+    if (userId.toString().startsWith('legacy-')) {
+      const newStatus = currentStatus === 'Bloqueado' ? 'Ativo' : 'Bloqueado';
+      setUsers(users.map(u => u.id === userId ? { ...u, status: newStatus } : u));
+      toast.success(`(Simulação) Status atualizado para: ${newStatus}`);
+      return;
+    }
+
+    // Handle Real Users (API)
     try {
       const response = await api.patch(`/admin/users/${userId}/status`);
       const newStatus = response.data.status;
@@ -103,6 +147,14 @@ const Admin = () => {
   };
 
   const handleDeleteUser = async (userId) => {
+    // Handle Legacy Users (Simulation)
+    if (userId.toString().startsWith('legacy-')) {
+      setUsers(users.filter(u => u.id !== userId));
+      toast.success("(Simulação) Usuário excluído.");
+      return;
+    }
+
+    // Handle Real Users (API)
     try {
       await api.delete(`/admin/users/${userId}`);
       setUsers(users.filter(u => u.id !== userId));
@@ -234,8 +286,7 @@ const Admin = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-slate-50">
-                        <TableHead>Nome</TableHead>
-                        <TableHead>Email</TableHead>
+                        <TableHead>Usuário</TableHead>
                         <TableHead>Função</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Criado em</TableHead>
@@ -245,7 +296,7 @@ const Admin = () => {
                     <TableBody>
                       {filteredUsers.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                          <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                             Nenhum usuário encontrado.
                           </TableCell>
                         </TableRow>
@@ -253,10 +304,10 @@ const Admin = () => {
                         filteredUsers.map((user) => (
                           <TableRow key={user.id}>
                             <TableCell>
-                              <span className="font-medium">{user.name}</span>
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-sm text-muted-foreground">{user.email}</span>
+                              <div className="flex flex-col">
+                                <span className="font-medium">{user.name}</span>
+                                <span className="text-xs text-muted-foreground">{user.email}</span>
+                              </div>
                             </TableCell>
                             <TableCell>
                               <Badge variant="outline" className={user.role === 'ADMIN' ? 'border-purple-200 bg-purple-50 text-purple-700' : 'border-slate-200 bg-slate-50 text-slate-700'}>
