@@ -50,6 +50,7 @@ const DatabaseManager = () => {
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   
   // Editor State
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -83,16 +84,22 @@ const DatabaseManager = () => {
     }
   };
 
-  const fetchDocuments = async (collectionName) => {
+  const fetchDocuments = async (collectionName, query = "") => {
     setIsLoading(true);
     try {
-      const response = await api.get(`/admin/db/${collectionName}`);
+      const params = query ? { q: query } : {};
+      const response = await api.get(`/admin/db/${collectionName}`, { params });
       setDocuments(response.data);
     } catch (error) {
       toast.error("Erro ao buscar documentos.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    fetchDocuments(selectedCollection, searchTerm);
   };
 
   const handleSave = async () => {
@@ -110,7 +117,7 @@ const DatabaseManager = () => {
       }
       
       setIsEditorOpen(false);
-      fetchDocuments(selectedCollection);
+      fetchDocuments(selectedCollection, searchTerm);
       
     } catch (error) {
       if (error instanceof SyntaxError) {
@@ -125,7 +132,7 @@ const DatabaseManager = () => {
     try {
       await api.delete(`/admin/db/${selectedCollection}/${id}`);
       toast.success("Documento excluído.");
-      fetchDocuments(selectedCollection);
+      fetchDocuments(selectedCollection, searchTerm);
     } catch (error) {
       toast.error("Erro ao excluir documento.");
     }
@@ -169,7 +176,10 @@ const DatabaseManager = () => {
                     key={col}
                     variant={selectedCollection === col ? "secondary" : "ghost"}
                     className="w-full justify-start"
-                    onClick={() => setSelectedCollection(col)}
+                    onClick={() => {
+                      setSelectedCollection(col);
+                      setSearchTerm(""); // Reset search on collection change
+                    }}
                   >
                     <TableIcon className="mr-2 h-4 w-4" />
                     {col}
@@ -182,7 +192,7 @@ const DatabaseManager = () => {
 
           {/* Main: Documents */}
           <Card className="lg:col-span-3 min-h-[600px]">
-            <CardHeader className="flex flex-row items-center justify-between border-b pb-4">
+            <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-4 gap-4">
               <div>
                 <CardTitle className="text-xl flex items-center gap-2">
                   {selectedCollection}
@@ -191,14 +201,26 @@ const DatabaseManager = () => {
                   </Badge>
                 </CardTitle>
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => fetchDocuments(selectedCollection)}>
-                  <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                  Atualizar
-                </Button>
-                <Button size="sm" onClick={() => openEditor(null)}>
-                  <Plus className="h-4 w-4 mr-2" /> Novo Documento
-                </Button>
+              
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <form onSubmit={handleSearch} className="relative w-full sm:w-64">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input 
+                    placeholder="Pesquisar (ID, nome, email...)" 
+                    className="pl-8"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </form>
+                
+                <div className="flex gap-2">
+                  <Button variant="outline" size="icon" onClick={() => fetchDocuments(selectedCollection, searchTerm)} title="Atualizar">
+                    <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                  </Button>
+                  <Button size="sm" onClick={() => openEditor(null)}>
+                    <Plus className="h-4 w-4 mr-2" /> Novo
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -253,7 +275,7 @@ const DatabaseManager = () => {
                   ))}
                   {documents.length === 0 && (
                     <div className="text-center py-12 text-muted-foreground">
-                      Nenhum documento encontrado nesta coleção.
+                      Nenhum documento encontrado.
                     </div>
                   )}
                 </div>
