@@ -407,6 +407,7 @@ const Admin = () => {
                         <TableHead>Usuário</TableHead>
                         <TableHead>Função</TableHead>
                         <TableHead>Status</TableHead>
+                        <TableHead>Validade</TableHead>
                         <TableHead>Criado em</TableHead>
                         <TableHead className="text-right">Ações</TableHead>
                       </TableRow>
