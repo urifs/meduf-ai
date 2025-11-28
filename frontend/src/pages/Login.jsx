@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Loader2, LogIn } from 'lucide-react';
+import { Loader2, LogIn, ExternalLink } from 'lucide-react';
 import api from '@/lib/api';
 
 const Login = () => {
@@ -108,21 +108,32 @@ const Login = () => {
           </Label>
         </div>
 
-        <Button 
-          type="submit" 
-          className="w-full h-11 text-base" 
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Entrando...
-            </>
-          ) : (
-            <>
-              <LogIn className="mr-2 h-4 w-4" /> Entrar na Plataforma
-            </>
-          )}
-        </Button>
+        <div className="space-y-3">
+          <Button 
+            type="submit" 
+            className="w-full h-11 text-base" 
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Entrando...
+              </>
+            ) : (
+              <>
+                <LogIn className="mr-2 h-4 w-4" /> Entrar na Plataforma
+              </>
+            )}
+          </Button>
+
+          <Button 
+            type="button"
+            variant="outline"
+            className="w-full h-11 text-base border-green-600 text-green-700 hover:bg-green-50 hover:text-green-800"
+            onClick={() => window.open('https://api.whatsapp.com/send/?phone=551152868823&text&type=phone_number&app_absent=0', '_blank')}
+          >
+            <ExternalLink className="mr-2 h-4 w-4" /> Adquirir Acesso
+          </Button>
+        </div>
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
