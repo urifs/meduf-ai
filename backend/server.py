@@ -305,20 +305,37 @@ async def create_user_admin(user: UserCreate, admin: UserInDB = Depends(get_admi
     result = await users_collection.insert_one(user_dict)
     return {"id": str(result.inserted_id), "message": "User created successfully"}
 
+from bson import ObjectId
+from bson.errors import InvalidId
+
+# ... (rest of imports)
+
+# ...
+
 @app.patch("/api/admin/users/{id}/status")
 async def toggle_user_status(id: str, admin: UserInDB = Depends(get_admin_user)):
-    user = await users_collection.find_one({"_id": ObjectId(id)})
+    try:
+        oid = ObjectId(id)
+    except InvalidId:
+        raise HTTPException(status_code=400, detail="Invalid user ID format")
+
+    user = await users_collection.find_one({"_id": oid})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
     new_status = "Bloqueado" if user.get("status") == "Ativo" else "Ativo"
-    await users_collection.update_one({"_id": ObjectId(id)}, {"$set": {"status": new_status}})
+    await users_collection.update_one({"_id": oid}, {"$set": {"status": new_status}})
     return {"status": new_status}
 
 @app.delete("/api/admin/users/{id}")
 async def delete_user(id: str, admin: UserInDB = Depends(get_admin_user)):
+    try:
+        oid = ObjectId(id)
+    except InvalidId:
+        raise HTTPException(status_code=400, detail="Invalid user ID format")
+
     # Delete user
-    result = await users_collection.delete_one({"_id": ObjectId(id)})
+    result = await users_collection.delete_one({"_id": oid})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="User not found")
     
