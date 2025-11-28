@@ -21,7 +21,8 @@ import {
   AlertCircle,
   Database,
   UserPlus,
-  Loader2
+  Loader2,
+  CalendarClock
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -77,6 +78,11 @@ const Admin = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '', days_valid: 30, role: 'USER' });
+
+  // Expiration Update State
+  const [isExpirationOpen, setIsExpirationOpen] = useState(false);
+  const [selectedUserForExpiration, setSelectedUserForExpiration] = useState(null);
+  const [newDaysValid, setNewDaysValid] = useState(30);
 
   // --- Authentication Check & Polling ---
   useEffect(() => {
@@ -137,6 +143,20 @@ const Admin = () => {
       toast.error(error.response?.data?.detail || "Erro ao criar usuário.");
     } finally {
       setIsCreating(false);
+    }
+  };
+
+  const handleUpdateExpiration = async () => {
+    if (!selectedUserForExpiration) return;
+    try {
+      await api.patch(`/admin/users/${selectedUserForExpiration.id}`, {
+        days_valid: parseInt(newDaysValid)
+      });
+      toast.success("Validade da conta atualizada!");
+      setIsExpirationOpen(false);
+      fetchData();
+    } catch (error) {
+      toast.error("Erro ao atualizar validade.");
     }
   };
 
@@ -415,7 +435,7 @@ const Admin = () => {
                     <TableBody>
                       {filteredUsers.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                          <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                             Nenhum usuário encontrado.
                           </TableCell>
                         </TableRow>
@@ -456,6 +476,12 @@ const Admin = () => {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                                  <DropdownMenuItem onClick={() => {
+                                    setSelectedUserForExpiration(user);
+                                    setIsExpirationOpen(true);
+                                  }}>
+                                    <CalendarClock className="mr-2 h-4 w-4" /> Alterar Validade
+                                  </DropdownMenuItem>
                                   <DropdownMenuItem onClick={() => handleToggleStatus(user.id, user.status)}>
                                     {user.status === 'Ativo' ? (
                                       <><Ban className="mr-2 h-4 w-4" /> Bloquear Acesso</>
@@ -573,6 +599,32 @@ const Admin = () => {
           </div>
 
         </div>
+
+        {/* Expiration Dialog */}
+        <Dialog open={isExpirationOpen} onOpenChange={setIsExpirationOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Alterar Validade da Conta</DialogTitle>
+              <DialogDescription>
+                Defina quantos dias de acesso o usuário <b>{selectedUserForExpiration?.name}</b> terá a partir de hoje.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <Label htmlFor="new_days">Dias de Acesso (a partir de hoje)</Label>
+              <Input 
+                id="new_days" 
+                type="number" 
+                min="1"
+                value={newDaysValid}
+                onChange={(e) => setNewDaysValid(e.target.value)}
+              />
+            </div>
+            <DialogFooter>
+              <Button onClick={handleUpdateExpiration}>Salvar Alteração</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
       </main>
     </div>
   );
