@@ -86,11 +86,11 @@ export const Header = () => {
               </div>
 
               {/* Expiration Counter */}
-              {daysRemaining !== null && userRole !== 'ADMIN' && (
-                <div className={`flex items-center gap-3 p-3 rounded-lg border ${daysRemaining < 5 ? 'bg-red-50 border-red-200 text-red-700' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>
+              {timeLeft !== null && userRole !== 'ADMIN' && (
+                <div className={`flex items-center gap-3 p-3 rounded-lg border ${timeLeft.days < 5 ? 'bg-red-50 border-red-200 text-red-700' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>
                   <Clock className="h-5 w-5" />
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold">{daysRemaining} dias restantes</span>
+                    <span className="text-sm font-bold">{formatTimeLeft(timeLeft)}</span>
                     <span className="text-xs opacity-80">Sua conta expira em breve</span>
                   </div>
                 </div>
