@@ -1,0 +1,18 @@
+[
+  {
+    "content": "Investigate CORSMiddleware import error in backend/server.py",
+    "status": "completed"
+  },
+  {
+    "content": "Check if fastapi package is installed in dependencies",
+    "status": "in_progress"
+  },
+  {
+    "content": "Verify requirements.txt and ensure fastapi is included",
+    "status": "pending"
+  },
+  {
+    "content": "Examine the app source code for the actual import statement",
+    "status": "pending"
+  }
+]
