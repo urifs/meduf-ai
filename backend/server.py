@@ -61,6 +61,7 @@ class UserCreate(UserBase):
     password: str
     crm: Optional[str] = None
     days_valid: int = 30
+    role: str = "USER"
 
 class UserInDB(UserBase):
     id: str = Field(alias="_id")
