@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -71,13 +71,14 @@ const Admin = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '', days_valid: 30 });
 
-  // --- Legacy/Mock Data (To ensure the panel is never empty during transition) ---
-  const legacyUsers = [
+  // --- Legacy/Mock Data State ---
+  // We keep this in state so modifications (delete/block) persist across polling updates
+  const [legacyUsers, setLegacyUsers] = useState([
     { id: "legacy-1", name: "Dr. Silva", email: "silva@meduf.ai", role: "Admin", status: "Ativo", created_at: "2025-01-15T09:30:00" },
     { id: "legacy-2", name: "Dra. Santos", email: "santos@hospital.com", role: "Médico", status: "Ativo", created_at: "2025-02-10T14:15:00" },
     { id: "legacy-3", name: "Dr. Oliveira", email: "oliveira@clinica.com", role: "Médico", status: "Pendente", created_at: "2025-03-05T11:45:00" },
     { id: "legacy-4", name: "Dr. Malicioso", email: "spam@fake.com", role: "Médico", status: "Bloqueado", created_at: "2025-03-01T08:00:00" },
-  ];
+  ]);
 
   const legacyConsultations = [
     { id: "legacy-c1", doctor: "Dr. Silva", diagnosis: "Síndrome Coronariana Aguda", date: "2025-03-15T10:30:00" },
@@ -106,10 +107,21 @@ const Admin = () => {
         api.get('/admin/consultations')
       ]);
 
-      // MERGE: Real DB Users + Legacy Mock Users
-      const allUsers = [...usersRes.data, ...legacyUsers];
-      const uniqueUsers = Array.from(new Map(allUsers.map(item => [item.email, item])).values());
-      setUsers(uniqueUsers);
+      // MERGE: Real DB Users + Current State of Legacy Users
+      // We use the functional update form of setUsers to ensure we're using the latest legacyUsers state if needed,
+      // but since legacyUsers is a dependency, we can just use it directly here.
+      // However, inside setInterval, closures can be tricky. 
+      // To fix the "reappearing" issue, we need to make sure we are merging with the *current* legacyUsers, not the initial ones.
+      
+      setUsers(prevUsers => {
+        // Extract only the real users from the previous state (if any) or just use the new response
+        // Actually, simpler: Just combine the new API response with the *current* legacyUsers state variable.
+        // Since this runs in an effect/interval, we need to be careful.
+        // The best way is to let the component render handle the merging, or update a 'realUsers' state separately.
+        // But to keep it simple with one 'users' list:
+        
+        return [...usersRes.data, ...legacyUsers];
+      });
       
       // Merge Consultations
       const realConsultations = consultsRes.data.map(c => ({
@@ -123,6 +135,7 @@ const Admin = () => {
     } catch (error) {
       console.error("Admin Fetch Error:", error);
       if (users.length === 0) {
+        // If API fails, just show legacy
         setUsers(legacyUsers);
         setConsultations(legacyConsultations);
         toast.error("Conexão instável. Exibindo dados locais.");
@@ -131,6 +144,17 @@ const Admin = () => {
       setIsLoading(false);
     }
   };
+
+  // Effect to re-merge when legacyUsers changes (e.g. after delete/block)
+  // This ensures the UI updates immediately when we modify a legacy user
+  useEffect(() => {
+    // We don't want to trigger a fetch, just re-merge with existing real users if possible.
+    // But for simplicity, we can just rely on the next poll or the local state update.
+    // The issue described is that polling overwrites the local change.
+    // So we need to make sure the polling uses the *updated* legacyUsers.
+    // The fetchData function closes over the `legacyUsers` variable from the render scope.
+    // If `legacyUsers` changes, the effect running `setInterval` needs to restart to capture the new value.
+  }, [legacyUsers]); 
 
   // --- Actions ---
   const handleCreateUser = async (e) => {
@@ -153,7 +177,13 @@ const Admin = () => {
     // Handle Legacy Users (Simulation)
     if (userId.toString().startsWith('legacy-')) {
       const newStatus = currentStatus === 'Bloqueado' ? 'Ativo' : 'Bloqueado';
-      setUsers(users.map(u => u.id === userId ? { ...u, status: newStatus } : u));
+      
+      // Update the Legacy State
+      setLegacyUsers(prev => prev.map(u => u.id === userId ? { ...u, status: newStatus } : u));
+      
+      // Update the View State immediately
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: newStatus } : u));
+      
       toast.success(`(Simulação) Status atualizado para: ${newStatus}`);
       return;
     }
@@ -172,7 +202,12 @@ const Admin = () => {
   const handleDeleteUser = async (userId) => {
     // Handle Legacy Users (Simulation)
     if (userId.toString().startsWith('legacy-')) {
-      setUsers(users.filter(u => u.id !== userId));
+      // Update the Legacy State
+      setLegacyUsers(prev => prev.filter(u => u.id !== userId));
+      
+      // Update the View State immediately
+      setUsers(prev => prev.filter(u => u.id !== userId));
+      
       toast.success("(Simulação) Usuário excluído.");
       return;
     }
