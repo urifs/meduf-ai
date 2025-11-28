@@ -69,7 +69,7 @@ const Admin = () => {
   // New User Form State
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
-  const [newUser, setNewUser] = useState({ name: '', email: '', password: '' });
+  const [newUser, setNewUser] = useState({ name: '', email: '', password: '', days_valid: 30 });
 
   // --- Legacy/Mock Data (To ensure the panel is never empty during transition) ---
   const legacyUsers = [
@@ -140,7 +140,7 @@ const Admin = () => {
       await api.post('/admin/users', newUser);
       toast.success("Usuário criado com sucesso!");
       setIsCreateOpen(false);
-      setNewUser({ name: '', email: '', password: '' });
+      setNewUser({ name: '', email: '', password: '', days_valid: 30 });
       fetchData(); // Refresh list immediately
     } catch (error) {
       toast.error(error.response?.data?.detail || "Erro ao criar usuário.");
@@ -242,7 +242,7 @@ const Admin = () => {
                 <DialogHeader>
                   <DialogTitle>Criar Nova Conta</DialogTitle>
                   <DialogDescription>
-                    Adicione um novo médico ao sistema. A conta terá validade de 30 dias.
+                    Adicione um novo médico ao sistema. Defina o período de acesso.
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleCreateUser} className="space-y-4 py-4">
@@ -277,6 +277,21 @@ const Admin = () => {
                       onChange={(e) => setNewUser({...newUser, password: e.target.value})}
                       required
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="days_valid">Dias de Acesso</Label>
+                    <Input 
+                      id="days_valid" 
+                      type="number" 
+                      min="1"
+                      placeholder="30" 
+                      value={newUser.days_valid}
+                      onChange={(e) => setNewUser({...newUser, days_valid: parseInt(e.target.value) || 30})}
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      A conta expirará automaticamente após este período.
+                    </p>
                   </div>
                   <DialogFooter>
                     <Button type="submit" disabled={isCreating}>
