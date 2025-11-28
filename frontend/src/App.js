@@ -5,7 +5,6 @@ import Dashboard from "@/pages/Dashboard";
 import SimpleDashboard from "@/pages/SimpleDashboard";
 import Selection from "@/pages/Selection";
 import Login from "@/pages/Login";
-import Register from "@/pages/Register";
 import History from "@/pages/History";
 import Admin from "@/pages/Admin";
 
@@ -28,8 +27,7 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-
+          
           {/* Protected Routes */}
           <Route 
             path="/" 

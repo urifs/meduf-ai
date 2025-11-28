@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { 
   Users, 
   Activity, 
@@ -18,7 +19,9 @@ import {
   MoreHorizontal,
   FileText,
   AlertCircle,
-  Database
+  Database,
+  UserPlus,
+  Loader2
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -39,6 +42,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import api from '@/lib/api';
 import { format } from 'date-fns';
@@ -53,19 +65,11 @@ const Admin = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [lastUpdated, setLastUpdated] = useState(new Date());
-
-  // --- Legacy/Mock Data (To ensure the panel is never empty during transition) ---
-  const legacyUsers = [
-    { id: "legacy-1", name: "Dr. Silva", email: "silva@meduf.ai", role: "Admin", status: "Ativo", created_at: "2025-01-15T09:30:00" },
-    { id: "legacy-2", name: "Dra. Santos", email: "santos@hospital.com", role: "Médico", status: "Ativo", created_at: "2025-02-10T14:15:00" },
-    { id: "legacy-3", name: "Dr. Oliveira", email: "oliveira@clinica.com", role: "Médico", status: "Pendente", created_at: "2025-03-05T11:45:00" },
-    { id: "legacy-4", name: "Dr. Malicioso", email: "spam@fake.com", role: "Médico", status: "Bloqueado", created_at: "2025-03-01T08:00:00" },
-  ];
-
-  const legacyConsultations = [
-    { id: "legacy-c1", doctor: "Dr. Silva", diagnosis: "Síndrome Coronariana Aguda", date: "2025-03-15T10:30:00" },
-    { id: "legacy-c2", doctor: "Dra. Santos", diagnosis: "Enxaqueca (Migrânea)", date: "2025-03-15T11:15:00" },
-  ];
+  
+  // New User Form State
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [newUser, setNewUser] = useState({ name: '', email: '', password: '' });
 
   // --- Authentication Check & Polling ---
   useEffect(() => {
@@ -74,7 +78,6 @@ const Admin = () => {
       navigate('/'); 
     } else {
       fetchData();
-      // Poll every 5 seconds to keep the list updated in real-time
       const interval = setInterval(fetchData, 5000);
       return () => clearInterval(interval);
     }
@@ -82,42 +85,28 @@ const Admin = () => {
 
   // --- Data Fetching ---
   const fetchData = async () => {
-    // Don't set loading to true on background polls to avoid flickering
-    // Only on first load
     if (users.length === 0) setIsLoading(true);
     
     try {
-      // Fetch Users and Consultations in parallel
       const [usersRes, consultsRes] = await Promise.all([
         api.get('/admin/users'),
         api.get('/admin/consultations')
       ]);
 
-      // MERGE: Real DB Users + Legacy Mock Users
-      // This ensures the user sees "all" accounts, even those from the prototype phase
-      const allUsers = [...usersRes.data, ...legacyUsers];
+      setUsers(usersRes.data);
       
-      // Remove duplicates based on email just in case
-      const uniqueUsers = Array.from(new Map(allUsers.map(item => [item.email, item])).values());
-      
-      setUsers(uniqueUsers);
-      
-      // Merge Consultations
       const realConsultations = consultsRes.data.map(c => ({
         ...c,
         date: c.date || c.created_at 
       }));
-      setConsultations([...realConsultations, ...legacyConsultations]);
+      setConsultations(realConsultations);
       
       setLastUpdated(new Date());
       
     } catch (error) {
       console.error("Admin Fetch Error:", error);
-      // If API fails, at least show legacy data
       if (users.length === 0) {
-        setUsers(legacyUsers);
-        setConsultations(legacyConsultations);
-        toast.error("Conexão instável. Exibindo dados locais.");
+        toast.error("Conexão instável.");
       }
     } finally {
       setIsLoading(false);
@@ -125,40 +114,39 @@ const Admin = () => {
   };
 
   // --- Actions ---
-  const handleToggleStatus = async (userId, currentStatus) => {
-    // Handle Legacy Users (Simulation)
-    if (userId.toString().startsWith('legacy-')) {
-      const newStatus = currentStatus === 'Bloqueado' ? 'Ativo' : 'Bloqueado';
-      setUsers(users.map(u => u.id === userId ? { ...u, status: newStatus } : u));
-      toast.success(`(Simulação) Status atualizado para: ${newStatus}`);
-      return;
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    setIsCreating(true);
+    try {
+      await api.post('/admin/users', newUser);
+      toast.success("Usuário criado com sucesso!");
+      setIsCreateOpen(false);
+      setNewUser({ name: '', email: '', password: '' });
+      fetchData(); // Refresh list immediately
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Erro ao criar usuário.");
+    } finally {
+      setIsCreating(false);
     }
+  };
 
-    // Handle Real Users (API)
+  const handleToggleStatus = async (userId, currentStatus) => {
     try {
       const response = await api.patch(`/admin/users/${userId}/status`);
       const newStatus = response.data.status;
       
       setUsers(users.map(u => u.id === userId ? { ...u, status: newStatus } : u));
-      toast.success(`Usuário ${newStatus === 'Bloqueado' ? 'bloqueado' : 'desbloqueado'} com sucesso.`);
+      toast.success(`Status atualizado para: ${newStatus}`);
     } catch (error) {
       toast.error("Falha ao atualizar status.");
     }
   };
 
   const handleDeleteUser = async (userId) => {
-    // Handle Legacy Users (Simulation)
-    if (userId.toString().startsWith('legacy-')) {
-      setUsers(users.filter(u => u.id !== userId));
-      toast.success("(Simulação) Usuário excluído.");
-      return;
-    }
-
-    // Handle Real Users (API)
     try {
       await api.delete(`/admin/users/${userId}`);
       setUsers(users.filter(u => u.id !== userId));
-      toast.success("Usuário e dados associados excluídos.");
+      toast.success("Usuário excluído.");
     } catch (error) {
       toast.error("Falha ao excluir usuário.");
     }
@@ -209,6 +197,61 @@ const Admin = () => {
               <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
               Atualizar
             </Button>
+            
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-primary hover:bg-primary/90">
+                  <UserPlus className="h-4 w-4 mr-2" /> Novo Usuário
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Criar Nova Conta</DialogTitle>
+                  <DialogDescription>
+                    Adicione um novo médico ao sistema. A conta terá validade de 30 dias.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleCreateUser} className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Nome</Label>
+                    <Input 
+                      id="name" 
+                      placeholder="João Silva" 
+                      value={newUser.name}
+                      onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input 
+                      id="email" 
+                      type="email" 
+                      placeholder="medico@hospital.com" 
+                      value={newUser.email}
+                      onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Senha Provisória</Label>
+                    <Input 
+                      id="password" 
+                      type="password" 
+                      placeholder="******" 
+                      value={newUser.password}
+                      onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <DialogFooter>
+                    <Button type="submit" disabled={isCreating}>
+                      {isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Criar Conta"}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 

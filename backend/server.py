@@ -177,47 +177,10 @@ async def root():
     return {"message": "Meduf AI API is running"}
 
 # Auth Routes
-@app.post("/api/auth/register", response_model=Token)
-async def register(user: UserCreate):
-    existing_user = await users_collection.find_one({"email": user.email})
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
-    hashed_password = get_password_hash(user.password)
-    
-    # Check if it's the specific admin user
-    role = "USER"
-    if user.email == "ur1fs" or user.email == "admin@meduf.ai": 
-         role = "ADMIN"
-
-    # Set expiration date (30 days from now)
-    created_at = datetime.utcnow()
-    expiration_date = created_at + timedelta(days=30)
-
-    user_dict = {
-        "email": user.email,
-        "name": user.name,
-        "password_hash": hashed_password,
-        "role": role,
-        "status": "Ativo",
-        "created_at": created_at,
-        "expiration_date": expiration_date
-    }
-    
-    result = await users_collection.insert_one(user_dict)
-    
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user.email, "role": role}, expires_delta=access_token_expires
-    )
-    
-    return {
-        "access_token": access_token, 
-        "token_type": "bearer", 
-        "user_name": user.name, 
-        "user_role": role,
-        "expiration_date": expiration_date
-    }
+# NOTE: Public registration is DISABLED. Only Admins can create users via /api/admin/users
+# @app.post("/api/auth/register", response_model=Token)
+# async def register(user: UserCreate):
+#     ... (Disabled)
 
 @app.post("/api/auth/login", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -308,6 +271,31 @@ async def get_all_users(admin: UserInDB = Depends(get_admin_user)):
         document["_id"] = str(document["_id"])
         users.append(UserInDB(**document))
     return users
+
+@app.post("/api/admin/users", response_model=dict)
+async def create_user_admin(user: UserCreate, admin: UserInDB = Depends(get_admin_user)):
+    existing_user = await users_collection.find_one({"email": user.email})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    hashed_password = get_password_hash(user.password)
+    
+    # Set expiration date (30 days from now)
+    created_at = datetime.utcnow()
+    expiration_date = created_at + timedelta(days=30)
+
+    user_dict = {
+        "email": user.email,
+        "name": user.name,
+        "password_hash": hashed_password,
+        "role": "USER",
+        "status": "Ativo",
+        "created_at": created_at,
+        "expiration_date": expiration_date
+    }
+    
+    result = await users_collection.insert_one(user_dict)
+    return {"id": str(result.inserted_id), "message": "User created successfully"}
 
 @app.patch("/api/admin/users/{id}/status")
 async def toggle_user_status(id: str, admin: UserInDB = Depends(get_admin_user)):

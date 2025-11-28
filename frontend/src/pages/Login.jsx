@@ -130,16 +130,13 @@ const Login = () => {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-background px-2 text-muted-foreground">
-              Ou continue com
+              Acesso Restrito
             </span>
           </div>
         </div>
 
         <div className="text-center text-sm text-muted-foreground">
-          Não tem uma conta?{' '}
-          <Link to="/register" className="font-semibold text-primary hover:underline">
-            Cadastre-se gratuitamente
-          </Link>
+          Novas contas são criadas apenas por administradores.
         </div>
       </form>
     </AuthLayout>
