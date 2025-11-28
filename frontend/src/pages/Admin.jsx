@@ -172,6 +172,25 @@ const Admin = () => {
     }
   };
 
+  const getDaysRemaining = (expirationDate) => {
+    if (!expirationDate) return "∞";
+    try {
+      const days = differenceInDays(new Date(expirationDate), new Date());
+      if (days < 0) return "Expirado";
+      return `${days} dias`;
+    } catch (e) {
+      return "-";
+    }
+  };
+
+  const getDaysColor = (expirationDate) => {
+    if (!expirationDate) return "text-slate-500";
+    const days = differenceInDays(new Date(expirationDate), new Date());
+    if (days < 0) return "text-red-600 font-bold";
+    if (days < 5) return "text-orange-600 font-bold";
+    return "text-green-600";
+  };
+
   const filteredUsers = users.filter(user => 
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
