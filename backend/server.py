@@ -433,6 +433,35 @@ async def update_user_admin(id: str, update: AdminUserUpdate, admin: UserInDB = 
         
     return {"message": "User updated successfully"}
 
+class AdminUserUpdate(BaseModel):
+    days_valid: Optional[int] = None
+    role: Optional[str] = None
+
+@app.patch("/api/admin/users/{id}")
+async def update_user_admin(id: str, update: AdminUserUpdate, admin: UserInDB = Depends(get_admin_user)):
+    try:
+        oid = ObjectId(id)
+    except InvalidId:
+        raise HTTPException(status_code=400, detail="Invalid user ID")
+        
+    user = await users_collection.find_one({"_id": oid})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    update_data = {}
+    
+    if update.days_valid is not None:
+        # Reset expiration to X days from NOW
+        update_data["expiration_date"] = datetime.utcnow() + timedelta(days=update.days_valid)
+        
+    if update.role is not None:
+        update_data["role"] = update.role
+        
+    if update_data:
+        await users_collection.update_one({"_id": oid}, {"$set": update_data})
+        
+    return {"message": "User updated successfully"}
+
 @app.patch("/api/admin/users/{id}/status")
 async def toggle_user_status(id: str, admin: UserInDB = Depends(get_admin_user)):
     try:
