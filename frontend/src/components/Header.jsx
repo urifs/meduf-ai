@@ -4,7 +4,7 @@ import { Activity, Stethoscope, User, FileText, ClipboardList, Pill, AlertCircle
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
-import { differenceInDays } from 'date-fns';
+import { differenceInDays, intervalToDuration } from 'date-fns';
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -12,14 +12,29 @@ export const Header = () => {
   const userName = localStorage.getItem('userName') || 'Dr. Silva';
   const userRole = localStorage.getItem('userRole');
   const userExpiration = localStorage.getItem('userExpiration');
-  const [daysRemaining, setDaysRemaining] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(null);
 
   useEffect(() => {
     if (userExpiration) {
-      const days = differenceInDays(new Date(userExpiration), new Date());
-      setDaysRemaining(days);
+      const now = new Date();
+      const end = new Date(userExpiration);
+      
+      if (end > now) {
+        const duration = intervalToDuration({ start: now, end: end });
+        setTimeLeft(duration);
+      } else {
+        setTimeLeft({ days: 0, hours: 0 });
+      }
     }
   }, [userExpiration]);
+
+  const formatTimeLeft = (duration) => {
+    if (!duration) return "";
+    const { days, hours } = duration;
+    if (days > 0) return `${days} dias e ${hours} horas restantes`;
+    if (hours > 0) return `${hours} horas restantes`;
+    return "Menos de 1 hora restante";
+  };
 
   const handleLogout = () => {
     localStorage.clear();
