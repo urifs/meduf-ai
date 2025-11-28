@@ -260,9 +260,13 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if user.get("status") == "Bloqueado":
          raise HTTPException(status_code=400, detail="User account is blocked")
 
+    # Generate and update Session ID (Single Session Enforcement)
+    session_id = str(uuid.uuid4())
+    await users_collection.update_one({"_id": user["_id"]}, {"$set": {"session_id": session_id}})
+
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user["email"], "role": user.get("role", "USER")}, expires_delta=access_token_expires
+        data={"sub": user["email"], "role": user.get("role", "USER"), "session_id": session_id}, expires_delta=access_token_expires
     )
     
     return {
