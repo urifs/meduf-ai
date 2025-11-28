@@ -268,6 +268,17 @@ async def get_consultations(current_user: UserInDB = Depends(get_current_active_
         consultations.append(ConsultationInDB(**document))
     return consultations
 
+@app.patch("/api/users/me", response_model=UserInDB)
+async def update_user_me(user_update: UserUpdate, current_user: UserInDB = Depends(get_current_active_user)):
+    update_data = user_update.dict(exclude_unset=True)
+    if update_data:
+        await users_collection.update_one({"_id": ObjectId(current_user.id)}, {"$set": update_data})
+        # Fetch updated user
+        updated_user = await users_collection.find_one({"_id": ObjectId(current_user.id)})
+        updated_user["_id"] = str(updated_user["_id"])
+        return UserInDB(**updated_user)
+    return current_user
+
 @app.delete("/api/consultations/{id}")
 async def delete_consultation(id: str, current_user: UserInDB = Depends(get_current_active_user)):
     result = await consultations_collection.delete_one({"_id": ObjectId(id), "user_id": current_user.id})
