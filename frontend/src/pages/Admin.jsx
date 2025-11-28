@@ -452,9 +452,45 @@ const Admin = () => {
             </Card>
           </div>
 
-          {/* Recent Activity (Takes up 1/3 width) */}
-          <div className="xl:col-span-1 space-y-4">
-            <Card className="shadow-sm h-full">
+          {/* Right Column (Takes up 1/3 width) */}
+          <div className="xl:col-span-1 space-y-8">
+            
+            {/* Admins List Card */}
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle>Administradores</CardTitle>
+                <CardDescription>Contas com acesso total ao sistema.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {users.filter(u => u.role === 'ADMIN').length === 0 ? (
+                    <div className="text-center py-4 text-muted-foreground text-sm">
+                      Nenhum administrador encontrado.
+                    </div>
+                  ) : (
+                    users.filter(u => u.role === 'ADMIN').map((admin) => (
+                      <div key={admin.id} className="flex items-center justify-between pb-2 border-b last:border-0 last:pb-0">
+                        <div className="flex items-center gap-3">
+                          <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                            <Shield className="h-4 w-4" />
+                          </div>
+                          <div className="space-y-0.5">
+                            <p className="text-sm font-medium leading-none">{admin.name}</p>
+                            <p className="text-xs text-muted-foreground">{admin.email}</p>
+                          </div>
+                        </div>
+                        <Badge variant="secondary" className="text-xs bg-indigo-50 text-indigo-700 border-indigo-100">
+                          Admin
+                        </Badge>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Recent Activity Card */}
+            <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle>Últimas Consultas</CardTitle>
                 <CardDescription>Atividade recente na plataforma.</CardDescription>
