@@ -125,6 +125,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
+        token_session_id: str = payload.get("session_id")
+        
         if email is None:
             raise credentials_exception
     except JWTError:
@@ -133,6 +135,18 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     user = await users_collection.find_one({"email": email})
     if user is None:
         raise credentials_exception
+        
+    # Single Session Enforcement
+    # If the user has a session_id in DB, it MUST match the token's session_id
+    # We allow token_session_id to be None for backward compatibility with old tokens during migration,
+    # BUT for strict enforcement, we should require it. 
+    # Let's enforce: if DB has session_id, token must match.
+    if user.get("session_id") and user.get("session_id") != token_session_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Sessão expirada. Você conectou em outro dispositivo.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     
     # Convert ObjectId to string for the model
     user["_id"] = str(user["_id"])
