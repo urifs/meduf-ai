@@ -49,6 +49,11 @@ class PyObjectId(ObjectId):
 class UserBase(BaseModel):
     email: str
     name: str
+    avatar_url: Optional[str] = None
+
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    avatar_url: Optional[str] = None
 
 class UserCreate(UserBase):
     password: str
