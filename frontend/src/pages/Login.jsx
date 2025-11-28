@@ -104,9 +104,14 @@ const Login = () => {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="password">Senha</Label>
-            <Link to="#" className="text-sm font-medium text-primary hover:underline">
+            <a 
+              href="https://api.whatsapp.com/send/?phone=551152868823&text&type=phone_number&app_absent=0" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-primary hover:underline"
+            >
               Esqueceu a senha?
-            </Link>
+            </a>
           </div>
           <Input 
             id="password" 
