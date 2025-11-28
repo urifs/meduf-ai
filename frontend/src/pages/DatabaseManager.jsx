@@ -17,7 +17,8 @@ import {
   X, 
   RefreshCw,
   ChevronRight,
-  Search
+  Search,
+  AlertTriangle
 } from 'lucide-react';
 import {
   Dialog,
@@ -78,6 +79,9 @@ const DatabaseManager = () => {
       setCollections(response.data);
       if (response.data.length > 0 && !selectedCollection) {
         setSelectedCollection(response.data[0]);
+      } else if (response.data.length === 0) {
+        setSelectedCollection(null);
+        setDocuments([]);
       }
     } catch (error) {
       toast.error("Erro ao listar coleções.");
@@ -138,6 +142,17 @@ const DatabaseManager = () => {
     }
   };
 
+  const handleDeleteCollection = async () => {
+    try {
+      await api.delete(`/admin/db/collections/${selectedCollection}`);
+      toast.success(`Coleção ${selectedCollection} excluída.`);
+      setSelectedCollection(null);
+      fetchCollections();
+    } catch (error) {
+      toast.error("Erro ao excluir coleção.");
+    }
+  };
+
   const openEditor = (doc = null) => {
     setEditingDoc(doc);
     setJsonContent(JSON.stringify(doc || {}, null, 2));
@@ -171,116 +186,153 @@ const DatabaseManager = () => {
             </CardHeader>
             <CardContent className="p-2">
               <div className="space-y-1">
-                {collections.map(col => (
-                  <Button
-                    key={col}
-                    variant={selectedCollection === col ? "secondary" : "ghost"}
-                    className="w-full justify-start"
-                    onClick={() => {
-                      setSelectedCollection(col);
-                      setSearchTerm(""); // Reset search on collection change
-                    }}
-                  >
-                    <TableIcon className="mr-2 h-4 w-4" />
-                    {col}
-                    {selectedCollection === col && <ChevronRight className="ml-auto h-4 w-4 opacity-50" />}
-                  </Button>
-                ))}
+                {collections.length === 0 ? (
+                  <p className="text-sm text-muted-foreground p-2">Nenhuma coleção encontrada.</p>
+                ) : (
+                  collections.map(col => (
+                    <Button
+                      key={col}
+                      variant={selectedCollection === col ? "secondary" : "ghost"}
+                      className="w-full justify-start"
+                      onClick={() => {
+                        setSelectedCollection(col);
+                        setSearchTerm(""); // Reset search on collection change
+                      }}
+                    >
+                      <TableIcon className="mr-2 h-4 w-4" />
+                      {col}
+                      {selectedCollection === col && <ChevronRight className="ml-auto h-4 w-4 opacity-50" />}
+                    </Button>
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
 
           {/* Main: Documents */}
           <Card className="lg:col-span-3 min-h-[600px]">
-            <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-4 gap-4">
-              <div>
-                <CardTitle className="text-xl flex items-center gap-2">
-                  {selectedCollection}
-                  <Badge variant="outline" className="ml-2 font-normal">
-                    {documents.length} documentos
-                  </Badge>
-                </CardTitle>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                <form onSubmit={handleSearch} className="relative w-full sm:w-64">
-                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input 
-                    placeholder="Pesquisar (ID, nome, email...)" 
-                    className="pl-8"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </form>
-                
-                <div className="flex gap-2">
-                  <Button variant="outline" size="icon" onClick={() => fetchDocuments(selectedCollection, searchTerm)} title="Atualizar">
-                    <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                  </Button>
-                  <Button size="sm" onClick={() => openEditor(null)}>
-                    <Plus className="h-4 w-4 mr-2" /> Novo
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              {isLoading ? (
-                <div className="flex items-center justify-center h-64">
-                  <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
-                </div>
-              ) : (
-                <div className="divide-y">
-                  {documents.map((doc) => (
-                    <div key={doc._id} className="p-4 hover:bg-slate-50 transition-colors group">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 overflow-hidden">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="secondary" className="font-mono text-xs">
-                              _id: {doc._id}
-                            </Badge>
-                          </div>
-                          <pre className="text-xs text-muted-foreground font-mono bg-slate-100 p-2 rounded overflow-x-auto max-h-32">
-                            {JSON.stringify(doc, null, 2)}
-                          </pre>
-                        </div>
-                        <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button variant="ghost" size="icon" onClick={() => openEditor(doc)}>
-                            <Edit className="h-4 w-4 text-blue-600" />
+            {selectedCollection ? (
+              <>
+                <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-4 gap-4">
+                  <div>
+                    <CardTitle className="text-xl flex items-center gap-2">
+                      {selectedCollection}
+                      <Badge variant="outline" className="ml-2 font-normal">
+                        {documents.length} documentos
+                      </Badge>
+                    </CardTitle>
+                  </div>
+                  
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <form onSubmit={handleSearch} className="relative w-full sm:w-64">
+                      <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input 
+                        placeholder="Pesquisar (ID, nome, email...)" 
+                        className="pl-8"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </form>
+                    
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="icon" onClick={() => fetchDocuments(selectedCollection, searchTerm)} title="Atualizar">
+                        <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                      </Button>
+                      <Button size="sm" onClick={() => openEditor(null)}>
+                        <Plus className="h-4 w-4 mr-2" /> Novo
+                      </Button>
+                      
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" size="icon" title="Excluir Coleção">
+                            <Trash2 className="h-4 w-4" />
                           </Button>
-                          
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <Trash2 className="h-4 w-4 text-red-600" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Excluir documento?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Esta ação é irreversível. O documento será removido permanentemente do banco de dados.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDelete(doc._id)} className="bg-red-600">
-                                  Excluir
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </div>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+                              <AlertTriangle className="h-5 w-5" /> Excluir Coleção Inteira?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Você está prestes a excluir a coleção <b>{selectedCollection}</b> e TODOS os seus documentos. Esta ação não pode ser desfeita.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDeleteCollection} className="bg-destructive hover:bg-destructive/90">
+                              Sim, Excluir Tudo
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
-                  ))}
-                  {documents.length === 0 && (
-                    <div className="text-center py-12 text-muted-foreground">
-                      Nenhum documento encontrado.
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {isLoading ? (
+                    <div className="flex items-center justify-center h-64">
+                      <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : (
+                    <div className="divide-y">
+                      {documents.map((doc) => (
+                        <div key={doc._id} className="p-4 hover:bg-slate-50 transition-colors group">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1 overflow-hidden">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Badge variant="secondary" className="font-mono text-xs">
+                                  _id: {doc._id}
+                                </Badge>
+                              </div>
+                              <pre className="text-xs text-muted-foreground font-mono bg-slate-100 p-2 rounded overflow-x-auto max-h-32">
+                                {JSON.stringify(doc, null, 2)}
+                              </pre>
+                            </div>
+                            <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button variant="ghost" size="icon" onClick={() => openEditor(doc)}>
+                                <Edit className="h-4 w-4 text-blue-600" />
+                              </Button>
+                              
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="ghost" size="icon">
+                                    <Trash2 className="h-4 w-4 text-red-600" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Excluir documento?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Esta ação é irreversível. O documento será removido permanentemente do banco de dados.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleDelete(doc._id)} className="bg-red-600">
+                                      Excluir
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      {documents.length === 0 && (
+                        <div className="text-center py-12 text-muted-foreground">
+                          Nenhum documento encontrado.
+                        </div>
+                      )}
                     </div>
                   )}
-                </div>
-              )}
-            </CardContent>
+                </CardContent>
+              </>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-muted-foreground">
+                <Database className="h-16 w-16 mb-4 opacity-20" />
+                <p>Selecione uma coleção para visualizar.</p>
+              </div>
+            )}
           </Card>
         </div>
 
