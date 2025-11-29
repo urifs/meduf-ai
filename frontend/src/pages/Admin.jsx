@@ -592,7 +592,14 @@ const Admin = () => {
                     </div>
                   ) : (
                     consultations.slice(0, 10).map((consult, i) => (
-                      <div key={i} className="flex items-start gap-4 pb-4 border-b last:border-0 last:pb-0">
+                      <div 
+                        key={i} 
+                        className="flex items-start gap-4 pb-4 border-b last:border-0 last:pb-0 cursor-pointer hover:bg-slate-50 p-2 rounded-md transition-colors"
+                        onClick={() => {
+                          setSelectedConsultation(consult);
+                          setIsConsultationOpen(true);
+                        }}
+                      >
                         <div className="h-9 w-9 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 mt-0.5">
                           <FileText className="h-4 w-4" />
                         </div>
