@@ -436,10 +436,10 @@ const Admin = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="rounded-md border">
+                <div className="rounded-md border max-h-[600px] overflow-y-auto">
                   <Table>
-                    <TableHeader>
-                      <TableRow className="bg-slate-50">
+                    <TableHeader className="sticky top-0 bg-slate-50 z-10">
+                      <TableRow>
                         <TableHead>Usuário</TableHead>
                         <TableHead>Função</TableHead>
                         <TableHead>Status</TableHead>
