@@ -30,68 +30,163 @@ const MedicationGuide = () => {
     // Simulate AI Processing Delay
     setTimeout(async () => {
       let mockResponse;
-      const text = symptoms.toLowerCase();
+      
+      // Normalize text: remove accents and lowercase
+      const text = symptoms.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-      // Logic focused purely on therapeutics
-      if (text.includes("dor") || text.includes("febre") || text.includes("inflamação")) {
+      // 1. Pain / Fever / Inflammation
+      if (text.includes("dor") || text.includes("febre") || text.includes("inflama") || text.includes("quente") || text.includes("algico") || text.includes("doendo")) {
         mockResponse = [
           {
             name: "Dipirona Monoidratada",
             dose: "1g (1 ampola ou 2 comprimidos)",
             frequency: "6/6 horas",
             route: "Endovenosa (IV) ou Oral (VO)",
-            notes: "Diluir em 10ml de AD se IV. Contraindicado em alergia a pirazolonas."
+            notes: "Analgesia potente. Contraindicado em alergia a pirazolonas ou hipotensão grave."
           },
           {
             name: "Cetoprofeno (Profenid)",
             dose: "100mg",
             frequency: "12/12 horas",
             route: "Intravenosa (IV) - Infusão lenta",
-            notes: "Diluir em 100ml de SF 0,9%. Correr em 20-30 min. Cuidado em renais crônicos."
+            notes: "Anti-inflamatório. Diluir em 100ml de SF 0,9%. Evitar em idosos/renais."
+          },
+          {
+            name: "Tramadol",
+            dose: "50mg a 100mg",
+            frequency: "8/8 horas",
+            route: "Intravenosa (IV) ou Oral (VO)",
+            notes: "Opioide fraco. Usar se dor refratária a dipirona/AINE. Pode causar náusea."
           }
         ];
-      } else if (text.includes("vômito") || text.includes("náusea") || text.includes("enjoo")) {
+      } 
+      // 2. Nausea / Vomiting / Dizziness
+      else if (text.includes("vomito") || text.includes("nausea") || text.includes("enjoo") || text.includes("ansia") || text.includes("tontura") || text.includes("vertigem")) {
         mockResponse = [
           {
             name: "Ondansetrona (Zofran)",
             dose: "4mg a 8mg",
             frequency: "8/8 horas",
             route: "Intravenosa (IV) ou Oral (VO)",
-            notes: "Injeção lenta (2-5 min). Pode causar cefaleia."
+            notes: "Antiemético potente. Injeção lenta (2-5 min). Baixo risco de sedação."
           },
           {
             name: "Metoclopramida (Plasil)",
             dose: "10mg",
             frequency: "8/8 horas",
             route: "Intravenosa (IV) ou Intramuscular (IM)",
-            notes: "Risco de efeitos extrapiramidais (distonia). Evitar em idosos."
+            notes: "Pró-cinético. Risco de distonia (efeito extrapiramidal). Evitar em jovens/idosos."
+          },
+          {
+            name: "Dimenidrinato (Dramin B6)",
+            dose: "1 ampola ou 1 cp",
+            frequency: "6/6 horas",
+            route: "Intravenosa (IV) ou Oral (VO)",
+            notes: "Bom para tontura/labirintite. Causa sonolência."
           }
         ];
-      } else if (text.includes("alergia") || text.includes("coceira") || text.includes("vermelhidão")) {
+      } 
+      // 3. Allergy / Itching
+      else if (text.includes("alergia") || text.includes("coceira") || text.includes("vermelh") || text.includes("prurido") || text.includes("picada") || text.includes("incha")) {
         mockResponse = [
           {
             name: "Dexclorfeniramina (Polaramine)",
             dose: "2mg a 4mg",
             frequency: "6/6 horas",
             route: "Oral (VO)",
-            notes: "Pode causar sonolência."
+            notes: "Anti-histamínico clássico. Pode causar sonolência."
           },
           {
             name: "Hidrocortisona",
-            dose: "100mg a 500mg (dependendo da gravidade)",
-            frequency: "Dose única ou 8/8h",
+            dose: "100mg a 500mg",
+            frequency: "Dose única (ataque)",
             route: "Intravenosa (IV)",
-            notes: "Corticosteroide de ação rápida para reações agudas."
+            notes: "Corticosteroide para reações agudas/anafilaxia. Ação anti-inflamatória potente."
+          },
+          {
+            name: "Prometazina (Fenergan)",
+            dose: "25mg (1 ampola)",
+            frequency: "Dose única",
+            route: "Intramuscular (IM) Profunda",
+            notes: "Anti-histamínico potente. Sedativo. Não fazer IV (risco de necrose)."
           }
         ];
-      } else {
+      } 
+      // 4. Respiratory / Cough
+      else if (text.includes("tosse") || text.includes("ar") || text.includes("garganta") || text.includes("peito") || text.includes("respir")) {
         mockResponse = [
           {
-            name: "Sintomáticos Gerais",
-            dose: "Avaliar caso a caso",
-            frequency: "Conforme necessidade",
-            route: "Oral ou Parenteral",
-            notes: "Sintomas inespecíficos. Reavaliar sinais vitais e história clínica."
+            name: "Acebrofilina",
+            dose: "10mg/ml (Xarope)",
+            frequency: "10ml 12/12h",
+            route: "Oral (VO)",
+            notes: "Broncodilatador e mucolítico. Alívio da tosse produtiva."
+          },
+          {
+            name: "Dipirona",
+            dose: "1g",
+            frequency: "6/6h",
+            route: "Oral (VO)",
+            notes: "Para febre ou dor no corpo associada."
+          },
+          {
+            name: "Prednisolona",
+            dose: "20mg a 40mg",
+            frequency: "1x ao dia (manhã)",
+            route: "Oral (VO)",
+            notes: "Corticosteroide. Usar se houver broncoespasmo ou inflamação importante (3-5 dias)."
+          }
+        ];
+      }
+      // 5. Gastric / Abdominal Pain
+      else if (text.includes("barriga") || text.includes("estomago") || text.includes("abdom") || text.includes("gastrit") || text.includes("queima")) {
+        mockResponse = [
+          {
+            name: "Omeprazol",
+            dose: "40mg",
+            frequency: "1x ao dia (jejum)",
+            route: "Endovenosa (IV) ou Oral (VO)",
+            notes: "Proteção gástrica. Inibidor de bomba de prótons."
+          },
+          {
+            name: "Escopolamina (Buscopan)",
+            dose: "20mg (1 ampola)",
+            frequency: "6/6h ou 8/8h",
+            route: "Endovenosa (IV)",
+            notes: "Antiespasmódico. Alívio de cólicas."
+          },
+          {
+            name: "Simeticona (Luftal)",
+            dose: "40mg a 125mg",
+            frequency: "6/6h",
+            route: "Oral (VO)",
+            notes: "Antigases. Alívio de distensão abdominal."
+          }
+        ];
+      }
+      // 6. Universal Fallback (Symptomatic Kit)
+      else {
+        mockResponse = [
+          {
+            name: "Dipirona",
+            dose: "1g",
+            frequency: "6/6h",
+            route: "Oral ou IV",
+            notes: "Analgesia geral e controle térmico."
+          },
+          {
+            name: "Ondansetrona",
+            dose: "4mg",
+            frequency: "8/8h",
+            route: "Oral ou IV",
+            notes: "Se houver náusea/vômito associado."
+          },
+          {
+            name: "Hidratação (Soro Fisiológico 0,9%)",
+            dose: "500ml a 1000ml",
+            frequency: "Correr em 1-2 horas",
+            route: "Endovenosa (IV)",
+            notes: "Expansão volêmica e hidratação basal."
           }
         ];
       }
