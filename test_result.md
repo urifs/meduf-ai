@@ -354,8 +354,8 @@ metadata:
   version: "1.5"
   test_sequence: 7
   run_ui: true
-  test_completed: false
-  all_tests_passed: false
+  test_completed: true
+  all_tests_passed: true
 
 test_plan:
   current_focus: []
