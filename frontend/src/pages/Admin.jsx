@@ -356,7 +356,7 @@ const Admin = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <Card className="border-l-4 border-l-blue-500 shadow-sm">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total de Usuários</CardTitle>
@@ -368,6 +368,21 @@ const Admin = () => {
               </div>
               <p className="text-xs text-muted-foreground mt-1">
                 {stats.activeUsers} ativos no momento
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-l-4 border-l-cyan-500 shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Usuários Online</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div className="text-3xl font-bold">{onlineCount}</div>
+                <Activity className="h-8 w-8 text-cyan-100" />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Nos últimos 5 minutos
               </p>
             </CardContent>
           </Card>
@@ -394,7 +409,7 @@ const Admin = () => {
             <CardContent>
               <div className="flex items-center justify-between">
                 <div className="text-3xl font-bold">{stats.totalConsultations}</div>
-                <Activity className="h-8 w-8 text-green-100" />
+                <FileText className="h-8 w-8 text-green-100" />
               </div>
               <p className="text-xs text-muted-foreground mt-1">
                 Registradas no banco de dados
