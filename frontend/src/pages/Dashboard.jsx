@@ -169,7 +169,7 @@ const Dashboard = () => {
           ]
         };
       } 
-      // 5. Musculoskeletal / Pain
+      // 6. Musculoskeletal / Pain
       else if (complaint.includes("dor") || complaint.includes("costas") || complaint.includes("lombar") || complaint.includes("perna") || complaint.includes("braço") || complaint.includes("muscular")) {
         mockResponse = {
           diagnoses: [
