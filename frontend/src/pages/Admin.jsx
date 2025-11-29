@@ -86,6 +86,10 @@ const Admin = () => {
   const [selectedUserForExpiration, setSelectedUserForExpiration] = useState(null);
   const [newDaysValid, setNewDaysValid] = useState(30);
 
+  // Consultation View State
+  const [selectedConsultation, setSelectedConsultation] = useState(null);
+  const [isConsultationOpen, setIsConsultationOpen] = useState(false);
+
   // --- Authentication Check & Polling ---
   useEffect(() => {
     if (userRole !== 'ADMIN') {
