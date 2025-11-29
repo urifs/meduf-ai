@@ -22,11 +22,11 @@ const Dashboard = () => {
     setTimeout(async () => {
       
       let mockResponse;
-      // Ensure complaint is a string and lowercased
-      const complaint = (formData.queixa || "").toLowerCase();
+      // Ensure complaint is a string, lowercased, and normalized (no accents)
+      const complaint = (formData.queixa || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
       // 1. Gynecological / Obstetric (High Priority)
-      if (complaint.includes("menstruação") || complaint.includes("atraso") || complaint.includes("sangramento vaginal") || complaint.includes("cólica") || complaint.includes("gestante") || complaint.includes("grávida")) {
+      if (complaint.includes("menstruacao") || complaint.includes("atraso") || complaint.includes("sangramento vaginal") || complaint.includes("colica") || complaint.includes("gestante") || complaint.includes("gravida")) {
         mockResponse = {
           diagnoses: [
             {
