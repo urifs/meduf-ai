@@ -71,6 +71,7 @@ const Admin = () => {
   
   const [users, setUsers] = useState([]);
   const [consultations, setConsultations] = useState([]);
+  const [onlineCount, setOnlineCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [lastUpdated, setLastUpdated] = useState(new Date());
