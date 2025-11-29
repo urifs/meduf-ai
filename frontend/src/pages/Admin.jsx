@@ -63,6 +63,7 @@ import { toast } from "sonner";
 import api from '@/lib/api';
 import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { ClinicalReport } from '@/components/ClinicalReport';
 
 const Admin = () => {
   const navigate = useNavigate();
