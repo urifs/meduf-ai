@@ -3,6 +3,7 @@ import "@/App.css";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Dashboard from "@/pages/Dashboard";
 import SimpleDashboard from "@/pages/SimpleDashboard";
+import MedicationGuide from "@/pages/MedicationGuide";
 import Selection from "@/pages/Selection";
 import Login from "@/pages/Login";
 import History from "@/pages/History";
@@ -52,6 +53,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <SimpleDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/medication" 
+            element={
+              <ProtectedRoute>
+                <MedicationGuide />
               </ProtectedRoute>
             } 
           />

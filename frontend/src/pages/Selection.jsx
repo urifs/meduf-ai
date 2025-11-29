@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Sparkles, Stethoscope, ArrowRight } from 'lucide-react';
+import { FileText, Sparkles, Stethoscope, ArrowRight, Syringe } from 'lucide-react';
 
 const Selection = () => {
   const navigate = useNavigate();
@@ -12,10 +12,11 @@ const Selection = () => {
     <div className="min-h-screen bg-background font-sans">
       <Header />
       <main className="container mx-auto px-4 py-16 md:px-8 flex flex-col items-center justify-center min-h-[80vh]">
-        <div className="grid md:grid-cols-2 gap-8 w-full max-w-4xl">
+        <div className="grid md:grid-cols-3 gap-6 w-full max-w-6xl">
+          
           {/* Simple Diagnosis Option */}
           <Card 
-            className="group hover:border-primary/50 transition-all duration-300 cursor-pointer hover:shadow-lg relative overflow-hidden"
+            className="group hover:border-primary/50 transition-all duration-300 cursor-pointer hover:shadow-lg relative overflow-hidden flex flex-col"
             onClick={() => navigate('/simple')}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -23,65 +24,71 @@ const Selection = () => {
               <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white transition-colors">
                 <Sparkles className="h-6 w-6" />
               </div>
-              <CardTitle className="text-2xl">Diagnóstico Simples</CardTitle>
-              <CardDescription className="text-base">
-                Ideal para anotações rápidas e fluxo livre.
+              <CardTitle className="text-xl">Diagnóstico Simples</CardTitle>
+              <CardDescription>
+                Texto livre para análise rápida.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                Digite toda a anamnese em um único campo de texto livre. A IA irá estruturar e analisar as informações automaticamente.
+            <CardContent className="space-y-4 flex-1 flex flex-col">
+              <p className="text-sm text-muted-foreground flex-1">
+                Digite a anamnese em um único campo. A IA estrutura e analisa automaticamente.
               </p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                  Entrada de texto livre
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                  Análise rápida
-                </li>
-              </ul>
-              <Button className="w-full mt-4 group-hover:bg-primary" variant="outline">
-                Selecionar Modo Simples <ArrowRight className="ml-2 h-4 w-4" />
+              <Button className="w-full mt-auto group-hover:bg-primary" variant="outline">
+                Acessar <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </CardContent>
           </Card>
 
           {/* Detailed Diagnosis Option */}
           <Card 
-            className="group hover:border-secondary/50 transition-all duration-300 cursor-pointer hover:shadow-lg relative overflow-hidden"
+            className="group hover:border-blue-500/50 transition-all duration-300 cursor-pointer hover:shadow-lg relative overflow-hidden flex flex-col"
             onClick={() => navigate('/detailed')}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <CardHeader>
-              <div className="h-12 w-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-4 group-hover:bg-secondary group-hover:text-white transition-colors">
-                <FileText className="h-6 w-6 text-secondary-foreground group-hover:text-white" />
+              <div className="h-12 w-12 rounded-lg bg-blue-100 flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors text-blue-600">
+                <FileText className="h-6 w-6" />
               </div>
-              <CardTitle className="text-2xl">Diagnóstico Detalhado</CardTitle>
-              <CardDescription className="text-base">
-                Estruturado para casos complexos.
+              <CardTitle className="text-xl">Diagnóstico Detalhado</CardTitle>
+              <CardDescription>
+                Campos estruturados e completos.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                Preencha campos específicos para Queixa, Histórico, Exame Físico e Complementares. Maior precisão na coleta de dados.
+            <CardContent className="space-y-4 flex-1 flex flex-col">
+              <p className="text-sm text-muted-foreground flex-1">
+                Preencha Queixa, Histórico e Exames separadamente para maior precisão.
               </p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-secondary" />
-                  Campos estruturados
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-secondary" />
-                  Ideal para documentação completa
-                </li>
-              </ul>
-              <Button className="w-full mt-4 group-hover:bg-secondary group-hover:text-white" variant="outline">
-                Selecionar Modo Detalhado <ArrowRight className="ml-2 h-4 w-4" />
+              <Button className="w-full mt-auto group-hover:bg-blue-600 group-hover:text-white" variant="outline">
+                Acessar <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </CardContent>
           </Card>
+
+          {/* Medication Guide Option */}
+          <Card 
+            className="group hover:border-green-500/50 transition-all duration-300 cursor-pointer hover:shadow-lg relative overflow-hidden flex flex-col"
+            onClick={() => navigate('/medication')}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <CardHeader>
+              <div className="h-12 w-12 rounded-lg bg-green-100 flex items-center justify-center mb-4 group-hover:bg-green-600 group-hover:text-white transition-colors text-green-600">
+                <Syringe className="h-6 w-6" />
+              </div>
+              <CardTitle className="text-xl">Guia Terapêutico</CardTitle>
+              <CardDescription>
+                Foco em prescrição e conduta.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 flex-1 flex flex-col">
+              <p className="text-sm text-muted-foreground flex-1">
+                Descreva o quadro para receber sugestões de medicamentos, doses e vias de administração.
+              </p>
+              <Button className="w-full mt-auto group-hover:bg-green-600 group-hover:text-white" variant="outline">
+                Acessar <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </CardContent>
+          </Card>
+
         </div>
       </main>
     </div>
