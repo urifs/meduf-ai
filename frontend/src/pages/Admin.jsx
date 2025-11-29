@@ -603,7 +603,7 @@ const Admin = () => {
                         <div className="h-9 w-9 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 mt-0.5">
                           <FileText className="h-4 w-4" />
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-1 flex-1">
                           <p className="text-sm font-medium leading-none">
                             {consult.diagnosis || "Análise Realizada"}
                           </p>
@@ -614,6 +614,9 @@ const Admin = () => {
                             {formatDate(consult.date)}
                           </p>
                         </div>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+                          <FileText className="h-4 w-4" />
+                        </Button>
                       </div>
                     ))
                   )}
