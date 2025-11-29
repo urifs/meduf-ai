@@ -591,7 +591,7 @@ const Admin = () => {
                       Nenhuma consulta registrada ainda.
                     </div>
                   ) : (
-                    consultations.slice(0, 10).map((consult, i) => (
+                    consultations.map((consult, i) => (
                       <div 
                         key={i} 
                         className="flex items-start gap-4 pb-4 border-b last:border-0 last:pb-0 cursor-pointer hover:bg-slate-50 p-2 rounded-md transition-colors"
