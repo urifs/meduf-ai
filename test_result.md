@@ -369,27 +369,33 @@ test_plan:
 frontend:
   - task: "Toxicology Feature - Paracetamol Protocol Verification"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/Toxicology.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "CRITICAL BUG FIX VERIFICATION: Need to test that 'intoxicação por paracetamol' returns correct Paracetamol protocol, not Cocaine protocol. This is the main bug that was reported and fixed."
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL BUG FIX VERIFIED: 'intoxicação por paracetamol' now correctly returns 'Paracetamol (Acetaminofeno)' as agent and 'N-Acetilcisteína (NAC)' as antidote. NO cocaine contamination detected. Bug fix successful!"
 
   - task: "Toxicology Feature - Multiple Substance Protocol Testing"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/Toxicology.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Need comprehensive testing of all substance protocols: Paracetamol, Cocaine, Unknown substances (dengue), and Opioids (morfina) to ensure no cross-contamination between protocols."
+      - working: true
+        agent: "testing"
+        comment: "✅ ALL PROTOCOLS VERIFIED: Comprehensive testing completed with visual verification via screenshots. 1) Paracetamol → 'Paracetamol (Acetaminofeno)' + 'N-Acetilcisteína (NAC)' ✅ 2) Cocaine → 'Estimulantes (Cocaína/Anfetaminas)' + 'Benzodiazepínicos (Sintomático)' ✅ 3) Unknown (dengue) → 'Agente Desconhecido / Outros' + 'Suporte Clínico (ABCDE)' ✅ 4) Opioid (morfina) → 'Opioide' + 'Naloxona' ✅. No cross-contamination between protocols. All antidotes correct."
 
 agent_communication:
   - agent: "testing"
