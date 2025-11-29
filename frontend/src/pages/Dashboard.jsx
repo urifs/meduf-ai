@@ -25,8 +25,36 @@ const Dashboard = () => {
       // Ensure complaint is a string and lowercased
       const complaint = (formData.queixa || "").toLowerCase();
 
-      // 1. Cardiac
-      if (complaint.includes("dor no peito") || complaint.includes("tórax") || complaint.includes("precordial") || complaint.includes("infarto") || complaint.includes("coração")) {
+      // 1. Gynecological / Obstetric (High Priority)
+      if (complaint.includes("menstruação") || complaint.includes("atraso") || complaint.includes("sangramento vaginal") || complaint.includes("cólica") || complaint.includes("gestante") || complaint.includes("grávida")) {
+        mockResponse = {
+          diagnoses: [
+            {
+              name: "Gravidez (Possível Gestação)",
+              justification: "Atraso menstrual em paciente em idade fértil é gravidez até prova em contrário."
+            },
+            {
+              name: "Dismenorreia / Alteração Hormonal",
+              justification: "Considerar se houver história de irregularidade menstrual ou SOP."
+            },
+            {
+              name: "Infecção do Trato Urinário (ITU)",
+              justification: "Diagnóstico diferencial comum se houver dor pélvica associada."
+            }
+          ],
+          conduct: {
+            exams: ["Beta-HCG (Sanguíneo)", "Ultrassom Transvaginal", "EAS (Urina Tipo 1)"],
+            procedures: ["Exame especular (se sangramento)", "Palpação abdominal"],
+            advice: "Abstinência sexual até definição. Iniciar ácido fólico se desejo de gestar."
+          },
+          medications: [
+            { name: "Ácido Fólico", dosage: "5mg/dia", mechanism: "Prevenção de defeitos do tubo neural." },
+            { name: "Buscopan Composto", dosage: "1 cp 8/8h", mechanism: "Sintomático para cólicas." }
+          ]
+        };
+      }
+      // 2. Cardiac
+      else if (complaint.includes("dor no peito") || complaint.includes("tórax") || complaint.includes("precordial") || complaint.includes("infarto") || complaint.includes("coração")) {
         mockResponse = {
           diagnoses: [
             {
