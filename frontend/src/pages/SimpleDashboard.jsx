@@ -119,33 +119,58 @@ const SimpleDashboard = () => {
           ]
         };
       }
-      // 3. Respiratory / Infection
-      else if (text.includes("febre") || text.includes("tosse") || text.includes("ar") || text.includes("garganta") || text.includes("pulmão") || text.includes("respirar")) {
-        mockResponse = {
-          diagnoses: [
-            {
-              name: "Infecção de Vias Aéreas Superiores (IVAS)",
-              justification: "Quadro febril inespecífico sugere etiologia viral ou bacteriana inicial."
+      // 3. Respiratory / Infection (Covid, Flu)
+      else if (text.includes("febre") || text.includes("tosse") || text.includes("ar") || text.includes("garganta") || text.includes("pulmao") || text.includes("respirar") || text.includes("covid") || text.includes("coronavirus") || text.includes("gripe") || text.includes("influenza")) {
+        if (text.includes("covid") || text.includes("coronavirus")) {
+           mockResponse = {
+            diagnoses: [
+              {
+                name: "Covid-19 (Suspeita/Confirmada)",
+                justification: "Menção direta à patologia ou quadro respiratório agudo sugestivo."
+              },
+              {
+                name: "Síndrome Gripal",
+                justification: "Diagnóstico diferencial principal."
+              }
+            ],
+            conduct: {
+              exams: ["RT-PCR SARS-CoV-2", "Teste Rápido Antígeno", "Oximetria de Pulso", "Tomografia de Tórax (se dessaturação)"],
+              procedures: ["Isolamento respiratório (gotículas/aerossóis)", "Notificação compulsória"],
+              advice: "Isolamento por 5-7 dias. Uso de máscara. Retorno se falta de ar."
             },
-            {
-              name: "Pneumonia Adquirida na Comunidade",
-              justification: "Considerar se houver dispneia, tosse produtiva ou ausculta pulmonar alterada."
+            medications: [
+              { name: "Dipirona", dosage: "1g 6/6h", mechanism: "Sintomático para febre e dor." },
+              { name: "Xarope (Dropropizina/Acebrofilina)", dosage: "Conforme bula", mechanism: "Alívio da tosse." },
+              { name: "Corticoide (Dexametasona)", dosage: "6mg/dia (Apenas se necessidade de O2)", mechanism: "Anti-inflamatório sistêmico (fase inflamatória)." }
+            ]
+          };
+        } else {
+          mockResponse = {
+            diagnoses: [
+              {
+                name: "Infecção de Vias Aéreas Superiores (IVAS)",
+                justification: "Quadro febril inespecífico sugere etiologia viral ou bacteriana inicial."
+              },
+              {
+                name: "Pneumonia Adquirida na Comunidade",
+                justification: "Considerar se houver dispneia, tosse produtiva ou ausculta pulmonar alterada."
+              },
+              {
+                name: "Influenza / Covid-19",
+                justification: "Síndrome gripal com febre e sintomas sistêmicos."
+              }
+            ],
+            conduct: {
+              exams: ["Teste Rápido Influenza/Covid", "Raio-X de Tórax (se dispneia)", "Hemograma"],
+              procedures: ["Avaliação de sinais vitais", "Hidratação oral vigorosa"],
+              advice: "Isolamento respiratório se suspeita de Covid. Repouso e hidratação."
             },
-            {
-              name: "Influenza / Covid-19",
-              justification: "Síndrome gripal com febre e sintomas sistêmicos."
-            }
-          ],
-          conduct: {
-            exams: ["Teste Rápido Influenza/Covid", "Raio-X de Tórax (se dispneia)", "Hemograma"],
-            procedures: ["Avaliação de sinais vitais", "Hidratação oral vigorosa"],
-            advice: "Isolamento respiratório se suspeita de Covid. Repouso e hidratação."
-          },
-          medications: [
-            { name: "Dipirona", dosage: "1g 6/6h", mechanism: "Antitérmico e analgésico" },
-            { name: "Xarope Expectorante", dosage: "Conforme necessidade", mechanism: "Sintomático para tosse" }
-          ]
-        };
+            medications: [
+              { name: "Dipirona", dosage: "1g 6/6h", mechanism: "Antitérmico e analgésico" },
+              { name: "Xarope Expectorante", dosage: "Conforme necessidade", mechanism: "Sintomático para tosse" }
+            ]
+          };
+        }
       }
       // 4. Tropical Diseases / Infectious (Malaria, Dengue)
       else if (text.includes("malaria") || text.includes("paludismo") || text.includes("dengue") || text.includes("zika") || text.includes("chikungunya") || text.includes("picada") || text.includes("mosquito")) {
