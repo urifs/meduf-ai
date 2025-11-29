@@ -140,7 +140,7 @@ const Dashboard = () => {
           ]
         };
       }
-      // 4. Neurological
+      // 5. Neurological
       else if (complaint.includes("cabeça") || complaint.includes("cefaleia") || complaint.includes("enxaqueca") || complaint.includes("tontura")) {
         mockResponse = {
           diagnoses: [
