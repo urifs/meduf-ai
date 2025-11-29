@@ -357,6 +357,7 @@ async def delete_consultation(id: str, current_user: UserInDB = Depends(get_curr
 @app.get("/api/admin/users", response_model=List[UserInDB])
 async def get_all_users(admin: UserInDB = Depends(get_admin_user)):
     users = []
+    # Removed limit to show all users
     cursor = users_collection.find({}).sort("created_at", -1)
     async for document in cursor:
         document["_id"] = str(document["_id"])
@@ -364,8 +365,6 @@ async def get_all_users(admin: UserInDB = Depends(get_admin_user)):
             users.append(UserInDB(**document))
         except Exception as e:
             print(f"Skipping invalid user document {document.get('_id')}: {e}")
-            # Optionally append a placeholder or partial user if needed, 
-            # but skipping prevents crashing the whole list.
     return users
 
 @app.post("/api/admin/users", response_model=dict)
