@@ -146,7 +146,58 @@ const SimpleDashboard = () => {
           ]
         };
       }
-      // 4. Neurological / Headache
+      // 4. Tropical Diseases / Infectious (Malaria, Dengue)
+      else if (text.includes("malaria") || text.includes("paludismo") || text.includes("dengue") || text.includes("zika") || text.includes("chikungunya") || text.includes("picada") || text.includes("mosquito")) {
+        if (text.includes("malaria") || text.includes("paludismo")) {
+          mockResponse = {
+            diagnoses: [
+              {
+                name: "Malária (Suspeita Clínica)",
+                justification: "Quadro febril com história de exposição/área endêmica ou menção direta sugere infecção por Plasmodium."
+              },
+              {
+                name: "Dengue / Arbovirose",
+                justification: "Diagnóstico diferencial obrigatório em febre aguda tropical."
+              }
+            ],
+            conduct: {
+              exams: ["Gota Espessa (Padrão Ouro)", "Teste Rápido para Malária", "Hemograma (Plaquetopenia?)", "Notificação Compulsória (SINAN)"],
+              procedures: ["Aferição de temperatura", "Hidratação venosa se sinais de gravidade"],
+              advice: "Repouso. Uso de repelentes. Retorno imediato se sinais de gravidade (icterícia, dispneia, sangramento)."
+            },
+            medications: [
+              { name: "Artemeter + Lumefantrina", dosage: "Conforme peso/protocolo MS", mechanism: "Antimalárico (Esquema para P. falciparum)." },
+              { name: "Cloroquina + Primaquina", dosage: "Conforme peso/protocolo MS", mechanism: "Antimalárico (Esquema para P. vivax)." },
+              { name: "Dipirona", dosage: "1g 6/6h", mechanism: "Sintomático para febre." }
+            ]
+          };
+        } else {
+          // Dengue/General Arbovirus fallback
+          mockResponse = {
+            diagnoses: [
+              {
+                name: "Dengue (Provável)",
+                justification: "Febre súbita, mialgia, artralgia e dor retro-orbital."
+              },
+              {
+                name: "Zika / Chikungunya",
+                justification: "Diagnósticos diferenciais de arboviroses."
+              }
+            ],
+            conduct: {
+              exams: ["Hemograma (Plaquetas/Hematócrito)", "NS1 (até 5º dia) ou Sorologia (após 6º dia)", "Prova do Laço"],
+              procedures: ["Hidratação vigorosa (Estadiamento A/B/C/D)", "Notificação"],
+              advice: "Hidratação oral (60-80ml/kg/dia). Não usar AAS/Anti-inflamatórios."
+            },
+            medications: [
+              { name: "Dipirona", dosage: "1g 6/6h", mechanism: "Analgesia e antitérmico." },
+              { name: "Soro de Reidratação Oral", dosage: "Livre demanda", mechanism: "Prevenção de choque." },
+              { name: "Contraindicado", dosage: "AAS e AINEs", mechanism: "Risco de sangramento." }
+            ]
+          };
+        }
+      }
+      // 5. Neurological / Headache
       else if (text.includes("cabeça") || text.includes("cefaleia") || text.includes("enxaqueca") || text.includes("tontura")) {
         mockResponse = {
           diagnoses: [
