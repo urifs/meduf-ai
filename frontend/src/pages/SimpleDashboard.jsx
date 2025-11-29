@@ -33,8 +33,36 @@ const SimpleDashboard = () => {
       let mockResponse;
       const text = anamnese.toLowerCase();
 
-      // 1. Cardiac / Chest Pain
-      if (text.includes("dor no peito") || text.includes("tórax") || text.includes("precordial") || text.includes("infarto") || text.includes("coração")) {
+      // 1. Gynecological / Obstetric (High Priority)
+      if (text.includes("menstruação") || text.includes("atraso") || text.includes("sangramento vaginal") || text.includes("cólica") || text.includes("gestante") || text.includes("grávida")) {
+        mockResponse = {
+          diagnoses: [
+            {
+              name: "Gravidez (Possível Gestação)",
+              justification: "Atraso menstrual em paciente em idade fértil é gravidez até prova em contrário."
+            },
+            {
+              name: "Dismenorreia / Alteração Hormonal",
+              justification: "Considerar se houver história de irregularidade menstrual ou SOP."
+            },
+            {
+              name: "Infecção do Trato Urinário (ITU)",
+              justification: "Diagnóstico diferencial comum se houver dor pélvica associada."
+            }
+          ],
+          conduct: {
+            exams: ["Beta-HCG (Sanguíneo)", "Ultrassom Transvaginal", "EAS (Urina Tipo 1)"],
+            procedures: ["Exame especular (se sangramento)", "Palpação abdominal"],
+            advice: "Abstinência sexual até definição. Iniciar ácido fólico se desejo de gestar."
+          },
+          medications: [
+            { name: "Ácido Fólico", dosage: "5mg/dia", mechanism: "Prevenção de defeitos do tubo neural." },
+            { name: "Buscopan Composto", dosage: "1 cp 8/8h", mechanism: "Sintomático para cólicas." }
+          ]
+        };
+      }
+      // 2. Cardiac / Chest Pain
+      else if (text.includes("dor no peito") || text.includes("tórax") || text.includes("precordial") || text.includes("infarto") || text.includes("coração")) {
         mockResponse = {
           diagnoses: [
             {
