@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Header } from '@/components/Header';
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import { Pill, Sparkles, ArrowLeft, Syringe } from 'lucide-react';
+import { Pill, Sparkles, ArrowLeft, Syringe, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,12 +10,14 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { Badge } from "@/components/ui/badge";
 import api from '@/lib/api';
+import html2canvas from 'html2canvas';
 
 const MedicationGuide = () => {
   const navigate = useNavigate();
   const [result, setResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [symptoms, setSymptoms] = useState("");
+  const reportRef = useRef(null);
 
   const handleAnalyze = async (e) => {
     e.preventDefault();
@@ -210,6 +212,29 @@ const MedicationGuide = () => {
     }, 1500);
   };
 
+  const handleSaveImage = async () => {
+    if (!reportRef.current) return;
+    
+    try {
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 2, // Higher quality
+        backgroundColor: "#ffffff",
+        useCORS: true
+      });
+      
+      const image = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = image;
+      link.download = `guia-terapeutico-${new Date().toISOString().slice(0,10)}.png`;
+      link.click();
+      
+      toast.success("Imagem salva com sucesso!");
+    } catch (error) {
+      console.error("Error saving image:", error);
+      toast.error("Erro ao salvar imagem.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background font-sans">
       <Header />
@@ -272,41 +297,48 @@ const MedicationGuide = () => {
           <div className="lg:col-span-7 xl:col-span-8">
             {result ? (
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                  <Pill className="h-6 w-6 text-green-600" /> Sugestão Terapêutica
-                </h2>
-                
-                <div className="grid gap-4">
-                  {result.map((med, index) => (
-                    <Card key={index} className="border-l-4 border-l-green-500 shadow-sm overflow-hidden">
-                      <CardContent className="pt-6">
-                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
-                          <div>
-                            <h3 className="text-lg font-bold text-green-800 dark:text-green-400">{med.name}</h3>
-                            <p className="text-sm text-muted-foreground mt-1">{med.notes}</p>
-                          </div>
-                          <Badge variant="outline" className="w-fit h-fit text-base px-3 py-1 border-green-200 bg-green-50 text-green-700">
-                            {med.route}
-                          </Badge>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg">
-                          <div>
-                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Dose</span>
-                            <p className="font-medium text-foreground">{med.dose}</p>
-                          </div>
-                          <div>
-                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Frequência</span>
-                            <p className="font-medium text-foreground">{med.frequency}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                    <Pill className="h-6 w-6 text-green-600" /> Sugestão Terapêutica
+                  </h2>
+                  <Button variant="default" size="sm" onClick={handleSaveImage} className="gap-2">
+                    <Download className="h-4 w-4" /> Salvar Imagem
+                  </Button>
                 </div>
+                
+                <div ref={reportRef} className="space-y-4 p-4 bg-white rounded-lg">
+                  <div className="grid gap-4">
+                    {result.map((med, index) => (
+                      <Card key={index} className="border-l-4 border-l-green-500 shadow-sm overflow-hidden">
+                        <CardContent className="pt-6">
+                          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+                            <div>
+                              <h3 className="text-lg font-bold text-green-800 dark:text-green-400">{med.name}</h3>
+                              <p className="text-sm text-muted-foreground mt-1">{med.notes}</p>
+                            </div>
+                            <Badge variant="outline" className="w-fit h-fit text-base px-3 py-1 border-green-200 bg-green-50 text-green-700">
+                              {med.route}
+                            </Badge>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg">
+                            <div>
+                              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Dose</span>
+                              <p className="font-medium text-foreground">{med.dose}</p>
+                            </div>
+                            <div>
+                              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Frequência</span>
+                              <p className="font-medium text-foreground">{med.frequency}</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
 
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800 dark:bg-yellow-950/20 dark:border-yellow-900 dark:text-yellow-400">
-                  <strong>Atenção:</strong> Estas são sugestões baseadas em protocolos padrão. Verifique sempre alergias, contraindicações e interações medicamentosas antes de prescrever.
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800 dark:bg-yellow-950/20 dark:border-yellow-900 dark:text-yellow-400">
+                    <strong>Atenção:</strong> Estas são sugestões baseadas em protocolos padrão. Verifique sempre alergias, contraindicações e interações medicamentosas antes de prescrever.
+                  </div>
                 </div>
               </div>
             ) : (
