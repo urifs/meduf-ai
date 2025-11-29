@@ -38,7 +38,7 @@ const Toxicology = () => {
       // --- KNOWLEDGE BASE ---
 
       // 1. Stimulants (Cocaine, Meth, Amphetamines)
-      if (text.includes("cocaina") || text.includes("crack") || text.includes("po") || text.includes("metanfetamina") || text.includes("anfetamina") || text.includes("ecstasy") || text.includes("mdma")) {
+      if (text.includes("cocaina") || text.includes("crack") || text.includes("metanfetamina") || text.includes("anfetamina") || text.includes("ecstasy") || text.includes("mdma")) {
         mockResponse = {
           agent: "Estimulantes (Cocaína/Anfetaminas)",
           antidote: "Benzodiazepínicos (Sintomático)",
