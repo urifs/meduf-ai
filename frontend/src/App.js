@@ -5,6 +5,7 @@ import Dashboard from "@/pages/Dashboard";
 import SimpleDashboard from "@/pages/SimpleDashboard";
 import MedicationGuide from "@/pages/MedicationGuide";
 import DrugInteraction from "@/pages/DrugInteraction";
+import Toxicology from "@/pages/Toxicology";
 import Selection from "@/pages/Selection";
 import Login from "@/pages/Login";
 import History from "@/pages/History";
@@ -70,6 +71,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <DrugInteraction />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/toxicology" 
+            element={
+              <ProtectedRoute>
+                <Toxicology />
               </ProtectedRoute>
             } 
           />
