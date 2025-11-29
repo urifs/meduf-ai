@@ -354,11 +354,11 @@ frontend:
 
 metadata:
   created_by: "testing_agent"
-  version: "1.4"
-  test_sequence: 6
+  version: "1.5"
+  test_sequence: 7
   run_ui: true
-  test_completed: true
-  all_tests_passed: true
+  test_completed: false
+  all_tests_passed: false
 
 test_plan:
   current_focus: []
