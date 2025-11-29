@@ -194,7 +194,7 @@ const Dashboard = () => {
           ]
         };
       }
-      // 6. Universal Fallback (Guaranteed Response)
+      // 7. Universal Fallback (Guaranteed Response)
       else {
         mockResponse = {
           diagnoses: [
