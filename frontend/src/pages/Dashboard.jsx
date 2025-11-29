@@ -140,7 +140,7 @@ const Dashboard = () => {
           ]
         };
       }
-      // 4. Tropical Diseases / Infectious (Malaria, Dengue)
+      // 5. Tropical Diseases / Infectious (Malaria, Dengue)
       else if (complaint.includes("malaria") || complaint.includes("paludismo") || complaint.includes("dengue") || complaint.includes("zika") || complaint.includes("chikungunya") || complaint.includes("picada") || complaint.includes("mosquito")) {
         if (complaint.includes("malaria") || complaint.includes("paludismo")) {
           mockResponse = {
@@ -191,7 +191,7 @@ const Dashboard = () => {
           };
         }
       }
-      // 5. Neurological
+      // 6. Neurological
       else if (complaint.includes("cabeça") || complaint.includes("cefaleia") || complaint.includes("enxaqueca") || complaint.includes("tontura")) {
         mockResponse = {
           diagnoses: [
@@ -220,7 +220,7 @@ const Dashboard = () => {
           ]
         };
       } 
-      // 6. Musculoskeletal / Pain
+      // 7. Musculoskeletal / Pain
       else if (complaint.includes("dor") || complaint.includes("costas") || complaint.includes("lombar") || complaint.includes("perna") || complaint.includes("braço") || complaint.includes("muscular")) {
         mockResponse = {
           diagnoses: [
@@ -245,7 +245,7 @@ const Dashboard = () => {
           ]
         };
       }
-      // 7. Universal Fallback (Guaranteed Response)
+      // 8. Universal Fallback (Guaranteed Response)
       else {
         mockResponse = {
           diagnoses: [
