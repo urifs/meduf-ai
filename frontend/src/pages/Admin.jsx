@@ -651,6 +651,41 @@ const Admin = () => {
           </DialogContent>
         </Dialog>
 
+        {/* Consultation Details Dialog */}
+        <Dialog open={isConsultationOpen} onOpenChange={setIsConsultationOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Detalhes da Consulta</DialogTitle>
+              <DialogDescription>
+                Realizada por Dr(a). {selectedConsultation?.doctor} em {formatDate(selectedConsultation?.date)}
+              </DialogDescription>
+            </DialogHeader>
+            
+            {selectedConsultation && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                <div className="md:col-span-1 space-y-4">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-muted-foreground">Dados do Paciente</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-sm space-y-2">
+                      <div><span className="font-semibold">Idade:</span> {selectedConsultation.patient?.idade || 'N/I'}</div>
+                      <div><span className="font-semibold">Sexo:</span> {selectedConsultation.patient?.sexo || 'N/I'}</div>
+                      <div><span className="font-semibold">Queixa:</span> {selectedConsultation.patient?.queixa || 'N/I'}</div>
+                      {selectedConsultation.patient?.historico && (
+                        <div><span className="font-semibold">Histórico:</span> {selectedConsultation.patient.historico}</div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+                <div className="md:col-span-2">
+                  <ClinicalReport data={selectedConsultation.report} />
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
       </main>
     </div>
   );
