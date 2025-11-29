@@ -81,6 +81,7 @@ const Admin = () => {
 
   // Expiration Update State
   const [isExpirationOpen, setIsExpirationOpen] = useState(false);
+  const [isUpdatingExpiration, setIsUpdatingExpiration] = useState(false);
   const [selectedUserForExpiration, setSelectedUserForExpiration] = useState(null);
   const [newDaysValid, setNewDaysValid] = useState(30);
 
@@ -148,6 +149,7 @@ const Admin = () => {
 
   const handleUpdateExpiration = async () => {
     if (!selectedUserForExpiration) return;
+    setIsUpdatingExpiration(true);
     try {
       await api.patch(`/admin/users/${selectedUserForExpiration.id}`, {
         days_valid: parseInt(newDaysValid)
@@ -156,7 +158,10 @@ const Admin = () => {
       setIsExpirationOpen(false);
       fetchData();
     } catch (error) {
+      console.error(error);
       toast.error("Erro ao atualizar validade.");
+    } finally {
+      setIsUpdatingExpiration(false);
     }
   };
 
@@ -476,7 +481,8 @@ const Admin = () => {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                  <DropdownMenuItem onClick={() => {
+                                  <DropdownMenuItem onSelect={(e) => {
+                                    e.preventDefault();
                                     setSelectedUserForExpiration(user);
                                     setIsExpirationOpen(true);
                                   }}>
@@ -620,7 +626,9 @@ const Admin = () => {
               />
             </div>
             <DialogFooter>
-              <Button onClick={handleUpdateExpiration}>Salvar Alteração</Button>
+              <Button onClick={handleUpdateExpiration} disabled={isUpdatingExpiration}>
+                {isUpdatingExpiration ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar Alteração"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
