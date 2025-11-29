@@ -110,9 +110,10 @@ const Admin = () => {
     try {
       // Add timestamp to prevent caching
       const timestamp = new Date().getTime();
-      const [usersRes, consultsRes] = await Promise.all([
+      const [usersRes, consultsRes, onlineRes] = await Promise.all([
         api.get(`/admin/users?t=${timestamp}`),
-        api.get(`/admin/consultations?t=${timestamp}`)
+        api.get(`/admin/consultations?t=${timestamp}`),
+        api.get(`/admin/stats/online?t=${timestamp}`)
       ]);
 
       // DIRECT MAPPING: No mock data merging. What you see is what is in the DB.
@@ -129,6 +130,8 @@ const Admin = () => {
         date: c.date || c.created_at 
       }));
       setConsultations(realConsultations);
+      
+      setOnlineCount(onlineRes.data.online_count);
       
       setLastUpdated(new Date());
       
