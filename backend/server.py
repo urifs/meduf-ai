@@ -150,6 +150,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     
     # Convert ObjectId to string for the model
     user["_id"] = str(user["_id"])
+    
+    # Track active user (update timestamp)
+    active_user_sessions[user["_id"]] = datetime.utcnow()
+    
     return UserInDB(**user)
 
 async def get_current_active_user(current_user: UserInDB = Depends(get_current_user)):
