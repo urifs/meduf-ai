@@ -372,7 +372,7 @@ async def upload_avatar(file: UploadFile = File(...), current_user: UserInDB = D
         # But wait, the frontend connects to /api. 
         # I mounted /static at root level of FastAPI app. So it is accessible at http://backend:8001/static
         
-        avatar_url = f"/static/uploads/{filename}"
+        avatar_url = f"/api/static/uploads/{filename}"
         
         # Update user in DB
         await users_collection.update_one(
