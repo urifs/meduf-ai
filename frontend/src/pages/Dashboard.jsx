@@ -82,7 +82,7 @@ const Dashboard = () => {
           ]
         };
       } 
-      // 2. Abdominal / Gastric
+      // 3. Abdominal / Gastric
       else if (complaint.includes("barriga") || complaint.includes("abdominal") || complaint.includes("estômago") || complaint.includes("epigastrica") || complaint.includes("epigástrica") || complaint.includes("fígado") || complaint.includes("intestino")) {
         mockResponse = {
           diagnoses: [
