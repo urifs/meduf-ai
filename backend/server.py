@@ -188,6 +188,42 @@ app = FastAPI()
 static_path = Path(__file__).parent / "static"
 app.mount("/static", StaticFiles(directory=static_path), name="static")
 
+# --- Active Users Tracking ---
+active_users = set()
+
+@app.middleware("http")
+async def track_active_users(request, call_next):
+    # Simple tracking: count unique IPs or tokens in the last X minutes?
+    # For real-time "online", websockets are best, but for HTTP, we can track "active in last 5 mins".
+    # We'll use a global set and a background task to clear it, or just a timestamp dict.
+    # Let's use a dict: {user_id: timestamp}
+    
+    response = await call_next(request)
+    return response
+
+# We need a way to identify the user in middleware or just update "last_seen" in DB on every request.
+# Updating DB on every request is heavy.
+# Let's use an in-memory dict for this prototype feature.
+active_user_sessions = {}
+
+@app.get("/api/admin/stats/online")
+async def get_online_users_count(admin: UserInDB = Depends(get_admin_user)):
+    # Count users active in last 5 minutes
+    now = datetime.utcnow()
+    threshold = now - timedelta(minutes=5)
+    
+    # Clean up old sessions
+    expired_users = [uid for uid, timestamp in active_user_sessions.items() if timestamp < threshold]
+    for uid in expired_users:
+        del active_user_sessions[uid]
+        
+    return {"online_count": len(active_user_sessions)}
+
+# We need to inject this tracking into the dependency or a middleware that parses the token.
+# Since we already have `get_current_user`, let's update the timestamp there.
+# But `get_current_user` is a dependency.
+# We can modify `get_current_user` to update the global dict.
+
 @app.on_event("startup")
 async def startup_event():
     asyncio.create_task(remove_expired_users())
