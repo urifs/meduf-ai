@@ -246,8 +246,18 @@ export const Header = () => {
                   )}
                 </nav>
 
-                {/* Logout Button */}
-                <div className="mt-auto pt-4 border-t">
+                {/* Support Button */}
+                <div className="mt-auto pt-4 border-t space-y-2">
+                  <a 
+                    href="https://api.whatsapp.com/send/?phone=551152868823&text&type=phone_number&app_absent=0" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-3 rounded-md transition-colors hover:bg-green-50 text-green-700 font-medium"
+                  >
+                    <HelpCircle className="h-4 w-4" />
+                    Suporte (WhatsApp)
+                  </a>
+
                   <Button 
                     variant="ghost" 
                     className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 gap-2"
