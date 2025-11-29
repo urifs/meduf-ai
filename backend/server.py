@@ -665,6 +665,80 @@ async def delete_document(collection_name: str, id: str, admin: UserInDB = Depen
         
     return {"message": "Document deleted"}
 
+# --- AI Engine Endpoints ---
+from ai_engine import (
+    analyze_detailed_diagnosis,
+    analyze_simple_diagnosis,
+    get_medication_guide,
+    analyze_drug_interaction,
+    analyze_toxicology,
+    DiagnosisResult,
+    MedicationItem,
+    ToxicologyResult,
+    InteractionResult
+)
+
+
+@app.post("/api/ai/diagnosis/detailed", response_model=dict)
+async def ai_detailed_diagnosis(patient_data: dict, user: UserInDB = Depends(get_current_user)):
+    """Detailed diagnosis with full patient context"""
+    try:
+        result = analyze_detailed_diagnosis(patient_data)
+        return result.dict()
+    except Exception as e:
+        print(f"AI Engine Error: {e}")
+        raise HTTPException(status_code=500, detail="Error processing diagnosis")
+
+
+@app.post("/api/ai/diagnosis/simple", response_model=dict)
+async def ai_simple_diagnosis(data: dict, user: UserInDB = Depends(get_current_user)):
+    """Simple diagnosis with text-only input"""
+    try:
+        text = data.get("text", "")
+        result = analyze_simple_diagnosis(text)
+        return result.dict()
+    except Exception as e:
+        print(f"AI Engine Error: {e}")
+        raise HTTPException(status_code=500, detail="Error processing diagnosis")
+
+
+@app.post("/api/ai/medication-guide", response_model=list)
+async def ai_medication_guide(data: dict, user: UserInDB = Depends(get_current_user)):
+    """Get medication recommendations based on symptoms"""
+    try:
+        symptoms = data.get("symptoms", "")
+        medications = get_medication_guide(symptoms)
+        return [med.dict() for med in medications]
+    except Exception as e:
+        print(f"AI Engine Error: {e}")
+        raise HTTPException(status_code=500, detail="Error processing medication guide")
+
+
+@app.post("/api/ai/drug-interaction", response_model=dict)
+async def ai_drug_interaction(data: dict, user: UserInDB = Depends(get_current_user)):
+    """Check interactions between two drugs"""
+    try:
+        drug1 = data.get("drug1", "")
+        drug2 = data.get("drug2", "")
+        result = analyze_drug_interaction(drug1, drug2)
+        return result.dict()
+    except Exception as e:
+        print(f"AI Engine Error: {e}")
+        raise HTTPException(status_code=500, detail="Error processing drug interaction")
+
+
+@app.post("/api/ai/toxicology", response_model=dict)
+async def ai_toxicology(data: dict, user: UserInDB = Depends(get_current_user)):
+    """Get toxicology protocol for a substance"""
+    try:
+        substance = data.get("substance", "")
+        result = analyze_toxicology(substance)
+        return result.dict()
+    except Exception as e:
+        print(f"AI Engine Error: {e}")
+        raise HTTPException(status_code=500, detail="Error processing toxicology")
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
