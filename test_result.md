@@ -249,14 +249,11 @@ metadata:
   all_tests_passed: true
 
 test_plan:
-  current_focus:
-    - "Toxicology Feature - Backend AI Engine Integration - Paracetamol"
-    - "Toxicology Feature - Backend AI Engine Integration - Cocaine"
-    - "Toxicology Feature - Backend API Response Time Verification"
+  current_focus: []
   stuck_tasks: []
   test_all: false
-  test_priority: "high_first"
-  test_summary: "REFACTORED TOXICOLOGY BACKEND INTEGRATION TESTING: Need to verify that the Toxicology feature now uses centralized backend AI engine (/api/ai/toxicology) instead of frontend if/else logic. Test specific scenarios with paracetamol and cocaine inputs to ensure correct protocols are returned from backend API with reasonable response times."
+  test_priority: "completed"
+  test_summary: "REFACTORED TOXICOLOGY BACKEND INTEGRATION TESTING COMPLETED SUCCESSFULLY: All 3 critical test scenarios verified through comprehensive Playwright testing. Backend AI engine integration working perfectly - paracetamol and cocaine protocols return correct agents and antidotes from /api/ai/toxicology endpoint. Response times excellent (0.27-0.28s). No console errors. Refactoring successful."
 
 frontend:
   - task: "Patient Analysis Form Functionality"
