@@ -190,7 +190,7 @@ app = FastAPI()
 
 # Mount static files
 static_path = Path(__file__).parent / "static"
-app.mount("/static", StaticFiles(directory=static_path), name="static")
+app.mount("/api/static", StaticFiles(directory=static_path), name="static")
 
 # --- Active Users Tracking ---
 active_users = set()
