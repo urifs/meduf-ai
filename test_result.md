@@ -249,11 +249,13 @@ metadata:
   all_tests_passed: true
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Toxicology Feature - Paracetamol Protocol Verification"
+    - "Toxicology Feature - Multiple Substance Protocol Testing"
   stuck_tasks: []
   test_all: false
-  test_priority: "completed"
-  test_summary: "Registration flow without CRM field successfully tested and verified. All 6 steps from review request completed successfully."
+  test_priority: "high_first"
+  test_summary: "CRITICAL: Testing Toxicology bug fix where paracetamol search was returning cocaine protocol. Need to verify all 4 test cases: Paracetamol, Cocaine, Unknown substance, and Opioids work correctly with no cross-contamination."
 
 frontend:
   - task: "Patient Analysis Form Functionality"
