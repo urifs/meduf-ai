@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import Dashboard from "@/pages/Dashboard";
 import SimpleDashboard from "@/pages/SimpleDashboard";
 import MedicationGuide from "@/pages/MedicationGuide";
+import DrugInteraction from "@/pages/DrugInteraction";
 import Selection from "@/pages/Selection";
 import Login from "@/pages/Login";
 import History from "@/pages/History";
@@ -61,6 +62,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <MedicationGuide />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/interaction" 
+            element={
+              <ProtectedRoute>
+                <DrugInteraction />
               </ProtectedRoute>
             } 
           />
