@@ -499,7 +499,8 @@ async def get_all_consultations(admin: UserInDB = Depends(get_admin_user)):
     # This is a simplified view for the admin dashboard
     consultations = []
     # Join with users to get doctor name would be better, but for now we'll fetch recent ones
-    cursor = consultations_collection.find({}).sort("created_at", -1).limit(50)
+    # User requested NO LIMIT on counters, so we remove the limit.
+    cursor = consultations_collection.find({}).sort("created_at", -1)
     
     async for doc in cursor:
         # Fetch doctor name
