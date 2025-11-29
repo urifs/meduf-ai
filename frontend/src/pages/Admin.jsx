@@ -585,7 +585,7 @@ const Admin = () => {
                 <CardDescription>Atividade recente na plataforma.</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
+                <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2">
                   {consultations.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground text-sm">
                       Nenhuma consulta registrada ainda.
