@@ -364,6 +364,31 @@ test_plan:
   test_priority: "completed"
   test_summary: "Patient History Feature comprehensive testing completed successfully. All 12 steps from review request verified: login, analysis form, data persistence, history page loading, entry verification, details dialog, search functionality, and delete operations all working perfectly."
 
+frontend:
+  - task: "Toxicology Feature - Paracetamol Protocol Verification"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Toxicology.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "CRITICAL BUG FIX VERIFICATION: Need to test that 'intoxicação por paracetamol' returns correct Paracetamol protocol, not Cocaine protocol. This is the main bug that was reported and fixed."
+
+  - task: "Toxicology Feature - Multiple Substance Protocol Testing"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Toxicology.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need comprehensive testing of all substance protocols: Paracetamol, Cocaine, Unknown substances (dengue), and Opioids (morfina) to ensure no cross-contamination between protocols."
+
 agent_communication:
   - agent: "testing"
     message: "Updated test plan for Meduf Ai Authentication Flow testing. All 7 authentication-related tasks need comprehensive verification through Playwright automation following the specific 12-step review request requirements."
@@ -375,3 +400,5 @@ agent_communication:
     message: "PATIENT HISTORY FEATURE TESTING COMPLETED - Found critical issue: History page (/history) not loading React components despite correct data in localStorage. Analysis form works perfectly and saves data correctly, but History page is completely blank. This prevents users from viewing, searching, or managing their analysis history. Requires immediate investigation of React/JavaScript loading on History route."
   - agent: "testing"
     message: "PATIENT HISTORY FEATURE RE-TESTING COMPLETED SUCCESSFULLY - All 12 steps from review request verified in comprehensive end-to-end test: 1) User login ✅ 2) Dashboard navigation ✅ 3) Analysis form (Age: 60, Sex: Feminino, Complaint: 'Dor de cabeça forte e fotofobia', History: 'Enxaqueca crônica') ✅ 4) Success toast verification ✅ 5) History page navigation ✅ 6) Entry verification (Date, Patient info, Complaint, Diagnosis) ✅ 7) 'Ver Detalhes' dialog ✅ 8) Dialog content verification ✅ 9) Dialog close ✅ 10) Search functionality (Enxaqueca/Fratura) ✅ 11) Delete functionality ✅ 12) Entry removal verification ✅. Previous History page loading issue was authentication-related and resolved when tested in single session. All features working perfectly."
+  - agent: "main"
+    message: "TOXICOLOGY BUG FIX IMPLEMENTED: Fixed critical issue where 'intoxicação por paracetamol' was returning cocaine protocol instead of paracetamol protocol. Code review shows correct logic in place. Frontend rebuilt. Need comprehensive testing to verify fix is working correctly."
