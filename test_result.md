@@ -365,6 +365,42 @@ test_plan:
   test_summary: "Patient History Feature comprehensive testing completed successfully. All 12 steps from review request verified: login, analysis form, data persistence, history page loading, entry verification, details dialog, search functionality, and delete operations all working perfectly."
 
 frontend:
+  - task: "Toxicology Feature - Backend AI Engine Integration - Paracetamol"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Toxicology.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "REFACTORED BACKEND INTEGRATION TESTING: Need to verify that refactored Toxicology feature now uses backend AI engine (/api/ai/toxicology) instead of frontend logic. Test paracetamol input should return 'Paracetamol (Acetaminofeno)' as agent and 'N-Acetilcisteína (NAC)' as antidote from backend API."
+
+  - task: "Toxicology Feature - Backend AI Engine Integration - Cocaine"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Toxicology.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "REFACTORED BACKEND INTEGRATION TESTING: Need to verify that cocaine input returns 'Estimulantes (Cocaína/Anfetaminas)' as agent and 'Benzodiazepínicos' as antidote from backend AI engine. Verify response time is reasonable (< 3 seconds) and no frontend errors in console."
+
+  - task: "Toxicology Feature - Backend API Response Time Verification"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Toxicology.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "PERFORMANCE TESTING: Need to verify that backend AI engine responses are delivered within reasonable time (< 3 seconds). Monitor network requests and ensure no timeout issues with /api/ai/toxicology endpoint."
+
   - task: "Toxicology Feature - Paracetamol Protocol Verification"
     implemented: true
     working: true
