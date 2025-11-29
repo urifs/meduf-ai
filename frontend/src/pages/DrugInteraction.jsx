@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Header } from '@/components/Header';
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import { Activity, ArrowLeft, Plus, Trash2, AlertTriangle, CheckCircle2, Info, ShieldAlert, HeartPulse, Brain } from 'lucide-react';
+import { Activity, ArrowLeft, Plus, Trash2, AlertTriangle, CheckCircle2, Info, ShieldAlert, HeartPulse, Brain, Copy, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -11,12 +11,14 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import api from '@/lib/api';
+import html2canvas from 'html2canvas';
 
 const DrugInteraction = () => {
   const navigate = useNavigate();
   const [medications, setMedications] = useState(["", ""]); 
   const [result, setResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const reportRef = useRef(null);
 
   const handleAddfield = () => {
     if (medications.length < 10) {
@@ -237,6 +239,51 @@ const DrugInteraction = () => {
     }, 1500);
   };
 
+  const copyToClipboard = () => {
+    if (!result) return;
+    
+    let text = `## Análise de Interação Medicamentosa\n\n`;
+    text += `Medicamentos: ${result.medications.join(", ")}\n\n`;
+    
+    if (result.interactions.length > 0) {
+      result.interactions.forEach(item => {
+        text += `### ${item.pair}\n`;
+        text += `* **Gravidade:** ${item.severity}\n`;
+        text += `* **Efeito:** ${item.effect}\n`;
+        text += `* **Toxicidade:** ${item.toxicity}\n`;
+        text += `* **Conduta:** ${item.conduct}\n\n`;
+      });
+    } else {
+      text += "Nenhuma interação grave encontrada.\n";
+    }
+    
+    navigator.clipboard.writeText(text);
+    toast.success("Copiado para a área de transferência!");
+  };
+
+  const handleSaveImage = async () => {
+    if (!reportRef.current) return;
+    
+    try {
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true
+      });
+      
+      const image = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = image;
+      link.download = `interacao-medicamentosa-${new Date().toISOString().slice(0,10)}.png`;
+      link.click();
+      
+      toast.success("Imagem salva com sucesso!");
+    } catch (error) {
+      console.error("Error saving image:", error);
+      toast.error("Erro ao salvar imagem.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background font-sans">
       <Header />
@@ -330,92 +377,102 @@ const DrugInteraction = () => {
                   <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
                     <Activity className="h-6 w-6 text-primary" /> Resultado da Análise
                   </h2>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={copyToClipboard} className="gap-2">
+                      <Copy className="h-4 w-4" /> Copiar
+                    </Button>
+                    <Button variant="default" size="sm" onClick={handleSaveImage} className="gap-2">
+                      <Download className="h-4 w-4" /> Salvar Imagem
+                    </Button>
+                  </div>
                 </div>
 
-                {result.interactions.length > 0 ? (
-                  <div className="space-y-4">
-                    <Alert variant="destructive" className="bg-red-50 border-red-200 text-red-900">
-                      <ShieldAlert className="h-4 w-4" />
-                      <AlertTitle>Alerta de Segurança</AlertTitle>
-                      <AlertDescription>
-                        Foram detectadas {result.interactions.length} interações que requerem atenção clínica.
-                      </AlertDescription>
-                    </Alert>
+                <div ref={reportRef} className="space-y-4 p-4 bg-white rounded-lg">
+                  {result.interactions.length > 0 ? (
+                    <div className="space-y-4">
+                      <Alert variant="destructive" className="bg-red-50 border-red-200 text-red-900">
+                        <ShieldAlert className="h-4 w-4" />
+                        <AlertTitle>Alerta de Segurança</AlertTitle>
+                        <AlertDescription>
+                          Foram detectadas {result.interactions.length} interações que requerem atenção clínica.
+                        </AlertDescription>
+                      </Alert>
 
-                    {result.interactions.map((item, i) => (
-                      <Card key={i} className="border-l-4 border-l-red-500 shadow-sm">
-                        <CardHeader className="pb-2">
-                          <div className="flex justify-between items-start">
-                            <CardTitle className="text-lg text-red-700 flex items-center gap-2">
-                              {item.pair}
-                            </CardTitle>
-                            <Badge variant="outline" className={`
-                              ${item.severity === 'Gravíssima' ? 'bg-red-900 text-white border-red-900' : 
-                                item.severity === 'Grave' ? 'bg-red-100 text-red-700 border-red-200' : 
-                                'bg-orange-100 text-orange-700 border-orange-200'}
-                            `}>
-                              {item.severity}
-                            </Badge>
-                          </div>
-                          <CardDescription className="text-xs font-mono mt-1">
-                            Mecanismo: {item.type}
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="grid md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <div>
-                                <span className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-1">
-                                  <Activity className="h-3 w-3" /> Efeito Clínico
-                                </span>
-                                <p className="text-sm text-foreground mt-1">{item.effect}</p>
+                      {result.interactions.map((item, i) => (
+                        <Card key={i} className="border-l-4 border-l-red-500 shadow-sm">
+                          <CardHeader className="pb-2">
+                            <div className="flex justify-between items-start">
+                              <CardTitle className="text-lg text-red-700 flex items-center gap-2">
+                                {item.pair}
+                              </CardTitle>
+                              <Badge variant="outline" className={`
+                                ${item.severity === 'Gravíssima' ? 'bg-red-900 text-white border-red-900' : 
+                                  item.severity === 'Grave' ? 'bg-red-100 text-red-700 border-red-200' : 
+                                  'bg-orange-100 text-orange-700 border-orange-200'}
+                              `}>
+                                {item.severity}
+                              </Badge>
+                            </div>
+                            <CardDescription className="text-xs font-mono mt-1">
+                              Mecanismo: {item.type}
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="grid md:grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <div>
+                                  <span className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-1">
+                                    <Activity className="h-3 w-3" /> Efeito Clínico
+                                  </span>
+                                  <p className="text-sm text-foreground mt-1">{item.effect}</p>
+                                </div>
+                                <div>
+                                  <span className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-1">
+                                    <HeartPulse className="h-3 w-3" /> Toxicidade/Risco
+                                  </span>
+                                  <p className="text-sm text-foreground mt-1">{item.toxicity}</p>
+                                </div>
                               </div>
-                              <div>
-                                <span className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-1">
-                                  <HeartPulse className="h-3 w-3" /> Toxicidade/Risco
+                              
+                              <div className="bg-red-50 p-3 rounded-md border border-red-100 h-fit">
+                                <span className="text-xs font-bold text-red-800 uppercase flex items-center gap-1">
+                                  <Brain className="h-3 w-3" /> Conduta Sugerida
                                 </span>
-                                <p className="text-sm text-foreground mt-1">{item.toxicity}</p>
+                                <p className="text-sm text-red-900 mt-1 font-medium">{item.conduct}</p>
                               </div>
                             </div>
-                            
-                            <div className="bg-red-50 p-3 rounded-md border border-red-100 h-fit">
-                              <span className="text-xs font-bold text-red-800 uppercase flex items-center gap-1">
-                                <Brain className="h-3 w-3" /> Conduta Sugerida
-                              </span>
-                              <p className="text-sm text-red-900 mt-1 font-medium">{item.conduct}</p>
-                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <Card className="border-l-4 border-l-green-500 bg-green-50/30">
+                      <CardContent className="pt-6 text-center">
+                        <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                          <CheckCircle2 className="h-6 w-6 text-green-600" />
+                        </div>
+                        <h3 className="text-lg font-medium text-green-900">Nenhuma interação grave detectada</h3>
+                        <p className="text-green-700 mt-2 max-w-md mx-auto">
+                          A combinação de <b>{result.medications.join(" + ")}</b> não apresentou alertas nas regras de segurança farmacológica cadastradas.
+                        </p>
+                        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+                          <div className="bg-white/50 p-3 rounded border border-green-100">
+                            <span className="text-xs font-bold text-green-800 block mb-1">Cardiovascular</span>
+                            <span className="text-xs text-green-700">Sem risco aparente de arritmias ou hipotensão severa.</span>
                           </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                ) : (
-                  <Card className="border-l-4 border-l-green-500 bg-green-50/30">
-                    <CardContent className="pt-6 text-center">
-                      <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                        <CheckCircle2 className="h-6 w-6 text-green-600" />
-                      </div>
-                      <h3 className="text-lg font-medium text-green-900">Nenhuma interação grave detectada</h3>
-                      <p className="text-green-700 mt-2 max-w-md mx-auto">
-                        A combinação de <b>{result.medications.join(" + ")}</b> não apresentou alertas nas regras de segurança farmacológica cadastradas.
-                      </p>
-                      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
-                        <div className="bg-white/50 p-3 rounded border border-green-100">
-                          <span className="text-xs font-bold text-green-800 block mb-1">Cardiovascular</span>
-                          <span className="text-xs text-green-700">Sem risco aparente de arritmias ou hipotensão severa.</span>
+                          <div className="bg-white/50 p-3 rounded border border-green-100">
+                            <span className="text-xs font-bold text-green-800 block mb-1">SNC / Sedação</span>
+                            <span className="text-xs text-green-700">Sem potencialização depressora evidente.</span>
+                          </div>
+                          <div className="bg-white/50 p-3 rounded border border-green-100">
+                            <span className="text-xs font-bold text-green-800 block mb-1">Metabolismo</span>
+                            <span className="text-xs text-green-700">Sem inibição/indução enzimática crítica (CYP450).</span>
+                          </div>
                         </div>
-                        <div className="bg-white/50 p-3 rounded border border-green-100">
-                          <span className="text-xs font-bold text-green-800 block mb-1">SNC / Sedação</span>
-                          <span className="text-xs text-green-700">Sem potencialização depressora evidente.</span>
-                        </div>
-                        <div className="bg-white/50 p-3 rounded border border-green-100">
-                          <span className="text-xs font-bold text-green-800 block mb-1">Metabolismo</span>
-                          <span className="text-xs text-green-700">Sem inibição/indução enzimática crítica (CYP450).</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
               </div>
             ) : (
               <Card className="h-full border-dashed border-2 flex items-center justify-center bg-muted/20 min-h-[400px]">

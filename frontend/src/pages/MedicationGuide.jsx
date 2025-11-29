@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Header } from '@/components/Header';
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import { Pill, Sparkles, ArrowLeft, Syringe, Download } from 'lucide-react';
+import { Pill, Sparkles, ArrowLeft, Syringe, Download, Copy } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -212,6 +212,22 @@ const MedicationGuide = () => {
     }, 1500);
   };
 
+  const copyToClipboard = () => {
+    if (!result) return;
+    
+    let text = `## Guia Terapêutico\n\n`;
+    result.forEach(med => {
+      text += `* **${med.name}**\n`;
+      text += `  - Dose: ${med.dose}\n`;
+      text += `  - Frequência: ${med.frequency}\n`;
+      text += `  - Via: ${med.route}\n`;
+      text += `  - Obs: ${med.notes}\n\n`;
+    });
+    
+    navigator.clipboard.writeText(text);
+    toast.success("Copiado para a área de transferência!");
+  };
+
   const handleSaveImage = async () => {
     if (!reportRef.current) return;
     
@@ -301,9 +317,14 @@ const MedicationGuide = () => {
                   <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
                     <Pill className="h-6 w-6 text-green-600" /> Sugestão Terapêutica
                   </h2>
-                  <Button variant="default" size="sm" onClick={handleSaveImage} className="gap-2">
-                    <Download className="h-4 w-4" /> Salvar Imagem
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={copyToClipboard} className="gap-2">
+                      <Copy className="h-4 w-4" /> Copiar
+                    </Button>
+                    <Button variant="default" size="sm" onClick={handleSaveImage} className="gap-2">
+                      <Download className="h-4 w-4" /> Salvar Imagem
+                    </Button>
+                  </div>
                 </div>
                 
                 <div ref={reportRef} className="space-y-4 p-4 bg-white rounded-lg">
