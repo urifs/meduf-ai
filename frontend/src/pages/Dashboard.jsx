@@ -111,7 +111,7 @@ const Dashboard = () => {
           ]
         };
       }
-      // 3. Respiratory / Infection
+      // 4. Respiratory / Infection
       else if (complaint.includes("febre") || complaint.includes("tosse") || complaint.includes("ar") || complaint.includes("garganta") || complaint.includes("pulmão") || complaint.includes("respirar")) {
         mockResponse = {
           diagnoses: [
