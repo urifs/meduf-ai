@@ -35,23 +35,40 @@ const Toxicology = () => {
       let mockResponse;
       const text = substance.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-      // 1. Paracetamol (Acetaminophen)
-      if (text.includes("paracetamol") || text.includes("tylenol") || text.includes("acetaminofeno")) {
+      // --- KNOWLEDGE BASE ---
+
+      // 1. Stimulants (Cocaine, Meth, Amphetamines)
+      if (text.includes("cocaina") || text.includes("crack") || text.includes("po") || text.includes("metanfetamina") || text.includes("anfetamina") || text.includes("ecstasy") || text.includes("mdma")) {
+        mockResponse = {
+          agent: "Estimulantes (Cocaína/Anfetaminas)",
+          antidote: "Benzodiazepínicos (Sintomático)",
+          mechanism: "Bloqueio da recaptação de catecolaminas (Dopamina/Noradrenalina). Hiperestimulação simpática.",
+          conduct: [
+            "Monitorização cardíaca contínua (risco de arritmias/infarto).",
+            "Controle da agitação/convulsões com Benzodiazepínicos (Diazepam/Midazolam).",
+            "Resfriamento agressivo se hipertermia (>39°C).",
+            "NÃO usar Beta-bloqueadores puros (risco de 'efeito alfa sem oposição')."
+          ],
+          protocol: "Diazepam: 10mg IV a cada 5-10 min até sedação leve. \nNitroglicerina: Se dor torácica isquêmica. \nBicarbonato de Sódio: Se rabdomiólise/acidose."
+        };
+      }
+      // 2. Paracetamol (Acetaminophen)
+      else if (text.includes("paracetamol") || text.includes("tylenol") || text.includes("acetaminofeno")) {
         mockResponse = {
           agent: "Paracetamol (Acetaminofeno)",
           antidote: "N-Acetilcisteína (NAC)",
-          mechanism: "Hepatotoxicidade por metabólito NAPQI. Necrose centrolobular.",
+          mechanism: "Hepatotoxicidade por metabólito NAPQI. Depleção de glutationa hepática.",
           conduct: [
             "Dosagem sérica de paracetamol (Nomograma de Rumack-Matthew) se ingestão > 4h.",
             "Lavagem gástrica se ingestão < 1h.",
-            "Carvão ativado se ingestão < 4h.",
-            "Iniciar NAC imediatamente se ingestão tóxica provável (>7.5g ou 150mg/kg)."
+            "Carvão ativado (1g/kg) se ingestão < 4h.",
+            "Iniciar NAC imediatamente se ingestão tóxica provável (>7.5g em adultos ou 150mg/kg em crianças)."
           ],
           protocol: "NAC Oral: Ataque 140mg/kg + 17 doses de 70mg/kg a cada 4h. \nNAC Venosa: Ataque 150mg/kg em 1h + 50mg/kg em 4h + 100mg/kg em 16h."
         };
       }
-      // 2. Opioids
-      else if (text.includes("opioide") || text.includes("morfina") || text.includes("fentanil") || text.includes("tramadol") || text.includes("codeina") || text.includes("heroina")) {
+      // 3. Opioids
+      else if (text.includes("opioide") || text.includes("morfina") || text.includes("fentanil") || text.includes("tramadol") || text.includes("codeina") || text.includes("heroina") || text.includes("metadona")) {
         mockResponse = {
           agent: "Opioide",
           antidote: "Naloxona",
@@ -59,13 +76,13 @@ const Toxicology = () => {
           conduct: [
             "Garantir via aérea (ABCDE).",
             "Ventilação assistida se bradipneia/apneia.",
-            "Administrar antídoto se depressão respiratória significativa."
+            "Administrar antídoto se depressão respiratória significativa (FR < 10)."
           ],
-          protocol: "Naloxona: 0.4mg a 2mg IV/IM/SC. Repetir a cada 2-3 min se necessário (até 10mg). Observar por 2h após última dose (risco de renarcotização)."
+          protocol: "Naloxona: 0.4mg a 2mg IV/IM/SC. Repetir a cada 2-3 min se necessário (até 10mg). \nObservar por 2h após última dose (risco de renarcotização, especialmente com Metadona/Tramadol)."
         };
       }
-      // 3. Benzodiazepines
-      else if (text.includes("benzo") || text.includes("diazepam") || text.includes("clonazepam") || text.includes("alprazolam") || text.includes("rivotril") || text.includes("midazolam")) {
+      // 4. Benzodiazepines
+      else if (text.includes("benzo") || text.includes("diazepam") || text.includes("clonazepam") || text.includes("alprazolam") || text.includes("rivotril") || text.includes("midazolam") || text.includes("lexotan")) {
         mockResponse = {
           agent: "Benzodiazepínico",
           antidote: "Flumazenil (Lanexat)",
@@ -75,10 +92,39 @@ const Toxicology = () => {
             "Carvão ativado se ingestão < 1h e via aérea protegida.",
             "Uso de antídoto APENAS em casos selecionados (risco de convulsão em usuários crônicos)."
           ],
-          protocol: "Flumazenil: 0.2mg IV em 15s. Repetir 0.1mg a cada 60s até 1mg total. CONTRAINDICADO se suspeita de ingestão de tricíclicos ou história de epilepsia."
+          protocol: "Flumazenil: 0.2mg IV em 15s. Repetir 0.1mg a cada 60s até 1mg total. \nCONTRAINDICADO se suspeita de ingestão de tricíclicos ou história de epilepsia."
         };
       }
-      // 4. Organophosphates / Carbamates (Pesticides)
+      // 5. Tricyclic Antidepressants
+      else if (text.includes("amitriptilina") || text.includes("nortriptilina") || text.includes("clomipramina") || text.includes("triciclico")) {
+        mockResponse = {
+          agent: "Antidepressivo Tricíclico",
+          antidote: "Bicarbonato de Sódio",
+          mechanism: "Bloqueio de canais de Sódio cardíacos (efeito quinidina-like). Arritmias graves.",
+          conduct: [
+            "ECG imediato (QRS > 100ms indica risco de convulsão/arritmia).",
+            "Carvão ativado se ingestão < 2h.",
+            "Alcalinização sérica se QRS alargado ou hipotensão."
+          ],
+          protocol: "Bicarbonato de Sódio 8.4%: 1-2 mEq/kg em bolus IV. Repetir até pH 7.45-7.55. \nTratar convulsões com Benzodiazepínicos. Evitar Flumazenil."
+        };
+      }
+      // 6. Dipirona / NSAIDs
+      else if (text.includes("dipirona") || text.includes("ibuprofeno") || text.includes("diclofenaco") || text.includes("nimesulida") || text.includes("aine")) {
+        mockResponse = {
+          agent: "AINEs / Dipirona",
+          antidote: "Suporte / Sintomático",
+          mechanism: "Inibição da COX (AINEs). Dipirona: mecanismo incerto, risco de hipotensão/choque em altas doses.",
+          conduct: [
+            "Carvão ativado se ingestão < 1-2h.",
+            "Proteção gástrica (IBP) para AINEs.",
+            "Hidratação venosa para prevenir insuficiência renal.",
+            "Monitorar função renal e coagulograma."
+          ],
+          protocol: "Não há antídoto específico. \nSe hipotensão por Dipirona: Expansão volêmica + Vasopressores se refratário. \nSe sangramento digestivo: Endoscopia."
+        };
+      }
+      // 7. Organophosphates / Carbamates (Pesticides)
       else if (text.includes("chumbinho") || text.includes("veneno") || text.includes("agrotoxico") || text.includes("organofosforado") || text.includes("carbamato")) {
         mockResponse = {
           agent: "Inibidor da Colinesterase (Organofosforado/Carbamato)",
@@ -92,7 +138,22 @@ const Toxicology = () => {
           protocol: "Atropina: 1-5mg IV a cada 5-10 min até secar secreções (pulmão limpo). \nPralidoxima: 1-2g IV em 30 min (para organofosforados, idealmente < 48h)."
         };
       }
-      // 5. Carbon Monoxide
+      // 8. Caustics (Bleach, Soda)
+      else if (text.includes("soda") || text.includes("caustica") || text.includes("agua sanitaria") || text.includes("cloro") || text.includes("acido") || text.includes("base")) {
+        mockResponse = {
+          agent: "Cáusticos (Ácidos/Bases)",
+          antidote: "Contraindicado neutralizar",
+          mechanism: "Necrose de liquefação (álcalis) ou coagulação (ácidos). Perfuração esofágica/gástrica.",
+          conduct: [
+            "NÃO provocar vômito (risco de nova queimadura).",
+            "NÃO passar sonda nasogástrica às cegas.",
+            "NÃO dar carvão ativado (não adsorve e atrapalha endoscopia).",
+            "Jejum absoluto."
+          ],
+          protocol: "Endoscopia Digestiva Alta nas primeiras 12-24h para estadiamento da lesão. \nAnalgesia potente. Avaliação cirúrgica se sinais de perfuração."
+        };
+      }
+      // 9. Carbon Monoxide
       else if (text.includes("monoxido") || text.includes("fumaca") || text.includes("incendio") || text.includes("gas")) {
         mockResponse = {
           agent: "Monóxido de Carbono (CO)",
@@ -106,7 +167,7 @@ const Toxicology = () => {
           protocol: "Manter O2 a 100% até HbCO < 5% (ou assintomático). Meia-vida do CO cai de 320min (ar ambiente) para 80min (O2 100%)."
         };
       }
-      // 6. Alcohol (Ethanol)
+      // 10. Alcohol (Ethanol)
       else if (text.includes("alcool") || text.includes("etanol") || text.includes("bebida") || text.includes("embriaguez")) {
         mockResponse = {
           agent: "Etanol (Intoxicação Aguda)",
@@ -120,7 +181,7 @@ const Toxicology = () => {
           protocol: "Glicose 50% se hipoglicemia. \nTiamina (Vit B1) 100mg IM/IV ANTES da glicose (prevenir Encefalopatia de Wernicke em etilistas crônicos)."
         };
       }
-      // 7. Universal Fallback
+      // 11. Universal Fallback
       else {
         mockResponse = {
           agent: "Agente Desconhecido / Outros",
@@ -232,7 +293,7 @@ const Toxicology = () => {
                     <Label htmlFor="substance">Substância / Agente Tóxico</Label>
                     <Textarea 
                       id="substance" 
-                      placeholder="Ex: Ingestão de 20 comprimidos de Paracetamol há 2 horas..." 
+                      placeholder="Ex: Ingestão de cocaína, paracetamol, chumbinho..." 
                       className="min-h-[300px] resize-none text-base leading-relaxed"
                       value={substance}
                       onChange={(e) => setSubstance(e.target.value)}
