@@ -31,10 +31,11 @@ const SimpleDashboard = () => {
     setTimeout(async () => {
       // Enhanced Mock Logic
       let mockResponse;
-      const text = anamnese.toLowerCase();
+      // Normalize text: remove accents and lowercase
+      const text = anamnese.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
       // 1. Gynecological / Obstetric (High Priority)
-      if (text.includes("menstruação") || text.includes("atraso") || text.includes("sangramento vaginal") || text.includes("cólica") || text.includes("gestante") || text.includes("grávida")) {
+      if (text.includes("menstruacao") || text.includes("atraso") || text.includes("sangramento vaginal") || text.includes("colica") || text.includes("gestante") || text.includes("gravida")) {
         mockResponse = {
           diagnoses: [
             {
