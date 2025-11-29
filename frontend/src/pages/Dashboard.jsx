@@ -111,34 +111,59 @@ const Dashboard = () => {
           ]
         };
       }
-      // 4. Respiratory / Infection
-      else if (complaint.includes("febre") || complaint.includes("tosse") || complaint.includes("ar") || complaint.includes("garganta") || complaint.includes("pulmão") || complaint.includes("respirar")) {
-        mockResponse = {
-          diagnoses: [
-            {
-              name: "Infecção de Vias Aéreas Superiores (IVAS)",
-              justification: "Quadro compatível com etiologia viral (Resfriado/Gripe) ou bacteriana (Amigdalite/Sinusite)."
+      // 4. Respiratory / Infection (Covid, Flu)
+      else if (complaint.includes("febre") || complaint.includes("tosse") || complaint.includes("ar") || complaint.includes("garganta") || complaint.includes("pulmao") || complaint.includes("respirar") || complaint.includes("covid") || complaint.includes("coronavirus") || complaint.includes("gripe") || complaint.includes("influenza")) {
+        if (complaint.includes("covid") || complaint.includes("coronavirus")) {
+           mockResponse = {
+            diagnoses: [
+              {
+                name: "Covid-19 (Suspeita/Confirmada)",
+                justification: "Menção direta à patologia ou quadro respiratório agudo sugestivo."
+              },
+              {
+                name: "Síndrome Gripal",
+                justification: "Diagnóstico diferencial principal."
+              }
+            ],
+            conduct: {
+              exams: ["RT-PCR SARS-CoV-2", "Teste Rápido Antígeno", "Oximetria de Pulso", "Tomografia de Tórax (se dessaturação)"],
+              procedures: ["Isolamento respiratório (gotículas/aerossóis)", "Notificação compulsória"],
+              advice: "Isolamento por 5-7 dias. Uso de máscara. Retorno se falta de ar."
             },
-            {
-              name: "Pneumonia Comunitária",
-              justification: "Suspeitar se houver febre alta, dispneia, taquipneia ou estertores à ausculta."
+            medications: [
+              { name: "Dipirona", dosage: "1g 6/6h", mechanism: "Sintomático para febre e dor." },
+              { name: "Xarope (Dropropizina/Acebrofilina)", dosage: "Conforme bula", mechanism: "Alívio da tosse." },
+              { name: "Corticoide (Dexametasona)", dosage: "6mg/dia (Apenas se necessidade de O2)", mechanism: "Anti-inflamatório sistêmico (fase inflamatória)." }
+            ]
+          };
+        } else {
+          mockResponse = {
+            diagnoses: [
+              {
+                name: "Infecção de Vias Aéreas Superiores (IVAS)",
+                justification: "Quadro compatível com etiologia viral (Resfriado/Gripe) ou bacteriana (Amigdalite/Sinusite)."
+              },
+              {
+                name: "Pneumonia Comunitária",
+                justification: "Suspeitar se houver febre alta, dispneia, taquipneia ou estertores à ausculta."
+              },
+              {
+                name: "Bronquite Aguda",
+                justification: "Tosse persistente com ou sem expectoração, geralmente viral."
+              }
+            ],
+            conduct: {
+              exams: ["Raio-X de Tórax (se sinais de gravidade)", "Hemograma", "Teste para Influenza/Covid-19"],
+              procedures: ["Oximetria de pulso", "Inalação com broncodilatador se houver sibilos"],
+              advice: "Repouso relativo. Hidratação abundante. Lavagem nasal com soro fisiológico."
             },
-            {
-              name: "Bronquite Aguda",
-              justification: "Tosse persistente com ou sem expectoração, geralmente viral."
-            }
-          ],
-          conduct: {
-            exams: ["Raio-X de Tórax (se sinais de gravidade)", "Hemograma", "Teste para Influenza/Covid-19"],
-            procedures: ["Oximetria de pulso", "Inalação com broncodilatador se houver sibilos"],
-            advice: "Repouso relativo. Hidratação abundante. Lavagem nasal com soro fisiológico."
-          },
-          medications: [
-            { name: "Dipirona", dosage: "500mg-1g 6/6h", mechanism: "Antitérmico e analgésico." },
-            { name: "Acebrofilina", dosage: "5-10ml 12/12h", mechanism: "Mucolítico e broncodilatador (sintomático para tosse)." },
-            { name: "Amoxicilina", dosage: "500mg 8/8h (Se indicação bacteriana)", mechanism: "Antibiótico beta-lactâmico." }
-          ]
-        };
+            medications: [
+              { name: "Dipirona", dosage: "500mg-1g 6/6h", mechanism: "Antitérmico e analgésico." },
+              { name: "Acebrofilina", dosage: "5-10ml 12/12h", mechanism: "Mucolítico e broncodilatador (sintomático para tosse)." },
+              { name: "Amoxicilina", dosage: "500mg 8/8h (Se indicação bacteriana)", mechanism: "Antibiótico beta-lactâmico." }
+            ]
+          };
+        }
       }
       // 5. Tropical Diseases / Infectious (Malaria, Dengue)
       else if (complaint.includes("malaria") || complaint.includes("paludismo") || complaint.includes("dengue") || complaint.includes("zika") || complaint.includes("chikungunya") || complaint.includes("picada") || complaint.includes("mosquito")) {
