@@ -110,10 +110,16 @@ const Admin = () => {
       ]);
 
       // DIRECT MAPPING: No mock data merging. What you see is what is in the DB.
-      setUsers(usersRes.data);
+      // Ensure we map _id to id for frontend consistency
+      const mappedUsers = usersRes.data.map(u => ({
+        ...u,
+        id: u._id || u.id
+      }));
+      setUsers(mappedUsers);
       
       const realConsultations = consultsRes.data.map(c => ({
         ...c,
+        id: c._id || c.id,
         date: c.date || c.created_at 
       }));
       setConsultations(realConsultations);
