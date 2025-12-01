@@ -8,6 +8,7 @@ import { Activity, ArrowLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import api from '@/lib/api';
+import { startAITask } from '@/lib/aiPolling';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -19,11 +20,21 @@ const Dashboard = () => {
     setReportData(null);
 
     try {
-      // Call AI Consensus Engine (3 AIs + PubMed)
-      toast.info("🔬 Analisando com IA...", { duration: 8000 });
+      // Call AI Consensus Engine (3 AIs + PubMed) with polling
+      const progressToast = toast.loading("🔬 Analisando com 3 IAs + PubMed...");
       
-      const response = await api.post('/ai/diagnosis/detailed', formData);
-      const aiReport = response.data;
+      const aiReport = await startAITask(
+        '/api/ai/consensus/diagnosis',
+        formData,
+        (task) => {
+          // Update progress
+          if (task.status === 'processing') {
+            toast.loading(`🔬 Processando... ${task.progress}%`, { id: progressToast });
+          }
+        }
+      );
+      
+      toast.success("✅ Análise concluída!", { id: progressToast });
       
       // Save to consultation history
       try {
