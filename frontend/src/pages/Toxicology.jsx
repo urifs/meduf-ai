@@ -32,8 +32,8 @@ const Toxicology = () => {
     setResult(null);
 
     try {
-      // Call AI Consensus Engine (3 AIs + PubMed) with polling
-      const progressToast = toast.loading("🔬 Analisando com 3 IAs + PubMed...");
+      // Call AI Consensus Engine (3 AIs) with polling
+      const progressToast = toast.loading("🔬 Analisando com 3 IAs (GPT-5, Claude, Gemini)...");
       
       const aiResponse = await startAITask(
         '/ai/consensus/toxicology',
