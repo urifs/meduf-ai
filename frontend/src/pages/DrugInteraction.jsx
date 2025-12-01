@@ -234,9 +234,9 @@ const DrugInteraction = () => {
       clearInterval(progressInterval);
       setProgress(100);
       
-      // Format for display
+      // Format for display - include ALL medications
       const mockResponse = {
-        medications: [activeMeds[0], activeMeds[1]],
+        medications: activeMeds,  // All medications
         severity: interactionData.severity,
         summary: interactionData.summary,
         details: interactionData.details,
@@ -250,7 +250,7 @@ const DrugInteraction = () => {
       try {
         await api.post('/consultations', {
           patient: { 
-            queixa: `[Interação] ${activeMeds[0]} + ${activeMeds[1]}`, 
+            queixa: `[Interação] ${activeMeds.join(' + ')}`,  // All medications
             idade: "N/I", 
             sexo: "N/I" 
           },
@@ -259,10 +259,11 @@ const DrugInteraction = () => {
             conduct: { 
               advice: interactionData.recommendations
             },
-            medications: [
-              { name: activeMeds[0], dosage: "Ver impacto", mechanism: "Renal/Hepático analisado" },
-              { name: activeMeds[1], dosage: "Ver impacto", mechanism: "Renal/Hepático analisado" }
-            ]
+            medications: activeMeds.map(med => ({  // All medications
+              name: med, 
+              dosage: "Ver impacto", 
+              mechanism: "Renal/Hepático analisado"
+            }))
           }
         });
         toast.success("✅ Análise completa com perfil renal e hepático!");
