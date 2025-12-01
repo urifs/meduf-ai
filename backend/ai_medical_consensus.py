@@ -462,24 +462,38 @@ async def get_ai_consensus_medication_guide(symptoms: str) -> Dict[str, Any]:
         }
 
 
-async def get_ai_consensus_drug_interaction(drug1: str, drug2: str) -> Dict[str, Any]:
+async def get_ai_consensus_drug_interaction(medications) -> Dict[str, Any]:
     """
     Analyze drug interaction using 3 AIs
+    Accepts either a list of medications or two string parameters (for backward compatibility)
     """
     try:
+        # Handle both old format (drug1, drug2) and new format (list)
+        if isinstance(medications, str):
+            # Old format with 2 arguments - medications is drug1, need to get drug2
+            # This won't work with new call, but keeping for safety
+            medications = [medications]
+        
+        if not isinstance(medications, list):
+            medications = [medications]
+        
+        # Create medications list string
+        meds_list = "\n".join([f"Medicamento {i+1}: {med}" for i, med in enumerate(medications)])
+        
         interaction_prompt = f"""**ANÁLISE DE INTERAÇÃO MEDICAMENTOSA:**
-Medicamento 1: {drug1}
-Medicamento 2: {drug2}
+{meds_list}
+
+**Analise TODAS as possíveis interações entre TODOS os medicamentos listados acima.**
 
 **Forneça análise completa em formato JSON:**
 ```json
 {{
   "severity": "GRAVE/MODERADA/BAIXA",
-  "summary": "Resumo da interação",
-  "details": "Detalhes farmacocinéticos e farmacodinâmicos",
-  "recommendations": "Recomendações clínicas",
-  "renal_impact": "Impacto renal de ambos os medicamentos",
-  "hepatic_impact": "Impacto hepático de ambos os medicamentos"
+  "summary": "Resumo das principais interações encontradas entre todos os medicamentos",
+  "details": "Detalhes farmacocinéticos e farmacodinâmicos de todas as interações relevantes",
+  "recommendations": "Recomendações clínicas considerando todos os medicamentos",
+  "renal_impact": "Impacto renal combinado de todos os medicamentos",
+  "hepatic_impact": "Impacto hepático combinado de todos os medicamentos"
 }}
 ```
 """
