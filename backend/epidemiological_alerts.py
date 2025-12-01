@@ -132,19 +132,19 @@ Por favor, forneça alertas epidemiológicos REAIS e ATUALIZADOS para:
     except Exception as e:
         print(f"⚠️ Error fetching alerts: {e}")
         
-        # Return fallback data with seasonal alerts
+        # Return fallback data with seasonal alerts (December 2025 - Summer in Brazil)
         fallback_data = {
             "brazil": [
-                {"state": "São Paulo", "disease": "Dengue", "level": "Alto", "date": "Hoje"},
-                {"state": "Rio de Janeiro", "disease": "Dengue", "level": "Alto", "date": "Hoje"},
-                {"state": "Minas Gerais", "disease": "Dengue", "level": "Médio", "date": "Esta semana"},
-                {"state": "Bahia", "disease": "Arboviroses", "level": "Médio", "date": "Esta semana"},
-                {"state": "Nacional", "disease": "Influenza (Verão)", "level": "Baixo", "date": "Esta semana"}
+                {"state": "Rio de Janeiro", "disease": "Dengue", "level": "Alto", "date": "Dezembro 2025"},
+                {"state": "São Paulo", "disease": "Dengue", "level": "Alto", "date": "Dezembro 2025"},
+                {"state": "Minas Gerais", "disease": "Chikungunya", "level": "Médio", "date": "Verão 2025"},
+                {"state": "Paraná", "disease": "Dengue", "level": "Médio", "date": "Dezembro 2025"},
+                {"state": "Nacional", "disease": "COVID-19", "level": "Baixo", "date": "Estável"}
             ],
             "world": [
-                {"country": "Europa", "disease": "Influenza", "level": "Médio", "date": "Esta semana"},
-                {"country": "EUA", "disease": "Covid-19", "level": "Baixo", "date": "Hoje"},
-                {"country": "Ásia", "disease": "Dengue", "level": "Médio", "date": "Esta semana"}
+                {"country": "Europa", "disease": "Influenza", "level": "Alto", "date": "Inverno 2025"},
+                {"country": "África Central", "disease": "Mpox", "level": "Médio", "date": "Dezembro 2025"},
+                {"country": "Sudeste Asiático", "disease": "Dengue", "level": "Médio", "date": "Dezembro 2025"}
             ]
         }
         
