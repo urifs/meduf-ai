@@ -76,6 +76,10 @@ const Admin = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [lastUpdated, setLastUpdated] = useState(new Date());
   
+  // Usage & Balance State
+  const [balance, setBalance] = useState(null);
+  const [monthlyUsage, setMonthlyUsage] = useState(null);
+  
   // New User Form State
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
