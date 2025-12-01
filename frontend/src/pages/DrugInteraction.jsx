@@ -409,15 +409,113 @@ const DrugInteraction = () => {
                 </div>
 
                 <div ref={reportRef} className="space-y-4 p-4 bg-white rounded-lg">
-                  {result.interactions.length > 0 ? (
+                  {result ? (
                     <div className="space-y-4">
-                      <Alert variant="destructive" className="bg-red-50 border-red-200 text-red-900">
+                      {/* Severity Alert */}
+                      <Alert variant={result.severity.includes("GRAVE") ? "destructive" : "default"} 
+                             className={result.severity.includes("GRAVE") ? "bg-red-50 border-red-200 text-red-900" : "bg-blue-50 border-blue-200 text-blue-900"}>
                         <ShieldAlert className="h-4 w-4" />
-                        <AlertTitle>Alerta de Segurança</AlertTitle>
+                        <AlertTitle>Nível de Interação: {result.severity}</AlertTitle>
                         <AlertDescription>
-                          Foram detectadas {result.interactions.length} interações que requerem atenção clínica.
+                          {result.summary}
                         </AlertDescription>
                       </Alert>
+                      
+                      {/* Interaction Details */}
+                      <Card className="border-l-4 border-l-blue-500 shadow-sm">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg text-blue-700">
+                            {result.medications[0]} + {result.medications[1]}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            <div>
+                              <span className="text-xs font-bold text-muted-foreground uppercase">Detalhes</span>
+                              <p className="text-sm text-foreground mt-1">{result.details}</p>
+                            </div>
+                            <div className="bg-blue-50 p-3 rounded-md border border-blue-100">
+                              <span className="text-xs font-bold text-blue-800 uppercase flex items-center gap-1">
+                                <Brain className="h-3 w-3" /> Recomendações
+                              </span>
+                              <p className="text-sm text-blue-900 mt-1 font-medium">{result.recommendations}</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      {/* NEW: Renal Impact Section */}
+                      <Card className="border-l-4 border-l-amber-500 shadow-sm">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg text-amber-700 flex items-center gap-2">
+                            🫘 Impacto Renal
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-2 text-sm whitespace-pre-line">
+                            {result.renal_impact || "Sem informações específicas disponíveis."}
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      {/* NEW: Hepatic Impact Section */}
+                      <Card className="border-l-4 border-l-orange-500 shadow-sm">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg text-orange-700 flex items-center gap-2">
+                            🫁 Impacto Hepático
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-2 text-sm whitespace-pre-line">
+                            {result.hepatic_impact || "Sem informações específicas disponíveis."}
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      {/* NEW: Monitoring Recommendations */}
+                      {result.monitoring && (result.monitoring.renal.length > 0 || result.monitoring.hepatic.length > 0 || result.monitoring.outros.length > 0) && (
+                        <Card className="border-l-4 border-l-purple-500 shadow-sm bg-purple-50/30">
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-lg text-purple-700 flex items-center gap-2">
+                              📊 Exames de Monitoramento Recomendados
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="grid md:grid-cols-3 gap-4">
+                              {result.monitoring.renal.length > 0 && (
+                                <div className="bg-white p-3 rounded border border-amber-100">
+                                  <span className="text-xs font-bold text-amber-800 block mb-2">🫘 Função Renal</span>
+                                  <ul className="text-xs text-amber-900 space-y-1">
+                                    {result.monitoring.renal.map((exam, i) => (
+                                      <li key={i}>• {exam}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              {result.monitoring.hepatic.length > 0 && (
+                                <div className="bg-white p-3 rounded border border-orange-100">
+                                  <span className="text-xs font-bold text-orange-800 block mb-2">🫁 Função Hepática</span>
+                                  <ul className="text-xs text-orange-900 space-y-1">
+                                    {result.monitoring.hepatic.map((exam, i) => (
+                                      <li key={i}>• {exam}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              {result.monitoring.outros.length > 0 && (
+                                <div className="bg-white p-3 rounded border border-purple-100">
+                                  <span className="text-xs font-bold text-purple-800 block mb-2">📋 Outros</span>
+                                  <ul className="text-xs text-purple-900 space-y-1">
+                                    {result.monitoring.outros.map((exam, i) => (
+                                      <li key={i}>• {exam}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
 
                       {result.interactions.map((item, i) => (
                         <Card key={i} className="border-l-4 border-l-red-500 shadow-sm">
