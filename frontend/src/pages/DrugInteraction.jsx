@@ -360,14 +360,16 @@ const DrugInteraction = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Input Section */}
-          <div className="lg:col-span-5 xl:col-span-4 space-y-6">
-            <Card className="h-full border-none shadow-md bg-card/50 backdrop-blur-sm">
+          <div className="lg:col-span-5 xl:col-span-4 space-y-6 animate-slide-in-left">
+            <Card className="h-full glass-card border-2 border-orange-200 shadow-xl hover:shadow-2xl transition-all duration-500">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl text-primary">
-                  <Activity className="h-5 w-5" />
-                  Interação Medicamentosa
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 text-white">
+                    <Activity className="h-5 w-5" />
+                  </div>
+                  <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Interação Medicamentosa</span>
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-base">
                   Adicione até 10 medicamentos para verificar a segurança da associação.
                 </CardDescription>
               </CardHeader>
