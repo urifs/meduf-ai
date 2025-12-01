@@ -84,6 +84,9 @@
       - working: true
         agent: "testing"
         comment: "✅ VERIFIED: Toxicology consensus endpoint working correctly. Task creation successful. Backend logs show 'Searching PubMed for paracetamol poisoning...' indicating proper background processing. Expected result structure includes agent, antidote, mechanism, conduct fields."
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE VERIFICATION COMPLETED: Toxicology endpoint (paracetamol) returns task_id in 0.01s. Task completed in 30.18s with correct protocol: agent='Paracetamol (Acetaminofeno)', antidote='N-acetilcisteína (NAC)'. All required fields present: agent, antidote, mechanism, conduct. Consensus from 2/3 AIs achieved. Background processing working perfectly."
 
   - task: "Background Task System - Consensus Medication Guide Endpoint"
     implemented: true
