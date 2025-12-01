@@ -440,6 +440,65 @@ frontend:
     status_history:
       - working: "NA"
         agent: "testing"
+  - task: "Drug Interaction - Renal Impact Section Display"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/DrugInteraction.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "REFACTORED DRUG INTERACTION TESTING: Need to verify that new renal impact section (🫘 Impacto Renal) displays correctly with specific warnings like 'nefrotoxicidade', 'TFG', 'creatinina' for drug combinations ibuprofeno+varfarina and metformina+enalapril."
+
+  - task: "Drug Interaction - Hepatic Impact Section Display"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/DrugInteraction.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "REFACTORED DRUG INTERACTION TESTING: Need to verify that new hepatic impact section (🫁 Impacto Hepático) displays correctly with specific warnings like 'hepatotoxicidade', 'TGO/TGP' for drug combinations ibuprofeno+varfarina and metformina+enalapril."
+
+  - task: "Drug Interaction - Monitoring Exams Section Display"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/DrugInteraction.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "REFACTORED DRUG INTERACTION TESTING: Need to verify that new monitoring section (📊 Exames de Monitoramento Recomendados) displays correctly with specific organ function tests for renal and hepatic monitoring for drug combinations ibuprofeno+varfarina and metformina+enalapril."
+
+  - task: "Drug Interaction - Serious Interaction Test (Ibuprofeno + Varfarina)"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/DrugInteraction.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "CRITICAL TEST CASE: Need to verify that ibuprofeno + varfarina combination shows GRAVE severity and displays comprehensive renal/hepatic impact information plus monitoring recommendations through backend /api/ai/drug-interaction endpoint."
+
+  - task: "Drug Interaction - Moderate Interaction Test (Metformina + Enalapril)"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/DrugInteraction.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "MODERATE TEST CASE: Need to verify that metformina + enalapril combination shows moderate interaction with renal impact warnings and appropriate monitoring recommendations including renal function tests through backend /api/ai/drug-interaction endpoint."
         comment: "Need comprehensive testing of all substance protocols: Paracetamol, Cocaine, Unknown substances (dengue), and Opioids (morfina) to ensure no cross-contamination between protocols."
       - working: true
         agent: "testing"
