@@ -13,14 +13,18 @@ import api from './api';
  * @param {number} maxAttempts - Max polling attempts (default 150 = 5 minutes)
  * @returns {Promise<object>} - Final result when task completes
  */
-export async function pollTask(taskId, onProgress = null, pollInterval = 2000, maxAttempts = 150) {
+export async function pollTask(taskId, onProgress = null, pollInterval = 2000, maxAttempts = 300) {
   let attempts = 0;
+  let consecutiveErrors = 0;
   
   while (attempts < maxAttempts) {
     try {
       // Get task status
       const response = await api.get(`/ai/tasks/${taskId}`);
       const task = response.data;
+      
+      // Reset error counter on success
+      consecutiveErrors = 0;
       
       // Call progress callback if provided
       if (onProgress) {
@@ -34,7 +38,8 @@ export async function pollTask(taskId, onProgress = null, pollInterval = 2000, m
       
       // Check if failed
       if (task.status === 'failed') {
-        throw new Error(task.error || 'Task failed');
+        console.error('Task failed:', task.error);
+        throw new Error(task.error || 'Erro ao processar análise');
       }
       
       // Wait before next poll
@@ -42,19 +47,29 @@ export async function pollTask(taskId, onProgress = null, pollInterval = 2000, m
       attempts++;
       
     } catch (error) {
+      consecutiveErrors++;
+      
       // If it's a 404, task not found
       if (error.response?.status === 404) {
-        throw new Error('Task não encontrada');
+        throw new Error('Tarefa não encontrada no servidor');
       }
+      
+      // If too many consecutive errors, fail
+      if (consecutiveErrors >= 5) {
+        console.error('Too many consecutive polling errors');
+        throw new Error('Erro de conexão. Por favor, tente novamente.');
+      }
+      
       // Other errors, retry
-      console.error('Polling error:', error);
+      console.error('Polling error (attempt ' + consecutiveErrors + '):', error.message);
       await new Promise(resolve => setTimeout(resolve, pollInterval));
       attempts++;
     }
   }
   
-  // Timeout
-  throw new Error('Tempo limite excedido. Por favor, tente novamente.');
+  // Timeout - but this should be rare with 300 attempts (10 minutes)
+  console.error('Polling timeout after', attempts, 'attempts');
+  throw new Error('Análise está demorando mais que o esperado. Por favor, tente novamente.');
 }
 
 /**
