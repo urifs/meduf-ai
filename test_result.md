@@ -442,15 +442,18 @@ frontend:
         agent: "testing"
   - task: "Drug Interaction - Renal Impact Section Display"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/pages/DrugInteraction.jsx"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "REFACTORED DRUG INTERACTION TESTING: Need to verify that new renal impact section (🫘 Impacto Renal) displays correctly with specific warnings like 'nefrotoxicidade', 'TFG', 'creatinina' for drug combinations ibuprofeno+varfarina and metformina+enalapril."
+      - working: false
+        agent: "testing"
+        comment: "❌ CANNOT DISPLAY: Renal Impact section code exists (lines 448-459) and is correctly implemented to show renal_impact from backend, but JavaScript error prevents any results from displaying. Backend returns proper renal_impact data but frontend crashes before rendering."
 
   - task: "Drug Interaction - Hepatic Impact Section Display"
     implemented: true
