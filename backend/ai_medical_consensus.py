@@ -393,8 +393,8 @@ async def get_ai_consensus_medication_guide(symptoms: str) -> Dict[str, Any]:
             return {"medications": data.get("medications", [])[:8]}  # Top 8
         except Exception as e:
             print(f"⚠️ Error parsing Gemini response: {e}")
-            # Return fallback
-            return {"medications": fallback_meds[:8]}
+            # Return fallback - will be generated below
+            pass
         
     except Exception as e:
         print(f"⚠️ Medication guide error: {e}")
