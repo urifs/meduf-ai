@@ -31,8 +31,10 @@ const Toxicology = () => {
     setResult(null);
 
     try {
-      // Call backend AI engine
-      const response = await api.post('/ai/toxicology', {
+      // Call AI Consensus Engine (3 AIs + PubMed)
+      toast.info("🔬 Consultando 3 IAs + bases médicas para toxicologia...", { duration: 8000 });
+      
+      const response = await api.post('/ai/consensus/toxicology', {
         substance: substance
       });
 
@@ -55,7 +57,7 @@ const Toxicology = () => {
             medications: [{ name: aiResponse.antidote, dosage: "Ver protocolo", mechanism: "Antídoto/Suporte" }]
           }
         });
-        toast.success("Protocolo gerado com sucesso!");
+        toast.success("✅ Protocolo completo! Consenso de 3 IAs + literatura médica");
       } catch (error) {
         console.error("Error saving:", error);
         toast.success("Protocolo gerado (não salvo no histórico).");

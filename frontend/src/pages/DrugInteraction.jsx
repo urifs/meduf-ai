@@ -205,9 +205,9 @@ const DrugInteraction = () => {
 
     try {
       // Call backend for drug interaction analysis
-      toast.info("🔬 Analisando interações + impacto renal/hepático...");
+      toast.info("🔬 Consultando 3 IAs + bases médicas para interações...", { duration: 8000 });
       
-      const response = await api.post('/ai/drug-interaction', {
+      const response = await api.post('/ai/consensus/drug-interaction', {
         drug1: activeMeds[0],
         drug2: activeMeds[1]
       });
