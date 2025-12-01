@@ -267,9 +267,9 @@ class BackendTester:
         """Test consensus medication guide endpoint"""
         print(f"\n💉 Testing Consensus Medication Guide...")
         
-        # Test data from review request
+        # Test data from review request - Guia Terapêutico
         test_data = {
-            "symptoms": "dor de cabeça"
+            "symptoms": "Dor lombar aguda"
         }
         
         start_time = time.time()
