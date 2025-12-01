@@ -29,12 +29,15 @@ const MedicationGuide = () => {
     setIsLoading(true);
     setResult(null);
 
-    // Simulate AI Processing Delay
-    setTimeout(async () => {
-      let mockResponse;
+    try {
+      // Call AI Consensus Engine (3 AIs + PubMed)
+      toast.info("🔬 Consultando 3 IAs + bases médicas para medicamentos...", { duration: 8000 });
       
-      // Normalize text: remove accents and lowercase
-      const text = symptoms.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const response = await api.post('/ai/consensus/medication-guide', {
+        symptoms: symptoms
+      });
+      
+      const aiMedications = response.data;
 
       // 1. Pain / Fever / Inflammation
       if (text.includes("dor") || text.includes("febre") || text.includes("inflama") || text.includes("quente") || text.includes("algico") || text.includes("doendo")) {
