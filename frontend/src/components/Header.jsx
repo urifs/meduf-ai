@@ -125,7 +125,7 @@ export const Header = () => {
                   Alertas Epidemiológicos
                 </h4>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Atualização diária de surtos e epidemias.
+                  {alertsLoading ? 'Carregando...' : 'Atualização automática a cada hora'}
                 </p>
               </div>
               <ScrollArea className="h-[300px]">
