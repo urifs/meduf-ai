@@ -10,21 +10,27 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 # Get Emergent LLM Key
 EMERGENT_KEY = os.environ.get("EMERGENT_LLM_KEY", "")
 
-# Cache system
+# Cache system - Updates every 1 hour
 _alerts_cache = {
     "data": None,
     "last_updated": None,
-    "ttl_minutes": 60  # Cache for 1 hour
+    "ttl_minutes": 60  # Cache for exactly 1 hour
 }
 
 
 def is_cache_valid() -> bool:
-    """Check if cache is still valid"""
+    """Check if cache is still valid (1 hour TTL)"""
     if not _alerts_cache["data"] or not _alerts_cache["last_updated"]:
         return False
     
     time_diff = datetime.utcnow() - _alerts_cache["last_updated"]
-    return time_diff < timedelta(minutes=_alerts_cache["ttl_minutes"])
+    is_valid = time_diff < timedelta(minutes=_alerts_cache["ttl_minutes"])
+    
+    if not is_valid:
+        minutes_old = time_diff.total_seconds() / 60
+        print(f"⏰ Cache expired ({minutes_old:.0f} minutes old). Fetching new alerts...")
+    
+    return is_valid
 
 
 async def fetch_real_epidemiological_alerts() -> Dict[str, List[Dict[str, Any]]]:
