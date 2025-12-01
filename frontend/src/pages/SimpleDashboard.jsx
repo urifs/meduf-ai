@@ -43,7 +43,6 @@ const SimpleDashboard = () => {
       );
       
       toast.success("✅ Análise concluída!", { id: progressToast });
-      // Save to consultation history
 
       // Save to consultation history
       try {
