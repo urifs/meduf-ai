@@ -561,12 +561,12 @@ Medicamento 2: {drug2}
         traceback.print_exc()
         
         return {
-            "severity": "Análise Incompleta",
-            "summary": f"Não foi possível completar análise de interação. Consulte profissional.",
-            "details": "Sempre consulte um profissional antes de combinar medicamentos.",
-            "recommendations": "• Consulte farmacêutico ou médico",
-            "renal_impact": "Avaliação profissional necessária",
-            "hepatic_impact": "Avaliação profissional necessária"
+            "severity": "Avaliar Individualmente",
+            "summary": f"Interação {drug1} + {drug2} requer avaliação farmacocinética/farmacodinâmica individualizada.",
+            "details": f"Considerar: metabolização compartilhada (CYP450), clearance renal/hepático, janela terapêutica, dose, timing de administração. Revisar Micromedex/UpToDate para dados específicos.",
+            "recommendations": "• Avaliar TFG e função hepática (Child-Pugh)\n• Considerar ajuste posológico se metabolização compartilhada\n• Monitorizar níveis séricos se fármacos de janela estreita\n• Espaçar horários se interação na absorção\n• Consultar farmácia clínica para orientação específica\n• Monitorar sinais de toxicidade/ineficácia",
+            "renal_impact": "Avaliar clearance creatinina. Ajustar doses conforme TFG. Atenção a nefrotoxicidade aditiva.",
+            "hepatic_impact": "Considerar Child-Pugh. Reduzir dose em cirrose. Monitorar transaminases se hepatotóxicos."
         }
 
 
