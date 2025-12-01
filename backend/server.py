@@ -820,8 +820,19 @@ async def ai_consensus_drug_interaction_endpoint(data: dict, user: UserInDB = De
     Drug interaction using 3 LLMs + PubMed research
     Returns task_id immediately, client polls for result
     """
-    drug1 = data.get("drug1", "")
-    drug2 = data.get("drug2", "")
+    # Support both old format (drug1, drug2) and new format (medications list)
+    medications = data.get("medications", [])
+    if not medications:
+        # Fallback to old format
+        drug1 = data.get("drug1", "")
+        drug2 = data.get("drug2", "")
+        medications = [drug1, drug2]
+    
+    # Filter empty medications
+    medications = [med.strip() for med in medications if med and med.strip()]
+    
+    if len(medications) < 2:
+        raise HTTPException(status_code=400, detail="Pelo menos 2 medicamentos são necessários")
     
     # Create task
     task_id = task_manager.create_task("drug-interaction")
@@ -831,8 +842,7 @@ async def ai_consensus_drug_interaction_endpoint(data: dict, user: UserInDB = De
         task_manager.execute_task(
             task_id,
             get_ai_consensus_drug_interaction,
-            drug1,
-            drug2
+            medications
         )
     )
     
