@@ -231,9 +231,7 @@ async def get_online_users_count(admin: UserInDB = Depends(get_admin_user)):
 # But `get_current_user` is a dependency.
 # We can modify `get_current_user` to update the global dict.
 
-@app.on_event("startup")
-async def startup_event():
-    asyncio.create_task(remove_expired_users())
+# Startup event moved to start_background_tasks() function above
 
 app.add_middleware(
     CORSMiddleware,
