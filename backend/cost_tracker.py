@@ -1,11 +1,13 @@
 """
 Cost Tracker for Gemini API Usage
 Tracks token usage and calculates costs per consultation
+Uses tiktoken for ACCURATE token counting (same as used by LLMs)
 """
 import os
 from datetime import datetime, timezone
 from typing import Dict, Any
 from motor.motor_asyncio import AsyncIOMotorClient
+import tiktoken
 
 # Gemini 2.5 Flash pricing (per 1M tokens)
 GEMINI_INPUT_COST = 0.15  # $0.15 per 1M input tokens
@@ -18,12 +20,30 @@ db_name = os.environ.get("DB_NAME", "meduf_ai")
 db = client[db_name]
 usage_stats_collection = db.usage_stats
 
+# Initialize tiktoken encoder for accurate token counting
+# Using cl100k_base which is used by GPT-4 and similar models
+try:
+    _tokenizer = tiktoken.get_encoding("cl100k_base")
+except Exception:
+    _tokenizer = None
+    print("⚠️ Tiktoken not available, using character-based estimation")
 
-def estimate_tokens(text: str) -> int:
+
+def count_tokens(text: str) -> int:
     """
-    Estimate token count from text
-    Rough estimate: 1 token ≈ 4 characters for Portuguese/English
+    Count tokens accurately using tiktoken (industry standard)
+    This matches the token counting used by most LLM APIs
     """
+    if not text:
+        return 0
+    
+    if _tokenizer:
+        try:
+            return len(_tokenizer.encode(text))
+        except Exception as e:
+            print(f"⚠️ Tiktoken error: {e}, falling back to estimation")
+    
+    # Fallback: rough estimate (1 token ≈ 4 characters)
     return len(text) // 4
 
 
