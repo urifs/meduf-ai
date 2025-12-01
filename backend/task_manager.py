@@ -69,6 +69,40 @@ class TaskManager:
             self.tasks[task_id]["error"] = error
             self.tasks[task_id]["completed_at"] = datetime.utcnow()
     
+    def execute_task_sync(
+        self, 
+        task_id: str, 
+        func: Callable, 
+        *args, 
+        **kwargs
+    ):
+        """
+        Execute a task function synchronously (for thread pool)
+        """
+        try:
+            self.update_status(task_id, TaskStatus.PROCESSING, progress=10)
+            print(f"🔄 Task {task_id} started")
+            
+            # Execute the function in sync context
+            import asyncio
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            try:
+                result = loop.run_until_complete(func(*args, **kwargs))
+                
+                # Mark as completed
+                self.complete_task(task_id, result)
+                print(f"✅ Task {task_id} completed successfully")
+                
+            finally:
+                loop.close()
+            
+        except Exception as e:
+            error_msg = str(e)
+            self.fail_task(task_id, error_msg)
+            print(f"❌ Task {task_id} failed: {error_msg}")
+
     async def execute_task(
         self, 
         task_id: str, 
@@ -77,41 +111,19 @@ class TaskManager:
         **kwargs
     ):
         """
-        Execute a task function in background
+        Execute a task function in background using thread pool
         Handles errors and updates status automatically
         """
-        try:
-            self.update_status(task_id, TaskStatus.PROCESSING, progress=10)
-            print(f"🔄 Task {task_id} started")
-            
-            # Create a background task to simulate progress updates
-            async def update_progress():
-                await asyncio.sleep(5)
-                self.update_status(task_id, TaskStatus.PROCESSING, progress=30)
-                await asyncio.sleep(10)
-                self.update_status(task_id, TaskStatus.PROCESSING, progress=50)
-                await asyncio.sleep(10)
-                self.update_status(task_id, TaskStatus.PROCESSING, progress=70)
-                await asyncio.sleep(10)
-                self.update_status(task_id, TaskStatus.PROCESSING, progress=85)
-            
-            # Start progress updater
-            progress_task = asyncio.create_task(update_progress())
-            
-            # Execute the actual function
-            result = await func(*args, **kwargs)
-            
-            # Cancel progress updater if still running
-            progress_task.cancel()
-            
-            # Mark as completed
-            self.complete_task(task_id, result)
-            print(f"✅ Task {task_id} completed successfully")
-            
-        except Exception as e:
-            error_msg = str(e)
-            self.fail_task(task_id, error_msg)
-            print(f"❌ Task {task_id} failed: {error_msg}")
+        # Submit to thread pool for true background execution
+        loop = asyncio.get_event_loop()
+        loop.run_in_executor(
+            self.executor,
+            self.execute_task_sync,
+            task_id,
+            func,
+            *args,
+            **kwargs
+        )
     
     async def cleanup_old_tasks(self):
         """Remove tasks older than cleanup_interval (background job)"""
