@@ -372,33 +372,29 @@ async def get_ai_consensus_medication_guide(symptoms: str) -> Dict[str, Any]:
 ```
 """
         
-        # Query 2 FREE Hugging Face models
-        tasks = []
-        for model in HF_MODELS[:2]:  # Use first 2 models
-            tasks.append(call_huggingface_api(model, medication_prompt, max_tokens=1200))
+        # Query Gemini
+        chat = LlmChat(
+            api_key=EMERGENT_KEY,
+            session_id=f"meduf-med-gemini",
+            system_message="Você é um farmacêutico clínico especializado. Recomende medicamentos baseados em evidências científicas."
+        ).with_model("gemini", "gemini-2.0-flash")
         
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+        response = await chat.send_message(UserMessage(text=medication_prompt))
         
-        # Parse responses
-        all_medications = []
-        for i, response_text in enumerate(results):
-            if isinstance(response_text, Exception) or not response_text:
-                continue
-            try:
-                # Extract JSON
-                if "```json" in response_text:
-                    response_text = response_text.split("```json")[1].split("```")[0].strip()
-                elif "```" in response_text:
-                    response_text = response_text.split("```")[1].split("```")[0].strip()
-                
-                data = json.loads(response_text)
-                for med in data.get("medications", []):
-                    if med not in all_medications:
-                        all_medications.append(med)
-            except:
-                continue
-        
-        return {"medications": all_medications[:8]}  # Top 8
+        # Parse response
+        try:
+            response_text = response.strip()
+            if "```json" in response_text:
+                response_text = response_text.split("```json")[1].split("```")[0].strip()
+            elif "```" in response_text:
+                response_text = response_text.split("```")[1].split("```")[0].strip()
+            
+            data = json.loads(response_text)
+            return {"medications": data.get("medications", [])[:8]}  # Top 8
+        except Exception as e:
+            print(f"⚠️ Error parsing Gemini response: {e}")
+            # Return fallback
+            return {"medications": fallback_meds[:8]}
         
     except Exception as e:
         print(f"⚠️ Medication guide error: {e}")
