@@ -36,10 +36,8 @@ const SimpleDashboard = () => {
       });
       
       const aiReport = response.data;
-
-      // 1. Gynecological / Obstetric (High Priority)
-      if (text.includes("menstruacao") || text.includes("atraso") || text.includes("sangramento vaginal") || text.includes("colica") || text.includes("gestante") || text.includes("gravida")) {
-        mockResponse = {
+      
+      // Save to consultation history
           diagnoses: [
             {
               name: "Gravidez (Possível Gestação)",
