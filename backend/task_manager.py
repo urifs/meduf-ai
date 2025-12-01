@@ -93,6 +93,24 @@ class TaskManager:
             try:
                 result = loop.run_until_complete(func(*args, **kwargs))
                 
+                # Track usage for cost calculation
+                task = self.tasks.get(task_id)
+                if task and result:
+                    try:
+                        # Prepare input/output text for tracking
+                        input_text = json.dumps(args[0]) if args else "{}"
+                        output_text = json.dumps(result) if result else "{}"
+                        
+                        # Track usage asynchronously
+                        loop.run_until_complete(track_usage(
+                            user_id="system",  # Can be updated to actual user_id
+                            consultation_type=task.get("type", "unknown"),
+                            input_text=input_text,
+                            output_text=output_text
+                        ))
+                    except Exception as track_error:
+                        print(f"⚠️ Error tracking usage: {track_error}")
+                
                 # Mark as completed
                 self.complete_task(task_id, result)
                 print(f"✅ Task {task_id} completed successfully")
