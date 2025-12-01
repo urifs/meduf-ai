@@ -97,15 +97,15 @@ export const Header = () => {
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 dark:bg-slate-950/80">
+    <header className="sticky top-0 z-50 w-full border-b bg-gradient-to-r from-white/90 via-blue-50/90 to-white/90 backdrop-blur-xl supports-[backdrop-filter]:bg-white/70 dark:from-slate-950/90 dark:via-slate-900/90 dark:to-slate-950/90 shadow-sm">
       <div className="container flex h-16 items-center justify-between px-4 md:px-8">
         {/* Logo Section */}
-        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <BrainCircuit className="h-5 w-5" />
+        <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
+            <BrainCircuit className="h-6 w-6" />
           </div>
-          <span className="text-lg font-semibold tracking-tight text-foreground">
-            Meduf <span className="text-primary">Ai</span>
+          <span className="text-xl font-bold tracking-tight text-foreground">
+            Meduf <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Ai</span>
           </span>
         </div>
 
