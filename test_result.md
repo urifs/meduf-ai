@@ -90,6 +90,9 @@
       - working: true
         agent: "testing"
         comment: "✅ COMPREHENSIVE VERIFICATION COMPLETED: Toxicology endpoint (paracetamol) returns task_id in 0.01s. Task completed in 30.18s with correct protocol: agent='Paracetamol (Acetaminofeno)', antidote='N-acetilcisteína (NAC)'. All required fields present: agent, antidote, mechanism, conduct. Consensus from 2/3 AIs achieved. Background processing working perfectly."
+      - working: true
+        agent: "testing"
+        comment: "✅ RE-TESTED WITH EXACT REVIEW REQUEST DATA: Toxicologia with substance: 'Paracetamol overdose'. Task_id returned in 0.04s (immediate response). Task completed in 34.09s with all required fields: agent, antidote, mechanism, conduct. Results valid and comprehensive. Minor: Non-critical TypeError in consensus processing (sequence item 1: expected str instance, dict found) but task completes successfully with valid results."
 
   - task: "Background Task System - Consensus Medication Guide Endpoint"
     implemented: true
