@@ -69,6 +69,9 @@
       - working: true
         agent: "testing"
         comment: "✅ COMPREHENSIVE VERIFICATION COMPLETED: Drug interaction endpoint (ibuprofeno+varfarina) returns task_id in 0.01s. Task completed in 24.15s with GRAVE severity classification. Result structure verified with all required fields: severity='GRAVE', renal_impact, hepatic_impact, monitoring. Consensus from 2/3 AIs achieved. Background processing working perfectly."
+      - working: true
+        agent: "testing"
+        comment: "✅ RE-TESTED WITH EXACT REVIEW REQUEST DATA: Interação Medicamentosa with medications: ['Paracetamol', 'Ibuprofeno']. Task_id returned in 0.04s (immediate response). Task completed in 26.08s with all required fields: severity, renal_impact, hepatic_impact, monitoring. New medications array format working correctly. Background processing successful."
 
   - task: "Background Task System - Consensus Toxicology Endpoint"
     implemented: true
