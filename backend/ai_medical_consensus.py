@@ -489,29 +489,20 @@ async def get_ai_consensus_medication_guide(symptoms: str) -> Dict[str, Any]:
 ```
 """
         
-        # Query 2 AIs
+        # Query 2 FREE Hugging Face models
         tasks = []
-        for provider, model in [
-            ("anthropic", "claude-sonnet-4-20250514"),
-            ("gemini", "gemini-2.0-flash")
-        ]:
-            chat = LlmChat(
-                api_key=EMERGENT_KEY,
-                session_id=f"meduf-med-{provider}",
-                system_message="Você é um farmacêutico clínico especializado. Recomende medicamentos baseados em evidências científicas."
-            ).with_model(provider, model)
-            tasks.append(chat.send_message(UserMessage(text=medication_prompt)))
+        for model in HF_MODELS[:2]:  # Use first 2 models
+            tasks.append(call_huggingface_api(model, medication_prompt, max_tokens=1200))
         
         results = await asyncio.gather(*tasks, return_exceptions=True)
         
         # Parse responses
         all_medications = []
-        for i, response in enumerate(results):
-            if isinstance(response, Exception):
+        for i, response_text in enumerate(results):
+            if isinstance(response_text, Exception) or not response_text:
                 continue
             try:
-                import json
-                response_text = response.strip()
+                # Extract JSON
                 if "```json" in response_text:
                     response_text = response_text.split("```json")[1].split("```")[0].strip()
                 elif "```" in response_text:
