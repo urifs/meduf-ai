@@ -494,10 +494,9 @@ Substância: {substance}
 ```
 """
         
-        # Query 3 AIs
+        # Query 2 AIs
         tasks = []
         for provider, model in [
-            ("openai", "gpt-5"),
             ("anthropic", "claude-sonnet-4-20250514"),
             ("gemini", "gemini-2.0-flash")
         ]:
