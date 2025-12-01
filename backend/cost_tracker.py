@@ -157,11 +157,18 @@ async def get_monthly_stats(year: int = None, month: int = None) -> Dict[str, An
     return get_monthly_stats_sync(year, month)
 
 
-async def get_all_time_stats() -> Dict[str, Any]:
+def get_all_time_stats_sync() -> Dict[str, Any]:
     """
-    Get all-time usage statistics
+    Get all-time usage statistics (synchronous version)
     """
     try:
+        from pymongo import MongoClient
+        
+        # Create sync MongoDB client
+        sync_client = MongoClient(MONGO_URL)
+        sync_db = sync_client[db_name]
+        sync_collection = sync_db.usage_stats
+        
         pipeline = [
             {
                 "$group": {
@@ -173,7 +180,8 @@ async def get_all_time_stats() -> Dict[str, Any]:
             }
         ]
         
-        result = await usage_stats_collection.aggregate(pipeline).to_list(1)
+        result = list(sync_collection.aggregate(pipeline))
+        sync_client.close()
         
         if result:
             stats = result[0]
@@ -197,3 +205,10 @@ async def get_all_time_stats() -> Dict[str, Any]:
             "total_cost_usd": 0.0,
             "error": str(e)
         }
+
+
+async def get_all_time_stats() -> Dict[str, Any]:
+    """
+    Get all-time usage statistics (async wrapper)
+    """
+    return get_all_time_stats_sync()
