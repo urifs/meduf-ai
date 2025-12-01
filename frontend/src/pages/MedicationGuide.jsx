@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from "@/components/ui/badge";
 import api from '@/lib/api';
 import html2canvas from 'html2canvas';
+import { startAITask } from '@/lib/aiPolling';
 
 const MedicationGuide = () => {
   const navigate = useNavigate();
@@ -30,14 +31,20 @@ const MedicationGuide = () => {
     setResult(null);
 
     try {
-      // Call AI Consensus Engine (3 AIs + PubMed)
-      toast.info("🔬 Analisando medicamentos...", { duration: 8000 });
+      // Call AI Consensus Engine (3 AIs + PubMed) with polling
+      const progressToast = toast.loading("🔬 Analisando com 3 IAs + PubMed...");
       
-      const response = await api.post('/ai/medication-guide', {
-        symptoms: symptoms
-      });
+      const aiMedications = await startAITask(
+        '/api/ai/consensus/medication-guide',
+        { symptoms: symptoms },
+        (task) => {
+          if (task.status === 'processing') {
+            toast.loading(`🔬 Processando... ${task.progress}%`, { id: progressToast });
+          }
+        }
+      );
       
-      const aiMedications = response.data;
+      toast.success("✅ Análise concluída!", { id: progressToast });
 
       // 1. Pain / Fever / Inflammation
       if (text.includes("dor") || text.includes("febre") || text.includes("inflama") || text.includes("quente") || text.includes("algico") || text.includes("doendo")) {
