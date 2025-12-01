@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { useNavigate } from 'react-router-dom';
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -19,6 +20,7 @@ const Toxicology = () => {
   const [result, setResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [substance, setSubstance] = useState("");
+  const [progress, setProgress] = useState(0);
   const reportRef = useRef(null);
 
   const handleAnalyze = async (e) => {
@@ -30,20 +32,34 @@ const Toxicology = () => {
 
     setIsLoading(true);
     setResult(null);
+    setProgress(10); // Start with 10% immediately
 
     try {
+      // Simulate smooth progress animation
+      const progressInterval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 85) return prev; // Cap at 85% until real completion
+          return prev + 5; // Increment by 5% every 1.5 seconds
+        });
+      }, 1500);
+
       // Call AI Consensus Engine with polling
-      const progressToast = toast.loading("🔬 Analisando...");
+      const progressToast = toast.loading("🔬 Analisando 10%...");
       
       const aiResponse = await startAITask(
         '/ai/consensus/toxicology',
         { substance: substance },
         (task) => {
-          if (task.status === 'processing') {
+          if (task.status === 'processing' && task.progress > 0) {
+            setProgress(task.progress);
             toast.loading(`🔬 Analisando ${task.progress}%`, { id: progressToast });
           }
         }
       );
+      
+      // Clear interval and set to 100%
+      clearInterval(progressInterval);
+      setProgress(100);
       
       toast.success("✅ Análise concluída!", { id: progressToast });
       
