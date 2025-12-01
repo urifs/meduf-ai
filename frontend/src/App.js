@@ -116,6 +116,22 @@ function App() {
               </ProtectedRoute>
             } 
           />
+          <Route 
+            path="/exam-reader" 
+            element={
+              <ProtectedRoute>
+                <ExamReader />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/xray-reader" 
+            element={
+              <ProtectedRoute>
+                <XRayReader />
+              </ProtectedRoute>
+            } 
+          />
           
           {/* Catch all - redirect to home (which will redirect to login if needed) */}
           <Route path="*" element={<Navigate to="/" replace />} />
