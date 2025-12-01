@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import api from '@/lib/api';
 import html2canvas from 'html2canvas';
+import { startAITask } from '@/lib/aiPolling';
 
 const DrugInteraction = () => {
   const navigate = useNavigate();
@@ -204,15 +205,23 @@ const DrugInteraction = () => {
     setResult(null);
 
     try {
-      // Call backend for drug interaction analysis
-      toast.info("🔬 Analisando interações + impacto renal/hepático...", { duration: 8000 });
+      // Call AI Consensus Engine (3 AIs + PubMed) with polling
+      const progressToast = toast.loading("🔬 Analisando com 3 IAs + PubMed...");
       
-      const response = await api.post('/ai/drug-interaction', {
-        drug1: activeMeds[0],
-        drug2: activeMeds[1]
-      });
+      const interactionData = await startAITask(
+        '/api/ai/consensus/drug-interaction',
+        {
+          drug1: activeMeds[0],
+          drug2: activeMeds[1]
+        },
+        (task) => {
+          if (task.status === 'processing') {
+            toast.loading(`🔬 Processando... ${task.progress}%`, { id: progressToast });
+          }
+        }
+      );
       
-      const interactionData = response.data;
+      toast.success("✅ Análise concluída!", { id: progressToast });
       
       // Format for display
       const mockResponse = {
