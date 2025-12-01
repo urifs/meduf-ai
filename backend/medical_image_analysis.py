@@ -1,6 +1,6 @@
 """
-Medical Image Analysis Engine - V2 with OCR
-Uses Gemini 2.0 Flash for text analysis after OCR extraction
+Medical Image Analysis Engine with Vision
+Uses Gemini 2.5 Flash for direct image analysis (supports vision)
 Supports: Lab exams, X-rays, CT scans, MRI, etc.
 """
 import os
@@ -18,28 +18,16 @@ EMERGENT_KEY = os.environ.get("EMERGENT_LLM_KEY", "sk-emergent-b51Fb1fC8C81f9e13
 
 def extract_text_from_image(image_data: str) -> str:
     """
-    Extract text from image using OCR
-    
-    Args:
-        image_data: Base64 encoded image
-    
-    Returns:
-        Extracted text
+    Extract text from image using OCR (fallback)
     """
     try:
-        # Decode base64
         image_bytes = base64.b64decode(image_data)
-        
-        # Open image
         image = Image.open(io.BytesIO(image_bytes))
         
-        # Convert to RGB if needed
         if image.mode != 'RGB':
             image = image.convert('RGB')
         
-        # Extract text using OCR (Portuguese + English)
         text = pytesseract.image_to_string(image, lang='por+eng')
-        
         return text.strip()
     except Exception as e:
         print(f"⚠️ OCR Error: {e}")
@@ -48,40 +36,26 @@ def extract_text_from_image(image_data: str) -> str:
 
 async def analyze_exam_image(image_data: str, image_type: str, additional_info: str = "") -> Dict[str, Any]:
     """
-    Analyze medical exam images (laboratory results)
+    Analyze medical exam images (laboratory results) using Gemini 2.5 Flash with vision
     """
     try:
-        print("🔍 Iniciando análise de exame...")
+        print("🔍 Iniciando análise de exame com Gemini 2.5 Flash (Vision)...")
         
-        # Extract text from image using OCR
+        # Prepare image data
         if image_type.startswith('image/'):
-            print("📸 Extraindo texto da imagem com OCR...")
-            extracted_text = extract_text_from_image(image_data)
-            
-            if not extracted_text:
-                return {
-                    "exam_type": "Erro na Extração",
-                    "altered_values": [],
-                    "clinical_interpretation": "Não foi possível extrair texto da imagem. Verifique se a imagem está legível e tente novamente.",
-                    "overall_severity": "Indeterminada",
-                    "recommendations": [
-                        "Tire uma foto mais clara e bem iluminada",
-                        "Certifique-se de que o texto está legível",
-                        "Evite sombras e reflexos"
-                    ],
-                    "urgent_attention": False,
-                    "additional_notes": "Falha na extração de texto por OCR"
-                }
-            
-            print(f"✅ Texto extraído ({len(extracted_text)} caracteres)")
+            # Use image directly for vision model
+            image_base64 = image_data
+            print("📸 Usando análise visual direta com Gemini 2.5 Flash")
         else:
-            # For text documents, use directly
+            # For non-images, use OCR
+            print("📄 Extraindo texto com OCR...")
+            image_base64 = None
             extracted_text = image_data
         
         # Create system prompt for lab exam analysis
         system_prompt = """Você é um médico especializado em análise de exames laboratoriais.
 
-Analise o texto do exame fornecido e identifique:
+Analise a IMAGEM do exame fornecido e identifique:
 
 1. **Tipo de Exame** - Identifique qual(is) exame(s) está(ão) presente(s)
 2. **Valores Alterados** - Liste TODOS os parâmetros fora dos valores de referência
@@ -90,13 +64,15 @@ Analise o texto do exame fornecido e identifique:
 5. **Recomendações** - Sugira condutas, exames complementares ou avaliações necessárias
 
 **IMPORTANTE:**
+- Leia TODOS os valores visíveis na imagem
 - Seja preciso e técnico
 - Destaque valores críticos ou muito alterados
 - Use terminologia médica brasileira
 - Indique se há necessidade de avaliação urgente
-- Compare com valores de referência quando disponíveis
+- Compare com valores de referência quando disponíveis no exame
 
-**FORMATO DA RESPOSTA (JSON):**
+**FORMATO DA RESPOSTA (APENAS JSON, SEM TEXTO EXTRA):**
+```json
 {
   "exam_type": "Tipo do exame identificado",
   "altered_values": [
@@ -108,42 +84,64 @@ Analise o texto do exame fornecido e identifique:
       "severity": "Leve/Moderada/Grave"
     }
   ],
-  "clinical_interpretation": "Interpretação clínica detalhada",
+  "clinical_interpretation": "Interpretação clínica detalhada das alterações",
   "overall_severity": "Leve/Moderada/Grave/Normal",
-  "recommendations": ["Recomendação 1", "Recomendação 2"],
+  "recommendations": [
+    "Recomendação 1",
+    "Recomendação 2"
+  ],
   "urgent_attention": true/false,
-  "additional_notes": "Observações adicionais"
-}"""
+  "additional_notes": "Observações adicionais importantes"
+}
+```"""
 
         # Build user prompt
         additional_context = ""
         if additional_info:
             additional_context = f"\n\n**Informações Adicionais do Paciente:**\n{additional_info}"
         
-        user_prompt = f"""Analise o seguinte texto extraído de um exame laboratorial:
+        if image_base64:
+            user_prompt = f"""Analise a IMAGEM do exame laboratorial fornecido.
+{additional_context}
+
+Por favor, leia todos os valores visíveis na imagem e forneça uma análise completa em formato JSON identificando todas as alterações e sua relevância clínica."""
+        else:
+            user_prompt = f"""Analise o seguinte texto de exame laboratorial:
 
 **TEXTO DO EXAME:**
 {extracted_text}
 {additional_context}
 
-Por favor, forneça uma análise completa em formato JSON identificando alterações e sua relevância clínica."""
+Por favor, forneça uma análise completa em formato JSON."""
 
-        print("🤖 Enviando para análise com Gemini 2.0 Flash...")
+        print("🤖 Enviando para Gemini 2.5 Flash com suporte a visão...")
         
-        # Create chat
+        # Create chat with Gemini 2.5 Flash (supports vision)
         chat = LlmChat(
             api_key=EMERGENT_KEY,
-            session_id="meduf-exam-analysis",
+            session_id="meduf-exam-vision",
             system_message=system_prompt
-        ).with_model("gemini", "gemini-2.0-flash")
+        ).with_model("gemini", "gemini-2.5-flash")
 
-        # Send message
-        response = await chat.send_message(UserMessage(text=user_prompt))
+        # Send message with image if available
+        if image_base64:
+            # Send with image
+            message = UserMessage(
+                text=user_prompt,
+                image_url=f"data:{image_type};base64,{image_base64}"
+            )
+        else:
+            # Send text only
+            message = UserMessage(text=user_prompt)
+
+        response = await chat.send_message(message)
         
-        print("📊 Resposta recebida, processando...")
+        print("📊 Resposta recebida do Gemini, processando...")
         
         # Parse JSON response
-        response_text = response.strip()
+        response_text = response.strip() if isinstance(response, str) else str(response)
+        
+        # Extract JSON from markdown code blocks
         if "```json" in response_text:
             response_text = response_text.split("```json")[1].split("```")[0].strip()
         elif "```" in response_text:
@@ -154,7 +152,7 @@ Por favor, forneça uma análise completa em formato JSON identificando alteraç
             print("✅ Análise concluída com sucesso!")
             return analysis
         except json.JSONDecodeError:
-            print("⚠️ Resposta não estruturada, retornando texto")
+            print("⚠️ Resposta não estruturada, retornando como texto")
             return {
                 "exam_type": "Exame Laboratorial",
                 "altered_values": [],
@@ -162,13 +160,25 @@ Por favor, forneça uma análise completa em formato JSON identificando alteraç
                 "overall_severity": "Avaliar",
                 "recommendations": ["Consulte um médico para interpretação completa"],
                 "urgent_attention": False,
-                "additional_notes": "Resposta em formato não estruturado"
+                "additional_notes": "Resposta em formato texto - análise manual recomendada"
             }
         
     except Exception as e:
         print(f"❌ Erro na análise: {e}")
         import traceback
         traceback.print_exc()
+        
+        # Try fallback with OCR if image analysis failed
+        if image_type.startswith('image/'):
+            print("🔄 Tentando fallback com OCR...")
+            try:
+                extracted_text = extract_text_from_image(image_data)
+                if extracted_text:
+                    print("📝 OCR bem-sucedido, reprocessando...")
+                    # Retry with extracted text
+                    return await analyze_exam_image(extracted_text, "text/plain", additional_info)
+            except:
+                pass
         
         return {
             "exam_type": "Erro na Análise",
@@ -178,6 +188,7 @@ Por favor, forneça uma análise completa em formato JSON identificando alteraç
             "recommendations": [
                 "Tente fazer o upload novamente",
                 "Verifique se a imagem está legível",
+                "Tire uma foto mais clara e bem iluminada",
                 "Consulte um médico para análise presencial"
             ],
             "urgent_attention": False,
@@ -187,80 +198,107 @@ Por favor, forneça uma análise completa em formato JSON identificando alteraç
 
 async def analyze_xray_image(image_data: str, image_type: str, body_region: str = "", additional_info: str = "") -> Dict[str, Any]:
     """
-    Analyze X-ray images using OCR + text analysis
+    Analyze X-ray images using Gemini 2.5 Flash with vision
     """
     try:
-        print("🔍 Iniciando análise de raio-X...")
+        print("🔍 Iniciando análise de raio-X com Gemini 2.5 Flash (Vision)...")
         
-        # Extract text from image if available
-        extracted_text = ""
-        if image_type.startswith('image/'):
-            print("📸 Extraindo texto da imagem com OCR...")
-            extracted_text = extract_text_from_image(image_data)
-            print(f"📝 Texto extraído: {len(extracted_text)} caracteres")
+        if not image_type.startswith('image/'):
+            return {
+                "body_region": body_region or "Não especificada",
+                "technical_quality": "Formato não suportado",
+                "normal_findings": [],
+                "abnormal_findings": [],
+                "diagnostic_impression": "Por favor, envie uma imagem (JPG ou PNG) do raio-X.",
+                "differential_diagnosis": [],
+                "overall_severity": "Indeterminada",
+                "recommendations": ["Envie uma imagem válida do raio-X"],
+                "urgent_attention": False,
+                "additional_notes": "Apenas imagens são aceitas para análise de raio-X"
+            }
         
-        # Create system prompt
-        system_prompt = """Você é um médico radiologista especializado.
+        print("📸 Usando análise visual direta com Gemini 2.5 Flash")
+        
+        # Create system prompt for X-ray analysis
+        system_prompt = """Você é um médico radiologista especializado em análise de raios-X.
 
-Para raios-X, analise a descrição/informações disponíveis e forneça:
+Analise a IMAGEM de raio-X fornecida e identifique:
 
-1. **Região Anatômica** - Identifique a região do corpo
-2. **Achados** - Liste achados normais e anormais quando possível
-3. **Impressão Diagnóstica** - Forneça hipóteses diagnósticas
-4. **Recomendações** - Sugira exames complementares ou condutas
+1. **Região Anatômica** - Identifique a região do corpo radiografada
+2. **Qualidade Técnica** - Avalie a qualidade da imagem (posicionamento, penetração, etc)
+3. **Achados Normais** - Descreva estruturas anatômicas visualizadas normais
+4. **Alterações Identificadas** - Liste TODAS as alterações ou anormalidades detectadas
+5. **Impressão Diagnóstica** - Forneça hipóteses diagnósticas baseadas nos achados
+6. **Gravidade** - Classifique a gravidade dos achados
+7. **Recomendações** - Sugira exames complementares ou condutas
 
-**NOTA:** Como estou analisando informações textuais (não a imagem diretamente), fornecerei uma análise baseada nos dados disponíveis e orientações gerais.
+**IMPORTANTE:**
+- Analise CUIDADOSAMENTE a imagem radiográfica
+- Seja preciso na descrição radiológica
+- Use terminologia médica padronizada
+- Destaque achados críticos ou suspeitos
+- Indique se há necessidade de correlação clínica
+- Mencione limitações quando relevante
 
-**FORMATO DA RESPOSTA (JSON):**
+**FORMATO DA RESPOSTA (APENAS JSON, SEM TEXTO EXTRA):**
+```json
 {
-  "body_region": "Região anatômica",
-  "technical_quality": "Avaliação baseada em informações disponíveis",
-  "normal_findings": ["Achado normal esperado 1"],
+  "body_region": "Região anatômica identificada",
+  "technical_quality": "Boa/Adequada/Limitada - descrição",
+  "normal_findings": ["Achado normal 1", "Achado normal 2"],
   "abnormal_findings": [
     {
-      "finding": "Descrição",
-      "location": "Localização",
+      "finding": "Descrição do achado anormal",
+      "location": "Localização específica",
       "severity": "Leve/Moderada/Grave",
       "clinical_significance": "Significado clínico"
     }
   ],
-  "diagnostic_impression": "Impressão diagnóstica",
-  "differential_diagnosis": ["Hipótese 1"],
-  "overall_severity": "Normal/Leve/Moderada/Grave",
-  "recommendations": ["Recomendação 1"],
-  "urgent_attention": false,
-  "additional_notes": "Observações"
-}"""
+  "diagnostic_impression": "Impressão diagnóstica principal",
+  "differential_diagnosis": ["Hipótese 1", "Hipótese 2"],
+  "overall_severity": "Normal/Leve/Moderada/Grave/Crítica",
+  "recommendations": [
+    "Recomendação 1",
+    "Recomendação 2"
+  ],
+  "urgent_attention": true/false,
+  "additional_notes": "Observações ou limitações do exame"
+}
+```"""
 
         # Build prompt
-        region_text = f"Região do Corpo: {body_region}\n" if body_region else ""
+        region_text = f"Região do Corpo Informada: {body_region}\n" if body_region else ""
         clinical_text = f"Informações Clínicas: {additional_info}\n" if additional_info else ""
-        ocr_text = f"\nTexto Extraído da Imagem:\n{extracted_text}\n" if extracted_text else ""
         
-        user_prompt = f"""Analise o raio-X com as seguintes informações:
+        user_prompt = f"""Analise a IMAGEM de raio-X fornecida.
 
-{region_text}{clinical_text}{ocr_text}
+{region_text}{clinical_text}
 
-**IMPORTANTE:** Estou fornecendo uma análise assistida. Para interpretação radiológica definitiva, é essencial a avaliação da imagem por um radiologista qualificado.
+Por favor, forneça uma análise radiológica completa em formato JSON identificando todas as alterações visíveis e sua relevância clínica."""
 
-Por favor, forneça uma análise em formato JSON com orientações clínicas gerais."""
-
-        print("🤖 Enviando para análise com Gemini 2.0 Flash...")
+        print("🤖 Enviando para Gemini 2.5 Flash com suporte a visão...")
         
-        # Create chat
+        # Create chat with Gemini 2.5 Flash (supports vision)
         chat = LlmChat(
             api_key=EMERGENT_KEY,
-            session_id="meduf-xray-analysis",
+            session_id="meduf-xray-vision",
             system_message=system_prompt
-        ).with_model("gemini", "gemini-2.0-flash")
+        ).with_model("gemini", "gemini-2.5-flash")
 
-        # Send message
-        response = await chat.send_message(UserMessage(text=user_prompt))
+        # Send message with image
+        message = UserMessage(
+            text=user_prompt,
+            image_url=f"data:{image_type};base64,{image_data}"
+        )
+
+        response = await chat.send_message(message)
         
-        print("📊 Resposta recebida, processando...")
+        print("📊 Resposta recebida do Gemini, processando...")
         
         # Parse response
-        response_text = response.strip()
+        response_text = response.strip() if isinstance(response, str) else str(response)
+        
+        # Extract JSON
         if "```json" in response_text:
             response_text = response_text.split("```json")[1].split("```")[0].strip()
         elif "```" in response_text:
@@ -268,25 +306,25 @@ Por favor, forneça uma análise em formato JSON com orientações clínicas ger
         
         try:
             analysis = json.loads(response_text)
-            print("✅ Análise concluída com sucesso!")
+            print("✅ Análise de raio-X concluída com sucesso!")
             return analysis
         except json.JSONDecodeError:
             print("⚠️ Resposta não estruturada")
             return {
                 "body_region": body_region or "Não especificada",
-                "technical_quality": "Análise textual",
+                "technical_quality": "Análise visual realizada",
                 "normal_findings": [],
                 "abnormal_findings": [],
                 "diagnostic_impression": response_text,
                 "differential_diagnosis": [],
                 "overall_severity": "Avaliar",
-                "recommendations": ["Avaliação radiológica presencial recomendada"],
+                "recommendations": ["Correlação clínica recomendada"],
                 "urgent_attention": False,
-                "additional_notes": "Resposta em formato texto"
+                "additional_notes": "Resposta em formato texto - avaliação radiológica presencial recomendada"
             }
         
     except Exception as e:
-        print(f"❌ Erro na análise: {e}")
+        print(f"❌ Erro na análise de raio-X: {e}")
         import traceback
         traceback.print_exc()
         
@@ -295,11 +333,12 @@ Por favor, forneça uma análise em formato JSON com orientações clínicas ger
             "technical_quality": "Erro no processamento",
             "normal_findings": [],
             "abnormal_findings": [],
-            "diagnostic_impression": f"Erro ao processar: {str(e)}",
+            "diagnostic_impression": f"Erro ao processar imagem: {str(e)}",
             "differential_diagnosis": [],
             "overall_severity": "Indeterminada",
             "recommendations": [
                 "Tente novamente com uma imagem mais clara",
+                "Verifique se a imagem está em formato JPG ou PNG",
                 "Consulte um radiologista para análise presencial"
             ],
             "urgent_attention": False,
