@@ -1,153 +1,131 @@
 <analysis>**original_problem_statement:**
-The user wants to build a web application named Meduf AI to serve as an AI Clinical Assistant for doctors. The application should assist with clinical reasoning, diagnostic hypotheses, and therapeutic conduct.
+The user wants to build a web application named Meduf AI to serve as an AI Clinical Assistant for doctors.
 
 PRODUCT REQUIREMENTS:
 - The app must accept patient data as input: age, sex, chief complaint, physical exam, complementary exams, and medical history.
 - The AI's output must be structured into three sections: Hipóteses Diagnósticas (Diagnostic Hypotheses), Conduta e Investigação (Conduct and Investigation), and Sugestão Farmacológica (Pharmacological Suggestion).
 - The UI should have input fields for all the patient data points.
 - The application should be in Portuguese.
-- A disclaimer must be present: Esta é uma ferramenta de auxílio à decisão clínica. A responsabilidade final pelo diagnóstico e prescrição é exclusivamente do médico assistente. (This is a clinical decision support tool. The final responsibility for diagnosis and prescription rests solely with the attending physician.)
+- A disclaimer must be present.
+- **NEW REQUIREMENT**: The application's core logic must be powered by a consensus of multiple real AIs (GPT, Gemini, Claude) using the Emergent Universal Key, and should also consult external medical literature (like PubMed).
+- **NEW REQUIREMENT**: The drug interaction analysis should include the impact on renal (kidney) and hepatic (liver) function.
 
 **User's preferred language**: Portuguese (Brazil). The next agent MUST respond in Portuguese.
 
 **what currently exists?**
-A full-stack application with a React frontend, FastAPI backend, and MongoDB database. Key features include:
-- A multi-faceted analysis tool accessible after login, with options for Detailed Diagnosis, Simple Diagnosis, Medication Guide, Drug Interaction, and Toxicology.
-- A complete user authentication system (Login/Logout). Account registration is restricted and can only be performed by an administrator.
-- An Admin Panel () for user management (viewing, creating, blocking, deleting, setting account expiration), and viewing recent platform activity.
-- A Database Manager panel () for administrators to perform raw CRUD operations on database collections.
-- A User Profile page () where users can update their name and upload a profile picture.
-- A patient history page () for users to view their past analyses.
-- A single-device session policy that logs out previous sessions upon a new login.
-- A Save as Image feature to download analysis results.
+A full-stack application with a React frontend and FastAPI backend.
+- **AI Engine:** A new backend module, , has been created to replace all previous frontend mock logic. This module is designed to query three LLMs (GPT, Gemini, Claude) and PubMed to generate a consensus-based response for all features (Diagnosis, Toxicology, etc.). However, this implementation is currently causing the application to hang.
+- **Authentication & Admin:** A full user authentication and administration system is in place and functional. The previously reported bug with the Admin Panel not showing users has been resolved (it was an environment-specific issue).
+- **Features:**
+    - All core features (Detailed/Simple Diagnosis, Medication Guide, Toxicology, Drug Interaction) have been refactored to call new backend endpoints ().
+    - The Drug Interaction feature now includes analysis of renal and hepatic impact.
+- **Bug Fixes:** The critical bug where the Toxicology feature returned dangerously incorrect information has been fixed and verified.
 
 **Last working item**:
-The agent was addressing a critical bug where the Toxicology feature provides dangerously incorrect medical protocols.
+The agent was debugging a critical issue where all application features are stuck in an infinite loading state after integrating the new multi-AI consensus engine.
 
-- **Last item agent was working:** The user reported that when searching for intoxicação por paracetamol (paracetamol poisoning) on the Toxicology page, the application returned the protocol for cocaína (cocaine). The agent attempted to fix this by modifying keyword matching logic.
-- **Status:** BLOCKED
+- **Last item agent was working:** Fixing the infinite loading bug. The agent hypothesized that the synchronous calls to multiple external AIs in the FastAPI backend were causing the requests to time out, making the application unresponsive. As a debugging step, the agent started modifying the consensus functions in  to remove the external AI calls and return basic mock data, aiming to restore basic functionality and confirm the timeout theory. This work was only partially completed.
+- **Status:** IN PROGRESS
 - **Agent Testing Done:** N
-- **Which testing method agent to use?** Frontend testing agent. The agent should be instructed to:
-    1. Navigate to the Toxicologia page.
-    2. Input paracetamol and verify the output is the correct protocol for paracetamol poisoning.
-    3. Input cocaína and verify the output is the correct protocol for cocaine poisoning.
-    4. Input dengue and verify it returns a sensible default or error, not a mismatched protocol.
-- **User Testing Done:** Y (User confirmed the bug still exists after the last agent's attempt).
+- **Which testing method agent to use?** backend testing agent. The agent should first use  to test the consensus endpoints directly after completing the temporary fix (disabling AI calls). Once the app is responsive with mock data, the agent can use the frontend testing agent to verify the UI is no longer stuck.
+- **User Testing Done:** Y (User confirmed all features are stuck loading).
 
 **All Pending/In progress Issue list**:
-
-- **Issue 1: (P0) Critical Bug: Incorrect Toxicology Protocols**
-- **Issue 2: (P1) Recurring Bug: Admin Panel Data Desynchronization**
+- **Issue 1: (P0) CRITICAL - Infinite Loading on All Features**
 
 **Issues Detail:**
 - **Issue 1:**
-  - **Description:** The Toxicology feature () returns dangerously incorrect information. For example, inputting paracetamol yields the protocol for cocaine. This is a high-severity, critical safety issue. The agent's last action was to incorrectly edit the  and  files for a malaria keyword, completely ignoring the user's report about the Toxicology page.
-  - **Attempted fixes:** Previous attempts involved tweaking the  string-matching logic within . These fixes have failed. The last agent action was completely misdirected.
+  - **Description:** After refactoring all features to use the new multi-AI consensus endpoints in the backend, the frontend gets stuck on Analisando... and never returns a result. This makes the entire application unusable. The root cause is suspected to be the long processing time of the synchronous AI API calls, leading to server timeouts.
+  - **Attempted fixes:**
+    1.  Fixed several  and  issues in .
+    2.  Invoked the , which suggested a function name mismatch, but that was not the root cause.
+    3.  **Partially Implemented Fix:** The agent started to edit the functions  and  in  to bypass the external AI calls and return a simple, fast response. This was intended to prove the timeout theory.
   - **Next debug checklist:**
-    1.  **STOP** any work on  or .
-    2.  Open .
-    3.  Analyze the  chain that determines the output. The issue is likely an incorrect condition or fall-through logic that defaults to the wrong protocol.
-    4.  Ensure the condition  is checked *before* more generic terms and that it correctly maps to the paracetamol protocol data.
-    5.  Refactor the logic to be less error-prone. A switch statement or a map of keywords to functions would be more robust than a long  chain.
-  - **Why fix this issue?** Providing incorrect medical treatment protocols is extremely dangerous and renders the application's core feature untrustworthy.
+    1.  **Complete the temporary fix:** Open  and ensure **ALL** consensus functions (, , etc.) are modified to temporarily remove the slow external AI calls and immediately return a mock response.
+    2.  **Verify Responsiveness:** Restart the backend and test the application. Confirm that the infinite loading issue is gone and the pages become responsive again (even if with mock data).
+    3.  **Implement Asynchronous Processing:** This is the real fix. Refactor the backend API endpoints in  to use FastAPI's . The endpoint should immediately return a task ID to the frontend, and the long-running AI consensus logic should run in the background.
+    4.  **Create a Polling Mechanism:** The frontend will need a new endpoint (e.g., ) that it can poll periodically to check the status of the background task and retrieve the final result when it's ready.
+  - **Why fix this issue?** The application is fundamentally broken and unusable in its current state.
   - **Status:** IN PROGRESS
-  - **Is recurring issue?** Y
-  - **Should Test frontend/backend/both after fix?** Frontend
-  - **Blocked on other issue:** No.
-
-- **Issue 2:**
-  - **Description:** The user has repeatedly complained that the Admin Panel does not display the correct list of users after deployment on the public URL. Newly created users don't appear, and the list is inconsistent with the database. This issue seems resolved in the preview environment but fails in production.
-  - **Attempted fixes:** The agent has tried adding cache-busting query parameters to API calls and forcing frontend rebuilds. These have been temporary or ineffective solutions. The problem likely lies in the production environment's configuration or a backend data retrieval issue that only manifests in that context.
-  - **Next debug checklist:**
-    1.  Verify that the backend endpoint  in  is fetching all users from the  collection without any hidden filters.
-    2.  Ensure the production environment variables for the backend (especially  and ) are correct and identical to the ones that work in preview.
-    3.  Review the logic in  that fetches and displays users. Ensure no outdated mock data or incorrect state management is interfering with the live data.
-  - **Why fix this issue?** The Admin Panel is a core feature for the user to manage the application. If it shows incorrect data, it is functionally broken.
-  - **Status:** NOT STARTED
-  - **Is recurring issue?** Y
-  - **Should Test frontend/backend/both after fix?** Both (and MUST be verified on the public production URL).
-  - **Blocked on other issue:** No, but P0 is higher priority.
+  - **Is recurring issue?** N
+  - **Should Test frontend/backend/both after fix?** Both.
+  - **Blocked on other issue:** No, this is the main blocker.
 
 **In progress Task List**:
-- None.
+- **Task 1: Complete the Multi-AI Consensus Integration (P0)**
+  - **Where to resume:** . The immediate priority is to fix the infinite loading bug as described above.
+  - **What will be achieved?** This will make the application's core features functional again and lay the groundwork for a robust, real-AI-powered assistant that can handle long processing times without freezing.
+  - **Status:** BLOCKED (by the Infinite Loading issue, which is part of this task).
+  - **Should Test frontend/backend/both after fix?** Both.
+  - **Blocked on something:** No.
 
 **Upcoming and Future Tasks**
-- **Refactor Mock AI Logic (P1):** The entire AI functionality across all diagnosis/guide pages is built on fragile  logic on the frontend. This is the root cause of many bugs, including the current critical issue. This entire logic should be moved to a backend endpoint that can process the input and return a structured response. This would centralize the AI logic, making it easier to debug and improve.
+- **Refactor AI Endpoints for Asynchronous Execution (P0):** Convert all  endpoints to use background tasks to prevent API timeouts and improve user experience. This is the necessary next step after stabilizing the application.
 
 **Completed work in this session**
-- **Initial Application:** Built the foundational AI clinical assistant app.
-- **Authentication & Admin Controls:** Implemented a full auth flow with an admin-only registration system and a comprehensive admin panel for user management.
-- **Database Integration:** Connected the entire application to a MongoDB backend, replacing initial mock data.
-- **Database Manager:** Created a separate panel for admins to directly manage database content.
-- **Core Features:** Added multiple analysis modules: Simple/Detailed Diagnosis, Medication Guide, Drug Interaction, and Toxicology.
-- **User Experience:** Implemented a user profile page, single-device session control, account expiration timers, and the ability to save reports as images.
-- **UI Improvements:** Redesigned the header and login page for a cleaner, more modern look and feel.
+- **Critical Bug Fix:** Resolved an issue where the Toxicology feature provided dangerously incorrect medical advice.
+- **Bug Fix:** Solved the recurring Admin Panel bug where users were not displayed (confirmed to be an environment-specific DB configuration issue).
+- **Feature Implementation:** Added analysis of renal and hepatic impact to the Drug Interaction feature, including backend logic and frontend display.
+- **Major Refactoring:** Initiated a major architectural overhaul by creating a backend multi-AI consensus engine () to power all analytical features, replacing the brittle frontend mock logic. All frontend pages (, , etc.) were updated to call the new backend endpoints.
+- **UX Improvement:** Removed references to illicit drugs from placeholder text in the Toxicology page as per user request.
+- **User Support:** Successfully handled a platform-related domain registration issue by escalating to the .
 
 **Earlier issues found/mentioned but not fixed**
-- The recurring issue of the Admin Panel data being out of sync (listed as P1 in All Pending/In progress Issue list). The user has reported this many times, and fixes have not been permanent.
+- None.
+
+**Known issue recurrence from previous fork**
+- None. The two main recurring issues from the previous fork (Toxicology bug, Admin panel sync) have been addressed and resolved.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Frontend:** React, React Router, Tailwind CSS, Shadcn UI, Axios for API calls,  for downloads.
-- **Backend:** Python with FastAPI, Motor for asynchronous MongoDB operations, Pydantic for data validation, JWT for authentication, and Bcrypt for password hashing.
+- **Frontend:** React, React Router, Tailwind CSS, Axios.
+- **Backend:** Python, FastAPI, Motor (for MongoDB).
+- **AI Integration:**  library for calling multiple LLMs (GPT, Gemini, Claude) via the Emergent Universal Key.
 - **Database:** MongoDB.
-- **DevOps:** Application is managed by . Frontend code is built into a production bundle using yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command..
 
 **key DB schema**
 - : 
 - : 
 
 **changes in tech stack**
--  library was added to the frontend.
--  version was pinned to  on the backend to resolve a dependency conflict.
+- Added  library to the backend for LLM calls.
 
 **All files**
-- : **CRITICAL FILE.** Contains the bug the user last reported.
-- : Manages all admin functionality. Has a history of data sync issues.
-- : The single source of truth for all backend API logic.
-- : Handles login logic and error notifications.
-- : Manages global navigation and the user session timer.
-- : Defines all frontend routes and protected areas.
+- : **CRITICAL FILE.** The source of the current infinite loading bug. Contains the logic for the multi-AI consensus engine.
+- : Contains all API endpoints, including the new (and currently failing)  routes.
+- : And all similar pages (, , etc.) were refactored to call the new backend endpoints.
 
 **Areas that need refactoring**:
-- **Mock AI Logic:** The  blocks in , , , , and  are extremely brittle and the source of persistent bugs. This entire rules engine should be migrated to a single, robust backend endpoint.
+- **Asynchronous Processing:** The entire AI consensus mechanism in  and  MUST be refactored to run asynchronously (e.g., using FastAPI's ) to prevent server timeouts and unfreeze the application.
 
 **key api endpoints**
-- : User login.
-- : GET all users, PATCH user details, DELETE user.
-- : Full CRUD for database management.
-- : GET/PATCH current user's profile.
-- : POST user profile picture.
-- : POST/GET clinical analyses.
+- 
+- 
+-  (and similar for , , , ): **These are the new, currently failing endpoints.**
 
 **Critical Info for New Agent**
-- **Priority #1 is fixing the Toxicology bug.** The agent's last actions were incorrect and did not address the user's report. Focus on .
-- The user is extremely frustrated with two recurring issues: the Admin Panel not showing correct data, and the AI providing incorrect answers.
-- All communication with the user must be in Brazilian Portuguese.
-- The AI is not a real AI; it's a series of hardcoded  statements on the frontend. Be aware of its limitations. This is a major architectural weakness that should be flagged for refactoring.
-- Admin credentials are  / .
+- **THE APP IS BROKEN:** Your absolute first priority (P0) is to fix the infinite loading bug. The application is unusable.
+- **The likely cause is a server timeout** due to long-running, synchronous AI API calls in the backend.
+- **Your immediate plan should be:**
+    1.  **Stabilize:** Finish the previous agent's work of temporarily disabling all external AI calls in  to make the app responsive again.
+    2.  **Re-implement correctly:** Refactor the AI calls to be asynchronous using background tasks so they don't block the server.
 
 **Last 5 User Messages and any pending user messages**
-1.  **User Request:** Improve the Toxicology feature to handle specific illicit drugs (cocaine, methamphetamine) and common medications (paracetamol), as it's returning generic answers. (Completed, but buggy)
-2.  **Agent Action:** Attempted to improve the Toxicology page logic.
-3.  **User BUG REPORT (PENDING):** The agent's fix was wrong. Searching for intoxicação por paracetamol (paracetamol poisoning) now returns the protocol for cocaine. This is a CRITICAL FAILURE.
-4.  **User Request:** Add a Save as Image button to all analysis reports. (Completed)
-5.  **User Request:** Add a Support button in the menu linking to a WhatsApp number. (Completed)
+1.  **User Request (Completed):** Integrate the new multi-AI consensus engine into ALL platform functions (diagnosis, toxicology, etc.).
+2.  **User Confirmation (Completed):** Pode realizar a todas as atividades e integrações pendentes (You can perform all pending activities and integrations).
+3.  **BUG REPORT (PENDING):** A plataforma não está retornando resposta, fica apenas analisando infinitamente, em todas as opções (The platform is not returning a response, it just keeps analyzing infinitely on all options).
+4.  (No further messages, agent started debugging)
 
 **Project Health Check:**
-- **Broken:** The Toxicology feature is critically broken and provides dangerous misinformation.
-- **Mocked:** The application's core intelligence is a series of hardcoded  blocks on the frontend, making it brittle and difficult to maintain.
+- **Broken:** The application's core functionality is completely unresponsive due to the infinite loading bug.
 
 **Testing status**
-- Testing agent used after significant changes: NO
-- Troubleshoot agent used after agent stuck in loop: NO
+- Testing agent used after significant changes: YES (Used successfully for earlier bug fixes and feature additions).
+- Troubleshoot agent used after agent stuck in loop: YES (Used for the current infinite loading issue).
 - Test files created: []
-- Known regressions:
-  - Admin Panel data synchronization in production.
-  - The Toxicology feature has severely regressed.
+- Known regressions: The entire application is currently non-functional.
 
 **Credentials to test flow:**
 - **Admin:**
@@ -155,6 +133,4 @@ info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this comm
   - **Password:** 
 
 **What agent forgot to execute**
-The agent completely failed to address the user's last and most critical bug report.
-- **User's Bug:** The **Toxicology** page gives the wrong protocol (paracetamol search returns cocaine result).
-- **Agent's Mistaken Action:** The agent started editing  and  to fix a previously mentioned issue about malaria, ignoring the user's immediate, critical feedback on the Toxicology feature. The next agent must correct this course immediately.</analysis>
+The agent did not fully complete its last debugging step. It only disabled the slow AI calls in *two* of the consensus functions in . To properly diagnose the issue, this change needs to be applied to **all** the consensus functions within that file before restarting the server and testing for responsiveness.</analysis>
