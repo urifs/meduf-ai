@@ -138,7 +138,7 @@ const Toxicology = () => {
                     <Label htmlFor="substance">Substância / Agente Tóxico</Label>
                     <Textarea 
                       id="substance" 
-                      placeholder="Ex: Ingestão de cocaína, paracetamol, chumbinho..." 
+                      placeholder="Ex: Ingestão de paracetamol, dipirona, produto de limpeza, veneno de rato..." 
                       className="min-h-[300px] resize-none text-base leading-relaxed"
                       value={substance}
                       onChange={(e) => setSubstance(e.target.value)}
