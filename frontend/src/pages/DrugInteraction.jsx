@@ -516,53 +516,6 @@ const DrugInteraction = () => {
                           </CardContent>
                         </Card>
                       )}
-
-                      {result.interactions.map((item, i) => (
-                        <Card key={i} className="border-l-4 border-l-red-500 shadow-sm">
-                          <CardHeader className="pb-2">
-                            <div className="flex justify-between items-start">
-                              <CardTitle className="text-lg text-red-700 flex items-center gap-2">
-                                {item.pair}
-                              </CardTitle>
-                              <Badge variant="outline" className={`
-                                ${item.severity === 'Gravíssima' ? 'bg-red-900 text-white border-red-900' : 
-                                  item.severity === 'Grave' ? 'bg-red-100 text-red-700 border-red-200' : 
-                                  'bg-orange-100 text-orange-700 border-orange-200'}
-                              `}>
-                                {item.severity}
-                              </Badge>
-                            </div>
-                            <CardDescription className="text-xs font-mono mt-1">
-                              Mecanismo: {item.type}
-                            </CardDescription>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="grid md:grid-cols-2 gap-4">
-                              <div className="space-y-2">
-                                <div>
-                                  <span className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-1">
-                                    <Activity className="h-3 w-3" /> Efeito Clínico
-                                  </span>
-                                  <p className="text-sm text-foreground mt-1">{item.effect}</p>
-                                </div>
-                                <div>
-                                  <span className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-1">
-                                    <HeartPulse className="h-3 w-3" /> Toxicidade/Risco
-                                  </span>
-                                  <p className="text-sm text-foreground mt-1">{item.toxicity}</p>
-                                </div>
-                              </div>
-                              
-                              <div className="bg-red-50 p-3 rounded-md border border-red-100 h-fit">
-                                <span className="text-xs font-bold text-red-800 uppercase flex items-center gap-1">
-                                  <Brain className="h-3 w-3" /> Conduta Sugerida
-                                </span>
-                                <p className="text-sm text-red-900 mt-1 font-medium">{item.conduct}</p>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
                     </div>
                   ) : null}
                 </div>
