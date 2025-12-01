@@ -213,9 +213,9 @@ async def create_consensus_diagnosis(
                         "original_name": diag.get("name")
                     }
                 diagnosis_count[name]["count"] += 1
-                diagnosis_count[name]["justifications"].append(
-                    f"[{provider.upper()}] {diag.get('justification', '')}"
-                )
+                justification = diag.get('justification', '')
+                if justification:
+                    diagnosis_count[name]["justifications"].append(justification)
         
         # Collect medications
         for med in ai_response.get("medications", []):
@@ -231,7 +231,7 @@ async def create_consensus_diagnosis(
         # Collect advice
         advice = conduct.get("advice", "")
         if advice:
-            all_advice.append(f"[{provider.upper()}] {advice}")
+            all_advice.append(advice)
     
     # Sort diagnoses by frequency
     sorted_diagnoses = sorted(
@@ -243,10 +243,12 @@ async def create_consensus_diagnosis(
     # Build consensus response
     consensus_diagnoses = []
     for name, data in sorted_diagnoses[:5]:  # Top 5 diagnoses
+        # Combine justifications without AI labels
+        combined_justification = " ".join(data["justifications"][:2])
         consensus_diagnoses.append({
             "name": data["original_name"],
-            "justification": f"**Consenso de {data['count']}/3 IAs.** " + " | ".join(data["justifications"][:2]),
-            "ai_agreement": f"{data['count']}/3 IAs"
+            "justification": combined_justification,
+            "ai_agreement": f"{data['count']}/2 IAs"
         })
     
     return {
