@@ -230,7 +230,7 @@ const Toxicology = () => {
                   </div>
                 </div>
                 
-                <div ref={reportRef} className="space-y-4 p-6 bg-white rounded-lg border shadow-sm">
+                <div ref={reportRef} className="space-y-4 p-6 bg-white rounded-xl shadow-lg border-2 border-rose-100">
                   <div className="flex flex-col md:flex-row justify-between gap-4 border-b pb-4">
                     <div>
                       <span className="text-xs font-bold text-muted-foreground uppercase">Agente Identificado</span>
