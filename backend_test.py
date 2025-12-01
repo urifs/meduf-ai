@@ -10,7 +10,7 @@ import json
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://clinical-helper-ai.preview.emergentagent.com/api"
+BACKEND_URL = "http://localhost:8001/api"
 TEST_USERNAME = "ur1fs"
 TEST_PASSWORD = "@Fred1807"
 
