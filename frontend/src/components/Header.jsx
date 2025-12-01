@@ -243,22 +243,6 @@ export const Header = () => {
                   </Link>
 
                   <Link 
-                    to="/exam-reader" 
-                    className={`flex items-center gap-2 px-4 py-3 rounded-md transition-colors ${isActive('/exam-reader') ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted text-foreground/80'}`}
-                  >
-                    <FileText className="h-4 w-4" />
-                    Leitor de Exames
-                  </Link>
-
-                  <Link 
-                    to="/xray-reader" 
-                    className={`flex items-center gap-2 px-4 py-3 rounded-md transition-colors ${isActive('/xray-reader') ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted text-foreground/80'}`}
-                  >
-                    <Activity className="h-4 w-4" />
-                    Leitor de Raio-X
-                  </Link>
-
-                  <Link 
                     to="/profile" 
                     className={`flex items-center gap-2 px-4 py-3 rounded-md transition-colors ${isActive('/profile') ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted text-foreground/80'}`}
                   >
