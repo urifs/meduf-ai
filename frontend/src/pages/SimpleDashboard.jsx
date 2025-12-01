@@ -3,7 +3,7 @@ import { Header } from '@/components/Header';
 import { ClinicalReport } from '@/components/ClinicalReport';
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import { Activity, Sparkles, ArrowLeft } from 'lucide-react';
+import { Sparkles, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { useNavigate } from 'react-router-dom';
 import api from '@/lib/api';
 import { startAITask } from '@/lib/aiPolling';
+import '../styles/animations.css';
 
 const SimpleDashboard = () => {
   const navigate = useNavigate();
@@ -29,18 +30,16 @@ const SimpleDashboard = () => {
 
     setIsLoading(true);
     setReportData(null);
-    setProgress(10); // Start with 10% immediately
+    setProgress(10);
 
     try {
-      // Simulate smooth progress animation
       const progressInterval = setInterval(() => {
         setProgress(prev => {
-          if (prev >= 85) return prev; // Cap at 85% until real completion
-          return prev + 5; // Increment by 5% every 1.5 seconds
+          if (prev >= 85) return prev;
+          return prev + 5;
         });
       }, 1500);
 
-      // Call AI Consensus Engine with polling
       const aiReport = await startAITask(
         '/ai/consensus/diagnosis',
         { queixa: anamnese, idade: 'N/I', sexo: 'N/I' },
@@ -51,11 +50,9 @@ const SimpleDashboard = () => {
         }
       );
       
-      // Clear interval and set to 100%
       clearInterval(progressInterval);
       setProgress(100);
 
-      // Save to consultation history
       try {
         await api.post('/consultations', {
           patient: {
@@ -71,7 +68,6 @@ const SimpleDashboard = () => {
       
       setReportData(aiReport);
       
-      // Save to localStorage for history
       const historyEntry = {
         id: Date.now().toString(),
         date: new Date().toISOString(),
@@ -93,38 +89,46 @@ const SimpleDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 relative">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-10 left-10 w-80 h-80 bg-purple-400/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-pink-400/10 rounded-full blur-3xl animate-float" style={{animationDelay: '2s'}}></div>
+      </div>
+
       <Header />
-      <main className="container mx-auto px-4 py-8 md:px-8">
+      <main className="container mx-auto px-4 py-8 md:px-8 relative z-10">
         <Button 
           variant="ghost" 
-          className="mb-6 pl-0 hover:pl-2 transition-all" 
+          className="mb-6 pl-0 hover:pl-2 transition-all group animate-fade-in-up" 
           onClick={() => navigate('/')}
         >
-          <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Seleção
+          <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" /> Voltar para Seleção
         </Button>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Column: Input */}
-          <div className="lg:col-span-5 xl:col-span-4 space-y-6">
-            <Card className="h-full border-none shadow-md bg-card/50 backdrop-blur-sm">
+          <div className="lg:col-span-5 xl:col-span-4 space-y-6 animate-slide-in-left">
+            <Card className="h-full glass-card border-2 border-purple-200 shadow-xl hover:shadow-2xl transition-all duration-500">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl text-primary">
-                  <Sparkles className="h-5 w-5" />
-                  Diagnóstico Simples
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 text-white">
+                    <Sparkles className="h-5 w-5" />
+                  </div>
+                  <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Diagnóstico Simples</span>
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-base">
                   Descreva o caso livremente. A IA identificará os padrões.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleAnalyze} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="anamnese">Anamnese Completa</Label>
+                    <Label htmlFor="anamnese" className="text-sm font-bold">Anamnese Completa</Label>
                     <Textarea 
                       id="anamnese" 
                       placeholder="Ex: Paciente 38 anos com febre de 38 graus e dor epigástrica..." 
-                      className="min-h-[300px] resize-none text-base leading-relaxed"
+                      className="min-h-[300px] resize-none text-base leading-relaxed border-2 border-purple-100 focus:border-purple-400 transition-colors"
                       value={anamnese}
                       onChange={(e) => setAnamnese(e.target.value)}
                     />
@@ -132,7 +136,7 @@ const SimpleDashboard = () => {
 
                   <Button 
                     type="submit" 
-                    className="w-full bg-gradient-to-r from-primary to-blue-600 hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl"
+                    className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl text-base font-semibold"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -141,7 +145,7 @@ const SimpleDashboard = () => {
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
-                        <Sparkles className="h-4 w-4" /> Gerar Análise Clínica
+                        <Sparkles className="h-5 w-5" /> Gerar Análise Clínica
                       </span>
                     )}
                   </Button>
@@ -151,16 +155,19 @@ const SimpleDashboard = () => {
           </div>
 
           {/* Right Column: Output */}
-          <div className="lg:col-span-7 xl:col-span-8">
+          <div className="lg:col-span-7 xl:col-span-8 animate-slide-in-right">
             {isLoading && progress > 0 && (
-              <Card className="mb-4">
+              <Card className="mb-4 glass-card border-2 border-purple-200 shadow-xl animate-pulse-glow">
                 <CardContent className="pt-6">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                      <span>🔬 Analisando com IA e banco de dados PubMed...</span>
-                      <span className="font-medium">{progress}%</span>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm font-medium">
+                      <span className="flex items-center gap-2 text-purple-700">
+                        <span className="animate-spin">🔬</span>
+                        Analisando com IA e banco de dados PubMed...
+                      </span>
+                      <span className="font-bold text-purple-600">{progress}%</span>
                     </div>
-                    <Progress value={progress} className="h-2" />
+                    <Progress value={progress} className="h-3 bg-purple-100 [&>div]:bg-gradient-to-r [&>div]:from-purple-500 [&>div]:to-pink-600 shadow-lg" />
                   </div>
                 </CardContent>
               </Card>
