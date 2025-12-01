@@ -104,7 +104,8 @@ const Admin = () => {
       navigate('/'); 
     } else {
       fetchData();
-      const interval = setInterval(fetchData, 5000);
+      // Auto-refresh every 3 seconds for real-time updates
+      const interval = setInterval(fetchData, 3000);
       return () => clearInterval(interval);
     }
   }, [userRole, navigate]);
