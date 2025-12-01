@@ -27,12 +27,18 @@ const SimpleDashboard = () => {
     setIsLoading(true);
     setReportData(null);
 
-    // Simulate AI Processing Delay
-    setTimeout(async () => {
-      // Enhanced Mock Logic
-      let mockResponse;
-      // Normalize text: remove accents and lowercase
-      const text = anamnese.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    try {
+      // Call AI Consensus Engine (3 AIs + PubMed)
+      toast.info("🔬 Consultando 3 IAs + bases médicas (PubMed)...", { duration: 8000 });
+      
+      const response = await api.post('/ai/consensus/diagnosis', {
+        queixa: anamnese,
+        idade: "N/I",
+        sexo: "N/I",
+        historia: anamnese
+      });
+      
+      const aiReport = response.data;
 
       // 1. Gynecological / Obstetric (High Priority)
       if (text.includes("menstruacao") || text.includes("atraso") || text.includes("sangramento vaginal") || text.includes("colica") || text.includes("gestante") || text.includes("gravida")) {
