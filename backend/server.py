@@ -762,6 +762,65 @@ async def ai_consensus_diagnosis(patient_data: dict, user: UserInDB = Depends(ge
     except Exception as e:
         print(f"AI Consensus Error: {e}")
         import traceback
+
+
+
+# Import new consensus functions
+from ai_medical_consensus import (
+    get_ai_consensus_medication_guide,
+    get_ai_consensus_drug_interaction,
+    get_ai_consensus_toxicology
+)
+
+
+@app.post("/api/ai/consensus/medication-guide", response_model=dict)
+async def ai_consensus_medication_guide(data: dict, user: UserInDB = Depends(get_current_user)):
+    """
+    Medication guide using 3 LLMs + PubMed research
+    """
+    try:
+        symptoms = data.get("symptoms", "")
+        print(f"🔬 Starting AI Consensus Medication Guide for: {symptoms}")
+        result = await get_ai_consensus_medication_guide(symptoms)
+        print(f"✅ Medication guide completed")
+        return result
+    except Exception as e:
+        print(f"AI Consensus Medication Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Error processing medication guide: {str(e)}")
+
+
+@app.post("/api/ai/consensus/drug-interaction", response_model=dict)
+async def ai_consensus_drug_interaction_endpoint(data: dict, user: UserInDB = Depends(get_current_user)):
+    """
+    Drug interaction using 3 LLMs + PubMed research
+    """
+    try:
+        drug1 = data.get("drug1", "")
+        drug2 = data.get("drug2", "")
+        print(f"🔬 Starting AI Consensus Drug Interaction: {drug1} + {drug2}")
+        result = await get_ai_consensus_drug_interaction(drug1, drug2)
+        print(f"✅ Drug interaction completed")
+        return result
+    except Exception as e:
+        print(f"AI Consensus Interaction Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Error processing drug interaction: {str(e)}")
+
+
+@app.post("/api/ai/consensus/toxicology", response_model=dict)
+async def ai_consensus_toxicology_endpoint(data: dict, user: UserInDB = Depends(get_current_user)):
+    """
+    Toxicology protocol using 3 LLMs + PubMed research
+    """
+    try:
+        substance = data.get("substance", "")
+        print(f"🔬 Starting AI Consensus Toxicology for: {substance}")
+        result = await get_ai_consensus_toxicology(substance)
+        print(f"✅ Toxicology protocol completed")
+        return result
+    except Exception as e:
+        print(f"AI Consensus Toxicology Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Error processing toxicology: {str(e)}")
+
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Error processing consensus diagnosis: {str(e)}")
 
