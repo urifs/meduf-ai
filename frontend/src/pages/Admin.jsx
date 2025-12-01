@@ -494,8 +494,11 @@ const Admin = () => {
               <p className="text-xs text-muted-foreground mt-1">
                 {monthlyUsage ? `${monthlyUsage.total_consultations} consultas (${monthlyUsage.total_tokens.toLocaleString()} tokens)` : 'Nenhuma consulta'}
               </p>
+              <p className="text-xs text-orange-600 mt-1">
+                ✓ Gemini 2.5 Flash ($0.15/$0.60 por 1M tokens)
+              </p>
               <p className="text-xs text-blue-600 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                💡 Atualiza a cada 3 segundos
+                💡 Valores exatos, atualizados a cada 3 segundos
               </p>
             </CardContent>
           </Card>
