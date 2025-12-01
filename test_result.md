@@ -477,11 +477,14 @@ frontend:
 
 metadata:
   created_by: "testing_agent"
-  version: "1.6"
-  test_sequence: 8
+  version: "1.7"
+  test_sequence: 9
   run_ui: false
   test_completed: true
   all_tests_passed: true
+  last_test_date: "2025-01-02"
+  critical_bug_fixed: true
+  consensus_endpoints_verified: 5
 
 test_plan:
   current_focus: []
