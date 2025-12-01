@@ -19,7 +19,7 @@ export async function pollTask(taskId, onProgress = null, pollInterval = 2000, m
   while (attempts < maxAttempts) {
     try {
       // Get task status
-      const response = await api.get(`/api/ai/tasks/${taskId}`);
+      const response = await api.get(`/ai/tasks/${taskId}`);
       const task = response.data;
       
       // Call progress callback if provided
