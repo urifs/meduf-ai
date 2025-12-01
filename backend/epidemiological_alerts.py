@@ -41,14 +41,14 @@ async def fetch_real_epidemiological_alerts() -> Dict[str, List[Dict[str, Any]]]
     print("🔄 Fetching fresh epidemiological alerts...")
     
     try:
-        # Use Claude for reliable, factual information
+        # Use Gemini 2.5 Flash for reliable, factual information
         chat = LlmChat(
             api_key=EMERGENT_KEY,
             session_id=f"meduf-epi-alerts-{datetime.utcnow().strftime('%Y%m%d%H')}",
             system_message="""Você é um epidemiologista que monitora surtos e alertas de doenças.
 Forneça informações REAIS e ATUAIS baseadas em dados epidemiológicos recentes.
 Seja factual e preciso. Use apenas dados de fontes confiáveis."""
-        ).with_model("anthropic", "claude-sonnet-4-20250514")
+        ).with_model("gemini", "gemini-2.5-flash")
         
         prompt = f"""**DATA DE HOJE: {datetime.utcnow().strftime('%d/%m/%Y')}**
 
