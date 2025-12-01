@@ -28,14 +28,11 @@ const SimpleDashboard = () => {
     setReportData(null);
 
     try {
-      // Call AI Consensus Engine (3 AIs + PubMed)
-      toast.info("🔬 Consultando 3 IAs + bases médicas (PubMed)...", { duration: 8000 });
+      // Call backend AI engine  
+      toast.info("🔬 Analisando com IA...");
       
-      const response = await api.post('/ai/consensus/diagnosis', {
-        queixa: anamnese,
-        idade: "N/I",
-        sexo: "N/I",
-        historia: anamnese
+      const response = await api.post('/ai/diagnosis/simple', {
+        text: anamnese
       });
       
       const aiReport = response.data;
@@ -335,7 +332,7 @@ const SimpleDashboard = () => {
       existingHistory.unshift(historyEntry);
       localStorage.setItem('meduf_history', JSON.stringify(existingHistory.slice(0, 50)));
       
-      toast.success("✅ Análise completa! Consenso de 3 IAs + literatura médica");
+      toast.success("✅ Análise concluída!");
       
     } catch (error) {
       console.error("AI Consensus Error:", error);
