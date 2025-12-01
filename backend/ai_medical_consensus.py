@@ -261,26 +261,15 @@ async def create_consensus_diagnosis(
 
 async def get_ai_consensus_diagnosis(patient_data: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Main function: Get consensus diagnosis from 3 AIs + PubMed research
+    Main function: Get consensus diagnosis from 3 AIs
     """
     try:
-        # Step 1: Search PubMed for relevant medical literature
-        print("🔍 Searching PubMed...")
-        query = f"{patient_data.get('queixa', '')} {patient_data.get('historia', '')}"
-        pubmed_articles = await search_pubmed(query, max_results=3)
-        
-        pubmed_context = ""
-        if pubmed_articles:
-            pubmed_context = "\n**LITERATURA MÉDICA RELEVANTE (PubMed):**\n"
-            for i, article in enumerate(pubmed_articles, 1):
-                pubmed_context += f"\n{i}. **{article['title']}**\n   {article['abstract']}\n"
-        
-        # Step 2: Query all 3 AIs in parallel
+        # Query all 3 AIs in parallel
         print("🤖 Querying 3 AIs in parallel...")
         tasks = [
-            get_ai_diagnosis("openai", "gpt-5", patient_data, pubmed_context),
-            get_ai_diagnosis("anthropic", "claude-sonnet-4-20250514", patient_data, pubmed_context),
-            get_ai_diagnosis("gemini", "gemini-2.0-flash", patient_data, pubmed_context)
+            get_ai_diagnosis("openai", "gpt-5", patient_data, ""),
+            get_ai_diagnosis("anthropic", "claude-sonnet-4-20250514", patient_data, ""),
+            get_ai_diagnosis("gemini", "gemini-2.0-flash", patient_data, "")
         ]
         
         results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -290,7 +279,7 @@ async def get_ai_consensus_diagnosis(patient_data: Dict[str, Any]) -> Dict[str, 
         
         print(f"✅ Got {len(valid_diagnoses)}/3 AI responses")
         
-        # Step 3: Create consensus
+        # Create consensus
         print("🧠 Creating consensus...")
         consensus = await create_consensus_diagnosis(valid_diagnoses)
         
@@ -316,24 +305,12 @@ async def get_ai_consensus_diagnosis(patient_data: Dict[str, Any]) -> Dict[str, 
 
 async def get_ai_consensus_medication_guide(symptoms: str) -> Dict[str, Any]:
     """
-    Get medication recommendations using 3 AIs + PubMed
+    Get medication recommendations using 3 AIs
     """
     try:
-        # Search PubMed
-        print("🔍 Searching PubMed for medication guidance...")
-        pubmed_articles = await search_pubmed(f"treatment {symptoms} medication", max_results=3)
-        
-        pubmed_context = ""
-        if pubmed_articles:
-            pubmed_context = "\n**LITERATURA MÉDICA RELEVANTE (PubMed):**\n"
-            for i, article in enumerate(pubmed_articles, 1):
-                pubmed_context += f"\n{i}. **{article['title']}**\n   {article['abstract']}\n"
-        
         # Create prompt for medication recommendations
         medication_prompt = f"""**SINTOMAS DO PACIENTE:**
 {symptoms}
-
-{pubmed_context}
 
 **Forneça recomendações de medicamentos em formato JSON:**
 ```json
@@ -396,24 +373,12 @@ async def get_ai_consensus_medication_guide(symptoms: str) -> Dict[str, Any]:
 
 async def get_ai_consensus_drug_interaction(drug1: str, drug2: str) -> Dict[str, Any]:
     """
-    Analyze drug interaction using 3 AIs + PubMed
+    Analyze drug interaction using 3 AIs
     """
     try:
-        # Search PubMed for interactions
-        print(f"🔍 Searching PubMed for {drug1} + {drug2} interaction...")
-        pubmed_articles = await search_pubmed(f"{drug1} {drug2} drug interaction", max_results=3)
-        
-        pubmed_context = ""
-        if pubmed_articles:
-            pubmed_context = "\n**LITERATURA MÉDICA RELEVANTE (PubMed):**\n"
-            for i, article in enumerate(pubmed_articles, 1):
-                pubmed_context += f"\n{i}. **{article['title']}**\n   {article['abstract']}\n"
-        
         interaction_prompt = f"""**ANÁLISE DE INTERAÇÃO MEDICAMENTOSA:**
 Medicamento 1: {drug1}
 Medicamento 2: {drug2}
-
-{pubmed_context}
 
 **Forneça análise completa em formato JSON:**
 ```json
@@ -514,23 +479,11 @@ Medicamento 2: {drug2}
 
 async def get_ai_consensus_toxicology(substance: str) -> Dict[str, Any]:
     """
-    Get toxicology protocol using 3 AIs + PubMed
+    Get toxicology protocol using 3 AIs
     """
     try:
-        # Search PubMed for toxicology
-        print(f"🔍 Searching PubMed for {substance} poisoning...")
-        pubmed_articles = await search_pubmed(f"{substance} poisoning intoxication treatment", max_results=3)
-        
-        pubmed_context = ""
-        if pubmed_articles:
-            pubmed_context = "\n**LITERATURA MÉDICA RELEVANTE (PubMed):**\n"
-            for i, article in enumerate(pubmed_articles, 1):
-                pubmed_context += f"\n{i}. **{article['title']}**\n   {article['abstract']}\n"
-        
         toxicology_prompt = f"""**ANÁLISE TOXICOLÓGICA:**
 Substância: {substance}
-
-{pubmed_context}
 
 **Forneça protocolo toxicológico em formato JSON:**
 ```json
