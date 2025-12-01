@@ -32,6 +32,14 @@ const SimpleDashboard = () => {
     setProgress(10); // Start with 10% immediately
 
     try {
+      // Simulate smooth progress animation
+      const progressInterval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 85) return prev; // Cap at 85% until real completion
+          return prev + 5; // Increment by 5% every 1.5 seconds
+        });
+      }, 1500);
+
       // Call AI Consensus Engine with polling
       const progressToast = toast.loading("🔬 Analisando 10%...");
       
@@ -39,12 +47,16 @@ const SimpleDashboard = () => {
         '/ai/consensus/diagnosis',
         { queixa: anamnese, idade: 'N/I', sexo: 'N/I' },
         (task) => {
-          if (task.status === 'processing') {
+          if (task.status === 'processing' && task.progress > 0) {
             setProgress(task.progress);
             toast.loading(`🔬 Analisando ${task.progress}%`, { id: progressToast });
           }
         }
       );
+      
+      // Clear interval and set to 100%
+      clearInterval(progressInterval);
+      setProgress(100);
       
       toast.success("✅ Análise concluída!", { id: progressToast });
 
