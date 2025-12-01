@@ -165,11 +165,11 @@ const Toxicology = () => {
               <CardContent>
                 <form onSubmit={handleAnalyze} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="substance">Substância / Agente Tóxico</Label>
+                    <Label htmlFor="substance" className="text-sm font-bold">Substância / Agente Tóxico</Label>
                     <Textarea 
                       id="substance" 
                       placeholder="Ex: Ingestão de paracetamol, dipirona, produto de limpeza, veneno de rato..." 
-                      className="min-h-[300px] resize-none text-base leading-relaxed"
+                      className="min-h-[300px] resize-none text-base leading-relaxed border-2 border-rose-100 focus:border-rose-400 transition-colors"
                       value={substance}
                       onChange={(e) => setSubstance(e.target.value)}
                     />
@@ -177,7 +177,7 @@ const Toxicology = () => {
 
                   <Button 
                     type="submit" 
-                    className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 transition-all duration-300 shadow-lg hover:shadow-xl text-white"
+                    className="w-full h-12 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl text-white text-base font-semibold"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -186,7 +186,7 @@ const Toxicology = () => {
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
-                        <Skull className="h-4 w-4" /> Gerar Conduta
+                        <Skull className="h-5 w-5" /> Gerar Conduta
                       </span>
                     )}
                   </Button>
