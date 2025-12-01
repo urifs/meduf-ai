@@ -501,14 +501,17 @@ Medicamento 2: {drug2}
         }
         
     except Exception as e:
-        print(f"Drug interaction consensus error: {e}")
+        print(f"⚠️ Drug interaction consensus error: {e}")
+        import traceback
+        traceback.print_exc()
+        
         return {
-            "severity": "ERRO",
-            "summary": "Erro ao processar análise",
-            "details": str(e),
-            "recommendations": "Tente novamente",
-            "renal_impact": "Não disponível",
-            "hepatic_impact": "Não disponível"
+            "severity": "Análise Incompleta",
+            "summary": f"Não foi possível completar análise de interação. Consulte profissional.",
+            "details": "Sempre consulte um profissional antes de combinar medicamentos.",
+            "recommendations": "• Consulte farmacêutico ou médico",
+            "renal_impact": "Avaliação profissional necessária",
+            "hepatic_impact": "Avaliação profissional necessária"
         }
 
 
@@ -588,11 +591,19 @@ Substância: {substance}
         }
         
     except Exception as e:
-        print(f"Toxicology consensus error: {e}")
+        print(f"⚠️ Toxicology consensus error: {e}")
+        import traceback
+        traceback.print_exc()
+        
         return {
-            "agent": "Erro na análise",
-            "antidote": "Suporte clínico",
-            "mechanism": str(e),
-            "conduct": ["Contatar Centro de Toxicologia"],
-            "protocol": "Erro ao processar protocolo"
+            "agent": f"Exposição a {substance}",
+            "antidote": "🚨 EMERGÊNCIA - LIGAR 192/193",
+            "mechanism": "EMERGÊNCIA MÉDICA",
+            "conduct": [
+                "Ligar 192 (SAMU) IMEDIATAMENTE",
+                "Centro Toxicologia: 0800 722 6001",
+                "Não induzir vômito",
+                "Levar embalagem ao hospital"
+            ],
+            "protocol": "⚠️ EMERGÊNCIA\n1. LIGAR 192/193\n2. Não induzir vômito\n3. Transportar urgente"
         }
