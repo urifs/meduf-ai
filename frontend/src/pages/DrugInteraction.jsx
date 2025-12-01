@@ -203,40 +203,61 @@ const DrugInteraction = () => {
     setIsLoading(true);
     setResult(null);
 
-    setTimeout(async () => {
-      const interactions = analyzeInteractions(activeMeds);
+    try {
+      // Call backend for drug interaction analysis
+      toast.info("🔬 Analisando interações + impacto renal/hepático...");
       
+      const response = await api.post('/ai/drug-interaction', {
+        drug1: activeMeds[0],
+        drug2: activeMeds[1]
+      });
+      
+      const interactionData = response.data;
+      
+      // Format for display
       const mockResponse = {
-        medications: activeMeds,
-        interactions: interactions,
-        summary: interactions.length > 0 
-          ? `Identificamos ${interactions.length} interações de relevância clínica.` 
-          : "Não foram encontradas interações graves nas bases de dados farmacológicos padrão para esta combinação."
+        medications: [activeMeds[0], activeMeds[1]],
+        severity: interactionData.severity,
+        summary: interactionData.summary,
+        details: interactionData.details,
+        recommendations: interactionData.recommendations,
+        renal_impact: interactionData.renal_impact,
+        hepatic_impact: interactionData.hepatic_impact,
+        monitoring: interactionData.monitoring
       };
 
+      // Save to consultation history
       try {
         await api.post('/consultations', {
           patient: { 
-            queixa: `[Interação] ${activeMeds.join(" + ")}`, 
+            queixa: `[Interação] ${activeMeds[0]} + ${activeMeds[1]}`, 
             idade: "N/I", 
             sexo: "N/I" 
           },
           report: { 
-            diagnoses: [{ name: "Análise de Interação", justification: mockResponse.summary }],
+            diagnoses: [{ name: "Análise de Interação", justification: interactionData.summary }],
             conduct: { 
-              advice: interactions.length > 0 ? "Ajuste posológico ou troca necessária." : "Combinação aparentemente segura." 
+              advice: interactionData.recommendations
             },
-            medications: interactions.map(i => ({ name: i.pair, dosage: i.severity, mechanism: i.effect }))
+            medications: [
+              { name: activeMeds[0], dosage: "Ver impacto", mechanism: "Renal/Hepático analisado" },
+              { name: activeMeds[1], dosage: "Ver impacto", mechanism: "Renal/Hepático analisado" }
+            ]
           }
         });
-        toast.success("Análise concluída!");
+        toast.success("✅ Análise completa com perfil renal e hepático!");
       } catch (error) {
         console.error("Error saving:", error);
       }
 
       setResult(mockResponse);
+      
+    } catch (error) {
+      console.error("Drug interaction error:", error);
+      toast.error("Erro ao analisar interação. Tente novamente.");
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const copyToClipboard = () => {
