@@ -193,6 +193,19 @@ const Toxicology = () => {
 
           {/* Output Section */}
           <div className="lg:col-span-7 xl:col-span-8">
+            {isLoading && progress > 0 && (
+              <Card className="mb-4">
+                <CardContent className="pt-6">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm text-muted-foreground">
+                      <span>🔬 Analisando com IA...</span>
+                      <span className="font-medium">{progress}%</span>
+                    </div>
+                    <Progress value={progress} className="h-2" />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
             {result ? (
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="flex items-center justify-between">
