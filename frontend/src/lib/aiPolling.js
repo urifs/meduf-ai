@@ -3,7 +3,7 @@
  * Handles polling for background AI tasks
  */
 
-import { api } from './api';
+import api from './api';
 
 /**
  * Poll a background task until completion
