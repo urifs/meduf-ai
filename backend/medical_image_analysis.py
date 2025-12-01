@@ -69,9 +69,11 @@ Analise a imagem/documento do exame fornecido e identifique:
 ```"""
 
         # Create prompt with additional context
+        additional_context = f"**Informações Adicionais do Paciente:**\n{additional_info}\n" if additional_info else ""
+        
         user_prompt = f"""Analise o exame laboratorial fornecido na imagem/documento.
 
-{f"**Informações Adicionais do Paciente:**\n{additional_info}\n" if additional_info else ""}
+{additional_context}
 
 Por favor, forneça uma análise completa identificando alterações e sua relevância clínica."""
 
