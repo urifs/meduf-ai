@@ -29,14 +29,20 @@ const SimpleDashboard = () => {
     setReportData(null);
 
     try {
-      // Call backend AI engine  
-      toast.info("🔬 Analisando com IA...");
+      // Call AI Consensus Engine (3 AIs + PubMed) with polling
+      const progressToast = toast.loading("🔬 Analisando com 3 IAs + PubMed...");
       
-      const response = await api.post('/ai/diagnosis/simple', {
-        text: anamnese
-      });
+      const aiReport = await startAITask(
+        '/api/ai/consensus/diagnosis',
+        { queixa: anamnese, idade: 'N/I', sexo: 'N/I' },
+        (task) => {
+          if (task.status === 'processing') {
+            toast.loading(`🔬 Processando... ${task.progress}%`, { id: progressToast });
+          }
+        }
+      );
       
-      const aiReport = response.data;
+      toast.success("✅ Análise concluída!", { id: progressToast });
       
       // Save to consultation history
           diagnoses: [
