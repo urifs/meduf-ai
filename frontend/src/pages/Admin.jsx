@@ -468,8 +468,11 @@ const Admin = () => {
               <p className="text-xs text-muted-foreground mt-1">
                 {balance ? `Gasto total: $${balance.spent_usd.toFixed(4)} (${balance.total_consultations} consultas)` : 'Carregando...'}
               </p>
+              <p className="text-xs text-emerald-600 mt-1">
+                ✓ Tokens contados com precisão (tiktoken)
+              </p>
               <p className="text-xs text-blue-600 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                💡 Atualiza a cada 3 segundos
+                💡 Custos refletem gastos reais da Universal Key
               </p>
             </CardContent>
           </Card>
