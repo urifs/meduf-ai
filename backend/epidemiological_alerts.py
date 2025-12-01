@@ -89,8 +89,15 @@ Por favor, forneça alertas epidemiológicos REAIS e ATUALIZADOS para:
 ```"""
         
         response = await chat.send_message(UserMessage(text=prompt))
-        # Response is already a string from the LLM
-        response_text = response if isinstance(response, str) else str(response)
+        # Handle different response types from emergentintegrations
+        if isinstance(response, str):
+            response_text = response
+        elif hasattr(response, 'text'):
+            response_text = response.text
+        elif hasattr(response, 'content'):
+            response_text = response.content
+        else:
+            response_text = str(response)
         
         # Extract JSON from response
         import json
