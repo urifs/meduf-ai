@@ -49,11 +49,16 @@ const Dashboard = () => {
       clearInterval(progressInterval);
       setProgress(100);
       
-      console.log("✅ AI task completed, result:", aiReport);
+      console.log("✅ AI task completed successfully!");
+      console.log("Result structure:", {
+        hasDiagnoses: !!aiReport?.diagnoses,
+        count: aiReport?.diagnoses?.length
+      });
       
-      // Clear interval and set to 100%
-      clearInterval(progressInterval);
-      setProgress(100);
+      if (!aiReport || !aiReport.diagnoses) {
+        console.error("❌ Invalid response");
+        throw new Error("Resposta inválida. Tente novamente.");
+      }
       
       // Save to consultation history
       try {
