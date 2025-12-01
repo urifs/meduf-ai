@@ -139,6 +139,10 @@ const Admin = () => {
       
       setOnlineCount(onlineRes.data.online_count);
       
+      // Set balance and monthly usage
+      setBalance(balanceRes.data);
+      setMonthlyUsage(monthlyRes.data);
+      
       setLastUpdated(new Date());
       
     } catch (error) {
