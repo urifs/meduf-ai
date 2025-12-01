@@ -108,6 +108,9 @@
       - working: true
         agent: "testing"
         comment: "✅ COMPREHENSIVE VERIFICATION COMPLETED: Medication guide endpoint (dor de cabeça) returns task_id in 0.01s. Task completed in 14.08s with medications array containing Paracetamol recommendations. Result structure verified with proper medications array format including name, dose, frequency, notes. Background processing working perfectly."
+      - working: true
+        agent: "testing"
+        comment: "✅ RE-TESTED WITH EXACT REVIEW REQUEST DATA: Guia Terapêutico with symptoms: 'Dor lombar aguda'. Task_id returned in 0.04s (immediate response). Task completed in 20.07s with medications array containing appropriate therapeutic recommendations. All success criteria met: immediate task creation, proper polling, valid medications array structure."
 
   - task: "Background Task System - Authentication Integration"
     implemented: true
