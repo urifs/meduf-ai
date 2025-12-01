@@ -56,8 +56,8 @@ const MedicationGuide = () => {
             diagnoses: [{ name: "Consulta Terapêutica com IA", justification: "Consenso de 3 IAs + PubMed" }],
             medications: aiMedications.medications?.map(m => ({ 
               name: m.name, 
-              dosage: `${m.dose} ${m.frequency}`, 
-              mechanism: m.notes 
+              dosage: `${m.dose || m.dosage} ${m.frequency || ''}`, 
+              mechanism: m.notes || m.contraindications
             })) || []
           }
         });
