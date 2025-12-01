@@ -46,9 +46,13 @@ const MedicationGuide = () => {
       
       toast.success("✅ Análise concluída!", { id: progressToast });
 
-      // 1. Pain / Fever / Inflammation
-      if (text.includes("dor") || text.includes("febre") || text.includes("inflama") || text.includes("quente") || text.includes("algico") || text.includes("doendo")) {
-        mockResponse = [
+      // Save to consultation history
+      try {
+        await api.post('/consultations', {
+          patient: { queixa: `[Guia Terapêutico] ${symptoms}`, idade: "N/I", sexo: "N/I" },
+          report: { 
+            diagnoses: [{ name: "Consulta Terapêutica com IA", justification: "Consenso de 3 IAs + PubMed" }],
+            medications: aiMedications.medications?.map(m => ({
           {
             name: "Dipirona Monoidratada",
             dose: "1g (1 ampola ou 2 comprimidos)",
