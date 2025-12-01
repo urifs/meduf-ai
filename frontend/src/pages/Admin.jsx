@@ -445,19 +445,31 @@ const Admin = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-emerald-500 shadow-sm">
+          <Card className="border-l-4 border-l-emerald-500 shadow-sm hover:shadow-lg transition-shadow cursor-pointer group" onClick={() => {
+            const newBalance = prompt('Digite o saldo REAL que você tem na Universal Key (em USD):', balance?.initial_balance_usd || '10.0');
+            if (newBalance && !isNaN(parseFloat(newBalance))) {
+              // Update via env variable (user needs to set it)
+              alert(`Configure a variável de ambiente:\n\nINITIAL_BALANCE_USD=${newBalance}\n\nOu atualize o saldo no backend manualmente.`);
+            }
+          }}>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Saldo Universal Key</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
+                Saldo Universal Key
+                <span className="text-xs opacity-0 group-hover:opacity-100 transition-opacity">Clique para configurar</span>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
                 <div className="text-3xl font-bold text-emerald-600">
                   ${balance ? balance.remaining_balance_usd.toFixed(2) : '0.00'}
                 </div>
-                <DollarSign className="h-8 w-8 text-emerald-100" />
+                <DollarSign className="h-8 w-8 text-emerald-100 group-hover:scale-110 transition-transform" />
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                {balance ? `Gasto: $${balance.spent_usd.toFixed(4)}` : 'Carregando...'}
+                {balance ? `Gasto total: $${balance.spent_usd.toFixed(4)} (${balance.total_consultations} consultas)` : 'Carregando...'}
+              </p>
+              <p className="text-xs text-blue-600 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                💡 Atualiza a cada 3 segundos
               </p>
             </CardContent>
           </Card>
