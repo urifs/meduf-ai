@@ -12,6 +12,8 @@ import History from "@/pages/History";
 import Admin from "@/pages/Admin";
 import Profile from "@/pages/Profile";
 import DatabaseManager from "@/pages/DatabaseManager";
+import ExamReader from "@/pages/ExamReader";
+import XRayReader from "@/pages/XRayReader";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
