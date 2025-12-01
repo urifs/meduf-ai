@@ -65,13 +65,14 @@ async def track_usage(
 ):
     """
     Track API usage and cost for a consultation
+    Uses tiktoken for ACCURATE token counting
     """
     try:
-        # Estimate tokens
-        input_tokens = estimate_tokens(input_text)
-        output_tokens = estimate_tokens(output_text)
+        # Count tokens accurately using tiktoken
+        input_tokens = count_tokens(input_text)
+        output_tokens = count_tokens(output_text)
         
-        # Calculate cost
+        # Calculate cost with REAL token counts
         cost_usd = calculate_cost(input_tokens, output_tokens)
         
         # Create usage record
