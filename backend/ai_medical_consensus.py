@@ -570,11 +570,19 @@ Substância: {substance}
         
         if not valid_responses:
             return {
-                "agent": "Agente Desconhecido",
-                "antidote": "Suporte clínico (ABCDE)",
-                "mechanism": "Não foi possível determinar",
-                "conduct": ["Estabilização", "Suporte ventilatório", "Monitorização"],
-                "protocol": "Protocolo básico de suporte"
+                "agent": f"Intoxicação por {substance}",
+                "antidote": "Consultar protocolo específico (Centro: 0800 722 6001)",
+                "mechanism": "Mecanismo variável. Avaliação clínica individualizada necessária.",
+                "conduct": [
+                    "ABCDE: estabilização e via aérea",
+                    "2x acesso venoso calibroso + SF 0,9%",
+                    "Monitorização: ECG contínuo, PA, SatO2",
+                    "Descontaminação: carvão ativado 1g/kg se < 2h",
+                    "Exames: gasometria, eletrólitos, função renal/hepática",
+                    "Antídoto específico conforme substância",
+                    "Consultar Centro de Toxicologia: 0800 722 6001"
+                ],
+                "protocol": f"**MANEJO TOXICOLÓGICO - {substance.upper()}**\n\n**1. ESTABILIZAÇÃO (ABCDE)**\n- Via aérea: IOT se Glasgow < 8\n- Suporte hemodinâmico: SF 0,9% 20ml/kg se hipotenso\n\n**2. DESCONTAMINAÇÃO**\n- Carvão ativado 1g/kg VO/SNE se < 1-2h\n- Avaliar lavagem gástrica conforme caso\n\n**3. ANTÍDOTO**\n- Verificar disponibilidade conforme substância\n- Consultar Centro: 0800 722 6001\n\n**4. SUPORTE**\n- Hidratação, correção distúrbios\n- Monitorização intensiva"
             }
         
         # Combine the best responses
