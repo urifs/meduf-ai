@@ -90,7 +90,7 @@ const Selection = () => {
           <div className={`text-center mb-12 ${mounted ? 'animate-fade-in-up' : 'opacity-0'}`}>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 mb-6">
               <Zap className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-medium text-blue-600">Powered by AI + PubMed</span>
+              <span className="text-sm font-medium text-blue-600">Powered by Meduf AI + PubMed</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
               Assistente Clínico Inteligente
@@ -156,7 +156,7 @@ const Selection = () => {
           {/* Bottom Info */}
           <div className={`mt-16 text-center ${mounted ? 'animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '600ms' }}>
             <p className="text-sm text-muted-foreground">
-              💡 Todas as análises utilizam consenso de múltiplas IAs e bases de dados médicas
+              💡 Todas as análises utilizam consenso de múltiplas IAs e base de dados PubMed
             </p>
           </div>
         </main>
