@@ -6,6 +6,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { Activity, ArrowLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from 'react-router-dom';
 import api from '@/lib/api';
 import { startAITask } from '@/lib/aiPolling';
@@ -14,6 +16,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [reportData, setReportData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const handleAnalyze = async (formData) => {
     setIsLoading(true);
@@ -29,6 +32,7 @@ const Dashboard = () => {
         (task) => {
           // Update progress
           if (task.status === 'processing') {
+            setProgress(task.progress);
             toast.loading(`🔬 Analisando ${task.progress}%`, { id: progressToast });
           }
         }
