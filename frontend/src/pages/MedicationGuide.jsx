@@ -196,23 +196,33 @@ const MedicationGuide = () => {
         ];
       }
 
-      // Save to Backend (as a consultation type 'medication')
+      // Save to consultation history
       try {
         await api.post('/consultations', {
           patient: { queixa: `[Guia Terapêutico] ${symptoms}`, idade: "N/I", sexo: "N/I" },
           report: { 
-            diagnoses: [{ name: "Consulta Terapêutica", justification: "Solicitação de conduta medicamentosa." }],
-            medications: mockResponse.map(m => ({ name: m.name, dosage: `${m.dose} ${m.frequency}`, mechanism: m.notes }))
+            diagnoses: [{ name: "Consulta Terapêutica com IA", justification: "Consenso de 3 IAs + PubMed" }],
+            medications: aiMedications.medications?.map(m => ({ 
+              name: m.name, 
+              dosage: `${m.dose} ${m.frequency}`, 
+              mechanism: m.notes 
+            })) || []
           }
         });
-        toast.success("Sugestão gerada com sucesso!");
+        toast.success("✅ Guia completo! Consenso de 3 IAs + literatura médica");
       } catch (error) {
         console.error("Error saving:", error);
+        toast.success("Guia gerado (não salvo no histórico).");
       }
 
-      setResult(mockResponse);
+      setResult(aiMedications.medications || []);
+      
+    } catch (error) {
+      console.error("AI Consensus Error:", error);
+      toast.error("Erro ao processar guia. Tente novamente.");
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const copyToClipboard = () => {
