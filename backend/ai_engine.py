@@ -652,11 +652,16 @@ def analyze_drug_interaction(drug1: str, drug2: str) -> InteractionResult:
     
     if (("digoxina" in d1) and ("amiodarona" in d2 or "verapamil" in d2)) or \
        (("digoxina" in d2) and ("amiodarona" in d1 or "verapamil" in d1)):
+        monitoring["outros"].append("Digoxinemia (níveis séricos)")
+        monitoring["outros"].append("ECG (avaliar ritmo e condução)")
         return InteractionResult(
             severity="GRAVE",
             summary="Risco de intoxicação digitálica.",
             details="Amiodarona e Verapamil reduzem clearance da Digoxina, elevando níveis séricos. Risco de bradicardia, bloqueio AV e arritmias.",
-            recommendations="Reduzir dose de Digoxina em 50% ao iniciar Amiodarona. Monitorar níveis séricos e ECG."
+            recommendations="Reduzir dose de Digoxina em 50% ao iniciar Amiodarona. Monitorar níveis séricos e ECG.",
+            renal_impact=f"**{drug1}:** {drug1_impact['renal']}\n**{drug2}:** {drug2_impact['renal']}",
+            hepatic_impact=f"**{drug1}:** {drug1_impact['hepatic']}\n**{drug2}:** {drug2_impact['hepatic']}",
+            monitoring=monitoring
         )
     
     if (("isrs" in d1 or "fluoxetina" in d1 or "sertralina" in d1) and ("tramadol" in d2 or "opioide" in d2)) or \
