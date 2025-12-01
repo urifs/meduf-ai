@@ -268,7 +268,7 @@ async def get_ai_consensus_diagnosis(patient_data: Dict[str, Any]) -> Dict[str, 
     try:
         # Query Gemini
         print("🤖 Querying Gemini AI...")
-        diagnosis = await get_ai_diagnosis("gemini", "gemini-2.0-flash", patient_data, "")
+        diagnosis = await get_ai_diagnosis("gemini", "gemini-2.5-flash", patient_data, "")
         
         if not diagnosis:
             print("⚠️ Gemini response failed, using fallback")
@@ -377,7 +377,7 @@ async def get_ai_consensus_medication_guide(symptoms: str) -> Dict[str, Any]:
             api_key=EMERGENT_KEY,
             session_id=f"meduf-med-gemini",
             system_message="Você é um farmacêutico clínico especializado. Recomende medicamentos baseados em evidências científicas."
-        ).with_model("gemini", "gemini-2.0-flash")
+        ).with_model("gemini", "gemini-2.5-flash")
         
         response = await chat.send_message(UserMessage(text=medication_prompt))
         
@@ -487,7 +487,7 @@ async def get_ai_consensus_drug_interaction(medications) -> Dict[str, Any]:
             api_key=EMERGENT_KEY,
             session_id=f"meduf-interaction-gemini",
             system_message="Você é um farmacologista especializado em interações medicamentosas. Baseie suas respostas em evidências científicas."
-        ).with_model("gemini", "gemini-2.0-flash")
+        ).with_model("gemini", "gemini-2.5-flash")
         
         response = await chat.send_message(UserMessage(text=interaction_prompt))
         
@@ -605,7 +605,7 @@ Substância: {substance}
             api_key=EMERGENT_KEY,
             session_id=f"meduf-tox-gemini",
             system_message="Você é um toxicologista clínico especializado. Forneça protocolos baseados em diretrizes internacionais."
-        ).with_model("gemini", "gemini-2.0-flash")
+        ).with_model("gemini", "gemini-2.5-flash")
         
         response = await chat.send_message(UserMessage(text=toxicology_prompt))
         
