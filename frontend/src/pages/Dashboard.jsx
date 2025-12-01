@@ -38,11 +38,18 @@ const Dashboard = () => {
         formData,
         (task) => {
           // Update progress based on real status (never decrease)
+          console.log(`📊 Task status: ${task.status}, progress: ${task.progress}%`);
           if (task.status === 'processing' && task.progress > 0) {
             setProgress(prev => Math.max(prev, task.progress));
           }
         }
       );
+      
+      // Clear interval and set to 100%
+      clearInterval(progressInterval);
+      setProgress(100);
+      
+      console.log("✅ AI task completed, result:", aiReport);
       
       // Clear interval and set to 100%
       clearInterval(progressInterval);
