@@ -390,8 +390,21 @@ async def get_ai_consensus_medication_guide(symptoms: str) -> Dict[str, Any]:
         return {"medications": all_medications[:8]}  # Top 8
         
     except Exception as e:
-        print(f"Medication guide error: {e}")
-        return {"medications": []}
+        print(f"⚠️ Medication guide error: {e}")
+        import traceback
+        traceback.print_exc()
+        
+        return {
+            "medications": [
+                {
+                    "name": "Consulta Médica Necessária",
+                    "dose": "N/A",
+                    "frequency": "N/A",
+                    "route": "Presencial",
+                    "notes": "Não foi possível gerar recomendações automatizadas. Consulte um médico ou farmacêutico para orientações personalizadas sobre medicamentos adequados aos seus sintomas."
+                }
+            ]
+        }
 
 
 async def get_ai_consensus_drug_interaction(drug1: str, drug2: str) -> Dict[str, Any]:
