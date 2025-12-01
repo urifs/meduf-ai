@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import api from '@/lib/api';
+import { startAITask } from '@/lib/aiPolling';
 
 const SimpleDashboard = () => {
   const navigate = useNavigate();
