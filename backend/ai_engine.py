@@ -610,14 +610,44 @@ def analyze_drug_interaction(drug1: str, drug2: str) -> InteractionResult:
     drug1_impact = get_drug_organ_impact(d1)
     drug2_impact = get_drug_organ_impact(d2)
     
+    # Build monitoring recommendations
+    monitoring = {
+        "renal": [],
+        "hepatic": [],
+        "outros": []
+    }
+    
+    # Check if any drug has renal impact
+    if "nefrotoxicidade" in drug1_impact["renal"].lower() or "renal" in drug1_impact["renal"].lower() or "tgf" in drug1_impact["renal"].lower():
+        monitoring["renal"].append("Monitorar Creatinina sérica")
+        monitoring["renal"].append("Calcular TFG (Taxa de Filtração Glomerular)")
+    if "nefrotoxicidade" in drug2_impact["renal"].lower() or "renal" in drug2_impact["renal"].lower() or "tgf" in drug2_impact["renal"].lower():
+        if "Monitorar Creatinina sérica" not in monitoring["renal"]:
+            monitoring["renal"].append("Monitorar Creatinina sérica")
+            monitoring["renal"].append("Calcular TFG (Taxa de Filtração Glomerular)")
+    
+    # Check if any drug has hepatic impact
+    if "hepatotoxicidade" in drug1_impact["hepatic"].lower() or "hepat" in drug1_impact["hepatic"].lower():
+        monitoring["hepatic"].append("Monitorar TGO/TGP (Transaminases)")
+        monitoring["hepatic"].append("Dosagem de Bilirrubinas")
+    if "hepatotoxicidade" in drug2_impact["hepatic"].lower() or "hepat" in drug2_impact["hepatic"].lower():
+        if "Monitorar TGO/TGP (Transaminases)" not in monitoring["hepatic"]:
+            monitoring["hepatic"].append("Monitorar TGO/TGP (Transaminases)")
+            monitoring["hepatic"].append("Dosagem de Bilirrubinas")
+    
     # Known dangerous interactions
     if (("varfarina" in d1 or "warfarin" in d1) and ("aine" in d2 or "aspirina" in d2 or "ibuprofeno" in d2)) or \
        (("varfarina" in d2 or "warfarin" in d2) and ("aine" in d1 or "aspirina" in d1 or "ibuprofeno" in d1)):
+        monitoring["outros"].append("INR (RNI) semanal ou conforme ajuste")
+        monitoring["outros"].append("Hemograma (avaliar sangramento)")
         return InteractionResult(
             severity="GRAVE",
             summary="Interação significativa entre anticoagulante e AINE.",
             details="Varfarina + AINEs aumentam MUITO o risco de sangramento. Os AINEs inibem agregação plaquetária e podem causar lesão gástrica, potencializando o efeito anticoagulante.",
-            recommendations="EVITAR combinação. Se necessário analgesia, preferir Paracetamol. Monitorar INR rigorosamente se uso inevitável."
+            recommendations="EVITAR combinação. Se necessário analgesia, preferir Paracetamol. Monitorar INR rigorosamente se uso inevitável.",
+            renal_impact=f"**{drug1}:** {drug1_impact['renal']}\n**{drug2}:** {drug2_impact['renal']}",
+            hepatic_impact=f"**{drug1}:** {drug1_impact['hepatic']}\n**{drug2}:** {drug2_impact['hepatic']}",
+            monitoring=monitoring
         )
     
     if (("digoxina" in d1) and ("amiodarona" in d2 or "verapamil" in d2)) or \
