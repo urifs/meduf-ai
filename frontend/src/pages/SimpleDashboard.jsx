@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { useNavigate } from 'react-router-dom';
 import api from '@/lib/api';
 import { startAITask } from '@/lib/aiPolling';
@@ -17,6 +18,7 @@ const SimpleDashboard = () => {
   const [reportData, setReportData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [anamnese, setAnamnese] = useState("");
+  const [progress, setProgress] = useState(0);
 
   const handleAnalyze = async (e) => {
     e.preventDefault();
@@ -37,6 +39,7 @@ const SimpleDashboard = () => {
         { queixa: anamnese, idade: 'N/I', sexo: 'N/I' },
         (task) => {
           if (task.status === 'processing') {
+            setProgress(task.progress);
             toast.loading(`🔬 Analisando ${task.progress}%`, { id: progressToast });
           }
         }
