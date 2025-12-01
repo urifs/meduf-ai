@@ -742,87 +742,162 @@ async def ai_toxicology(data: dict, user: UserInDB = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail="Error processing toxicology")
 
 
-# --- AI Consensus Engine (3 AIs + PubMed) ---
-from ai_medical_consensus import get_ai_consensus_diagnosis
+# --- Background Task Manager ---
+from task_manager import task_manager, TaskStatus
+import asyncio
 
 
-@app.post("/api/ai/consensus/diagnosis", response_model=dict)
-async def ai_consensus_diagnosis(patient_data: dict, user: UserInDB = Depends(get_current_user)):
-    """
-    Advanced AI Diagnosis using 3 LLMs + PubMed research
-    - Queries: GPT-5, Claude Sonnet 4, Gemini 2.0
-    - Searches: PubMed for relevant medical literature
-    - Returns: Consensus diagnosis from all sources
-    """
-    try:
-        print(f"🔬 Starting AI Consensus Diagnosis for: {patient_data.get('queixa', 'N/A')}")
-        result = await get_ai_consensus_diagnosis(patient_data)
-        print(f"✅ Consensus diagnosis completed")
-        return result
-    except Exception as e:
-        print(f"AI Consensus Error: {e}")
-        import traceback
+# Start cleanup task on startup
+@app.on_event("startup")
+async def start_background_tasks():
+    asyncio.create_task(remove_expired_users())
+    asyncio.create_task(task_manager.cleanup_old_tasks())
 
 
-
-# Import new consensus functions
+# --- AI Consensus Engine (3 AIs + PubMed) with Background Processing ---
 from ai_medical_consensus import (
+    get_ai_consensus_diagnosis,
     get_ai_consensus_medication_guide,
     get_ai_consensus_drug_interaction,
     get_ai_consensus_toxicology
 )
 
 
+@app.post("/api/ai/consensus/diagnosis", response_model=dict)
+async def ai_consensus_diagnosis(patient_data: dict, user: UserInDB = Depends(get_current_user)):
+    """
+    Advanced AI Diagnosis using 3 LLMs + PubMed research
+    Returns task_id immediately, client polls for result
+    """
+    # Create task
+    task_id = task_manager.create_task("diagnosis")
+    
+    # Start background processing
+    asyncio.create_task(
+        task_manager.execute_task(
+            task_id,
+            get_ai_consensus_diagnosis,
+            patient_data
+        )
+    )
+    
+    return {
+        "task_id": task_id,
+        "status": "pending",
+        "message": "Análise iniciada. Use /api/ai/tasks/{task_id} para verificar o progresso."
+    }
+
+
 @app.post("/api/ai/consensus/medication-guide", response_model=dict)
 async def ai_consensus_medication_guide(data: dict, user: UserInDB = Depends(get_current_user)):
     """
     Medication guide using 3 LLMs + PubMed research
+    Returns task_id immediately, client polls for result
     """
-    try:
-        symptoms = data.get("symptoms", "")
-        print(f"🔬 Starting AI Consensus Medication Guide for: {symptoms}")
-        result = await get_ai_consensus_medication_guide(symptoms)
-        print(f"✅ Medication guide completed")
-        return result
-    except Exception as e:
-        print(f"AI Consensus Medication Error: {e}")
-        raise HTTPException(status_code=500, detail=f"Error processing medication guide: {str(e)}")
+    symptoms = data.get("symptoms", "")
+    
+    # Create task
+    task_id = task_manager.create_task("medication-guide")
+    
+    # Start background processing
+    asyncio.create_task(
+        task_manager.execute_task(
+            task_id,
+            get_ai_consensus_medication_guide,
+            symptoms
+        )
+    )
+    
+    return {
+        "task_id": task_id,
+        "status": "pending",
+        "message": "Análise iniciada. Use /api/ai/tasks/{task_id} para verificar o progresso."
+    }
 
 
 @app.post("/api/ai/consensus/drug-interaction", response_model=dict)
 async def ai_consensus_drug_interaction_endpoint(data: dict, user: UserInDB = Depends(get_current_user)):
     """
     Drug interaction using 3 LLMs + PubMed research
+    Returns task_id immediately, client polls for result
     """
-    try:
-        drug1 = data.get("drug1", "")
-        drug2 = data.get("drug2", "")
-        print(f"🔬 Starting AI Consensus Drug Interaction: {drug1} + {drug2}")
-        result = await get_ai_consensus_drug_interaction(drug1, drug2)
-        print(f"✅ Drug interaction completed")
-        return result
-    except Exception as e:
-        print(f"AI Consensus Interaction Error: {e}")
-        raise HTTPException(status_code=500, detail=f"Error processing drug interaction: {str(e)}")
+    drug1 = data.get("drug1", "")
+    drug2 = data.get("drug2", "")
+    
+    # Create task
+    task_id = task_manager.create_task("drug-interaction")
+    
+    # Start background processing
+    asyncio.create_task(
+        task_manager.execute_task(
+            task_id,
+            get_ai_consensus_drug_interaction,
+            drug1,
+            drug2
+        )
+    )
+    
+    return {
+        "task_id": task_id,
+        "status": "pending",
+        "message": "Análise iniciada. Use /api/ai/tasks/{task_id} para verificar o progresso."
+    }
 
 
 @app.post("/api/ai/consensus/toxicology", response_model=dict)
 async def ai_consensus_toxicology_endpoint(data: dict, user: UserInDB = Depends(get_current_user)):
     """
     Toxicology protocol using 3 LLMs + PubMed research
+    Returns task_id immediately, client polls for result
     """
-    try:
-        substance = data.get("substance", "")
-        print(f"🔬 Starting AI Consensus Toxicology for: {substance}")
-        result = await get_ai_consensus_toxicology(substance)
-        print(f"✅ Toxicology protocol completed")
-        return result
-    except Exception as e:
-        print(f"AI Consensus Toxicology Error: {e}")
-        raise HTTPException(status_code=500, detail=f"Error processing toxicology: {str(e)}")
+    substance = data.get("substance", "")
+    
+    # Create task
+    task_id = task_manager.create_task("toxicology")
+    
+    # Start background processing
+    asyncio.create_task(
+        task_manager.execute_task(
+            task_id,
+            get_ai_consensus_toxicology,
+            substance
+        )
+    )
+    
+    return {
+        "task_id": task_id,
+        "status": "pending",
+        "message": "Análise iniciada. Use /api/ai/tasks/{task_id} para verificar o progresso."
+    }
 
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Error processing consensus diagnosis: {str(e)}")
+
+@app.get("/api/ai/tasks/{task_id}", response_model=dict)
+async def get_task_status(task_id: str, user: UserInDB = Depends(get_current_user)):
+    """
+    Get status of a background task
+    Returns: status (pending/processing/completed/failed), result, error
+    """
+    task = task_manager.get_task(task_id)
+    
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    response = {
+        "task_id": task["id"],
+        "type": task["type"],
+        "status": task["status"],
+        "progress": task["progress"],
+        "created_at": task["created_at"].isoformat()
+    }
+    
+    if task["status"] == TaskStatus.COMPLETED:
+        response["result"] = task["result"]
+        response["completed_at"] = task["completed_at"].isoformat()
+    elif task["status"] == TaskStatus.FAILED:
+        response["error"] = task["error"]
+        response["completed_at"] = task["completed_at"].isoformat()
+    
+    return response
 
 
 
