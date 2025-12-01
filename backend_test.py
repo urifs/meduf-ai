@@ -409,9 +409,14 @@ class BackendTester:
         tests_passed = 0
         total_tests = 0
         
-        # Test 1: Consensus Diagnosis
+        # Test 1: Consensus Diagnosis (Simple)
         total_tests += 1
-        if self.test_consensus_diagnosis():
+        if self.test_consensus_diagnosis_simple():
+            tests_passed += 1
+        
+        # Test 2: Consensus Diagnosis (Detailed)
+        total_tests += 1
+        if self.test_consensus_diagnosis_detailed():
             tests_passed += 1
         
         # Test 2: Consensus Drug Interaction  
