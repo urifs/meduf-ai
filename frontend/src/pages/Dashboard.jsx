@@ -406,6 +406,19 @@ const Dashboard = () => {
 
           {/* Right Column: Output */}
           <div className="lg:col-span-7 xl:col-span-8">
+            {isLoading && progress > 0 && (
+              <Card className="mb-4">
+                <CardContent className="pt-6">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm text-muted-foreground">
+                      <span>🔬 Analisando com IA...</span>
+                      <span className="font-medium">{progress}%</span>
+                    </div>
+                    <Progress value={progress} className="h-2" />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
             <ClinicalReport data={reportData} />
           </div>
         </div>
