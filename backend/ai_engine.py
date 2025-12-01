@@ -666,37 +666,58 @@ def analyze_drug_interaction(drug1: str, drug2: str) -> InteractionResult:
     
     if (("isrs" in d1 or "fluoxetina" in d1 or "sertralina" in d1) and ("tramadol" in d2 or "opioide" in d2)) or \
        (("isrs" in d2 or "fluoxetina" in d2 or "sertralina" in d2) and ("tramadol" in d1 or "opioide" in d1)):
+        monitoring["outros"].append("Monitorar sinais de síndrome serotoninérgica")
         return InteractionResult(
             severity="MODERADA a GRAVE",
             summary="Risco de Síndrome Serotoninérgica.",
             details="ISRS + Tramadol/Opioides aumentam serotonina no SNC. Sintomas: agitação, hipertermia, rigidez, tremor, hiperreflexia.",
-            recommendations="Monitorar sinais de síndrome serotoninérgica. Preferir analgésicos não-opioides. Suspender drogas e suporte se sintomas."
+            recommendations="Monitorar sinais de síndrome serotoninérgica. Preferir analgésicos não-opioides. Suspender drogas e suporte se sintomas.",
+            renal_impact=f"**{drug1}:** {drug1_impact['renal']}\n**{drug2}:** {drug2_impact['renal']}",
+            hepatic_impact=f"**{drug1}:** {drug1_impact['hepatic']}\n**{drug2}:** {drug2_impact['hepatic']}",
+            monitoring=monitoring
         )
     
     if (("metformina" in d1) and ("contraste iodado" in d2)) or \
        (("metformina" in d2) and ("contraste iodado" in d1)):
+        if "Monitorar Creatinina sérica" not in monitoring["renal"]:
+            monitoring["renal"].append("Monitorar Creatinina sérica")
+            monitoring["renal"].append("Calcular TFG ANTES e APÓS contraste")
+        monitoring["outros"].append("Gasometria arterial (se acidose)")
         return InteractionResult(
             severity="MODERADA",
             summary="Risco de acidose láctica.",
             details="Contraste iodado pode causar nefropatia, reduzindo eliminação de Metformina e precipitando acidose láctica.",
-            recommendations="Suspender Metformina 48h ANTES do exame. Reavaliar função renal. Retornar após 48-72h se função renal normal."
+            recommendations="Suspender Metformina 48h ANTES do exame. Reavaliar função renal. Retornar após 48-72h se função renal normal.",
+            renal_impact=f"**{drug1}:** {drug1_impact['renal']}\n**{drug2}:** {drug2_impact['renal']}\n\n⚠️ ATENÇÃO: Contraste pode causar nefropatia aguda!",
+            hepatic_impact=f"**{drug1}:** {drug1_impact['hepatic']}\n**{drug2}:** {drug2_impact['hepatic']}",
+            monitoring=monitoring
         )
     
     if (("iecas" in d1 or "enalapril" in d1 or "captopril" in d1) and ("espironolactona" in d2 or "amilorida" in d2)) or \
        (("iecas" in d2 or "enalapril" in d2 or "captopril" in d2) and ("espironolactona" in d1 or "amilorida" in d1)):
+        if "Monitorar Creatinina sérica" not in monitoring["renal"]:
+            monitoring["renal"].append("Monitorar Creatinina sérica")
+        monitoring["outros"].append("Potássio (K+) sérico semanal")
+        monitoring["outros"].append("ECG se hipercalemia")
         return InteractionResult(
             severity="MODERADA",
             summary="Risco de hipercalemia.",
             details="IECAs + Diuréticos poupadores de potássio aumentam retenção de K+. Risco de arritmias cardíacas.",
-            recommendations="Monitorar K+ sérico regularmente. Evitar suplementação de potássio. Considerar diurético tiazídico como alternativa."
+            recommendations="Monitorar K+ sérico regularmente. Evitar suplementação de potássio. Considerar diurético tiazídico como alternativa.",
+            renal_impact=f"**{drug1}:** {drug1_impact['renal']}\n**{drug2}:** {drug2_impact['renal']}\n\n⚠️ Ambos afetam homeostase de K+ renal!",
+            hepatic_impact=f"**{drug1}:** {drug1_impact['hepatic']}\n**{drug2}:** {drug2_impact['hepatic']}",
+            monitoring=monitoring
         )
     
-    # No known interaction
+    # No known interaction - but still show organ impact
     return InteractionResult(
         severity="BAIXA ou DESCONHECIDA",
         summary="Não há interação grave conhecida entre esses medicamentos na literatura comum.",
         details="Isso não exclui interações raras ou farmacocinéticas sutis. Sempre consultar bula e bases especializadas (Micromedex, UpToDate).",
-        recommendations="Monitoramento clínico de rotina. Relatar ao médico qualquer efeito adverso novo após início da combinação."
+        recommendations="Monitoramento clínico de rotina. Relatar ao médico qualquer efeito adverso novo após início da combinação.",
+        renal_impact=f"**{drug1}:** {drug1_impact['renal']}\n**{drug2}:** {drug2_impact['renal']}",
+        hepatic_impact=f"**{drug1}:** {drug1_impact['hepatic']}\n**{drug2}:** {drug2_impact['hepatic']}",
+        monitoring=monitoring if monitoring["renal"] or monitoring["hepatic"] else None
     )
 
 
