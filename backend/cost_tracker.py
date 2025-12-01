@@ -7,9 +7,9 @@ from datetime import datetime, timezone
 from typing import Dict, Any
 from motor.motor_asyncio import AsyncIOMotorClient
 
-# Gemini 2.0 Flash pricing (per 1M tokens)
-GEMINI_INPUT_COST = 0.10  # $0.10 per 1M input tokens
-GEMINI_OUTPUT_COST = 0.40  # $0.40 per 1M output tokens
+# Gemini 2.5 Flash pricing (per 1M tokens)
+GEMINI_INPUT_COST = 0.15  # $0.15 per 1M input tokens
+GEMINI_OUTPUT_COST = 0.60  # $0.60 per 1M output tokens
 
 # MongoDB connection
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
