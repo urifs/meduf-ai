@@ -114,14 +114,66 @@ class BackendTester:
             self.log_result("Consensus Diagnosis (Simple)", False, f"Error: {str(e)}", duration)
             return False
     
+    def test_consensus_diagnosis_detailed(self):
+        """Test consensus diagnosis endpoint - Detailed case"""
+        print(f"\n🧠 Testing Consensus Diagnosis (Detailed)...")
+        
+        # Test data from review request - Diagnóstico Detalhado with complete patient data
+        test_data = {
+            "queixa": "Dor de cabeça intensa há 3 dias com fotofobia e náuseas",
+            "idade": "35", 
+            "sexo": "M",
+            "historia": "Paciente com histórico de enxaqueca, sem uso de medicações regulares",
+            "exame_fisico": "PA: 120/80 mmHg, FC: 72 bpm, Tax: 36.5°C, consciente e orientado",
+            "sintomas_associados": "fotofobia, náuseas, sem vômitos"
+        }
+        
+        start_time = time.time()
+        try:
+            # Step 1: Submit diagnosis request
+            response = self.session.post(
+                f"{BACKEND_URL}/ai/consensus/diagnosis",
+                json=test_data
+            )
+            submit_duration = time.time() - start_time
+            
+            if response.status_code != 200:
+                self.log_result("Consensus Diagnosis (Detailed) - Submit", False, 
+                              f"Submit failed: {response.status_code} - {response.text}", submit_duration)
+                return False
+            
+            data = response.json()
+            task_id = data.get("task_id")
+            
+            if not task_id:
+                self.log_result("Consensus Diagnosis (Detailed) - Submit", False, 
+                              "No task_id returned", submit_duration)
+                return False
+            
+            # Check if response was immediate (< 1 second as required)
+            if submit_duration > 1.0:
+                self.log_result("Consensus Diagnosis (Detailed) - Submit Speed", False, 
+                              f"Response too slow: {submit_duration:.2f}s (should be < 1s)", submit_duration)
+            else:
+                self.log_result("Consensus Diagnosis (Detailed) - Submit Speed", True, 
+                              f"Immediate response with task_id: {task_id}", submit_duration)
+            
+            # Step 2: Poll for results
+            return self.poll_task_result(task_id, "Consensus Diagnosis (Detailed)", 
+                                       expected_fields=["diagnoses", "conduct", "medications"])
+            
+        except Exception as e:
+            duration = time.time() - start_time
+            self.log_result("Consensus Diagnosis (Detailed)", False, f"Error: {str(e)}", duration)
+            return False
+
     def test_consensus_drug_interaction(self):
         """Test consensus drug interaction endpoint"""
         print(f"\n💊 Testing Consensus Drug Interaction...")
         
-        # Test data from review request
+        # Test data from review request - Interação Medicamentosa
         test_data = {
-            "drug1": "ibuprofeno",
-            "drug2": "varfarina"
+            "medications": ["Paracetamol", "Ibuprofeno"]
         }
         
         start_time = time.time()
