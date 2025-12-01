@@ -135,6 +135,21 @@
       - working: true
         agent: "testing"
         comment: "✅ COMPREHENSIVE VERIFICATION: Simple diagnosis endpoint tested with N/I data (dor de cabeça forte, idade: N/I, sexo: N/I) as specified in review request. Task_id returned in 0.041s (immediate response). Task completed in 24.5s with 5 diagnoses including 'Cefaleia Tensional' and 'Cefaleia em Salvas'. Proper handling of incomplete patient data. Background processing working perfectly."
+      - working: true
+        agent: "testing"
+        comment: "✅ RE-TESTED WITH EXACT REVIEW REQUEST DATA: Diagnóstico Simples with 'Dor de cabeça intensa há 3 dias', idade: '35', sexo: 'M'. Task_id returned in 0.04s (immediate response). Task completed in 26.09s with proper diagnoses, conduct, and medications fields. All success criteria met: task creation, polling completion, valid results structure."
+
+  - task: "Background Task System - Detailed Diagnosis Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE VERIFICATION: Detailed diagnosis endpoint tested with complete patient data including história, exame_físico, sintomas_associados. Task_id returned in 0.04s (immediate response). Task completed in 32.09s with comprehensive analysis including diagnoses, conduct, and medications. Background processing handles complex patient data correctly."
 
 backend:
 ##   - task: "Task name"
