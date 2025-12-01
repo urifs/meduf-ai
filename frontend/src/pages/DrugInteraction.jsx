@@ -282,6 +282,7 @@ const DrugInteraction = () => {
       toast.error("Erro ao analisar interação. Tente novamente.");
     } finally {
       setIsLoading(false);
+      setProgress(0);
     }
   };
 
