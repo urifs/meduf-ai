@@ -564,33 +564,7 @@ const DrugInteraction = () => {
                         </Card>
                       ))}
                     </div>
-                  ) : (
-                    <Card className="border-l-4 border-l-green-500 bg-green-50/30">
-                      <CardContent className="pt-6 text-center">
-                        <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                          <CheckCircle2 className="h-6 w-6 text-green-600" />
-                        </div>
-                        <h3 className="text-lg font-medium text-green-900">Nenhuma interação grave detectada</h3>
-                        <p className="text-green-700 mt-2 max-w-md mx-auto">
-                          A combinação de <b>{result.medications.join(" + ")}</b> não apresentou alertas nas regras de segurança farmacológica cadastradas.
-                        </p>
-                        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
-                          <div className="bg-white/50 p-3 rounded border border-green-100">
-                            <span className="text-xs font-bold text-green-800 block mb-1">Cardiovascular</span>
-                            <span className="text-xs text-green-700">Sem risco aparente de arritmias ou hipotensão severa.</span>
-                          </div>
-                          <div className="bg-white/50 p-3 rounded border border-green-100">
-                            <span className="text-xs font-bold text-green-800 block mb-1">SNC / Sedação</span>
-                            <span className="text-xs text-green-700">Sem potencialização depressora evidente.</span>
-                          </div>
-                          <div className="bg-white/50 p-3 rounded border border-green-100">
-                            <span className="text-xs font-bold text-green-800 block mb-1">Metabolismo</span>
-                            <span className="text-xs text-green-700">Sem inibição/indução enzimática crítica (CYP450).</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
+                  ) : null}
                 </div>
               </div>
             ) : (
