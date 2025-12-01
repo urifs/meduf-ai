@@ -8,6 +8,8 @@ from datetime import datetime
 from typing import Dict, Any, Optional, Callable
 from enum import Enum
 from concurrent.futures import ThreadPoolExecutor
+from cost_tracker import track_usage
+import json
 
 
 class TaskStatus(str, Enum):
