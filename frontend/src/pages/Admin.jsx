@@ -22,7 +22,9 @@ import {
   Database,
   UserPlus,
   Loader2,
-  CalendarClock
+  CalendarClock,
+  DollarSign,
+  TrendingUp
 } from 'lucide-react';
 import {
   DropdownMenu,
