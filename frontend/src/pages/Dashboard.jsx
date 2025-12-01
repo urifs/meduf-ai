@@ -419,7 +419,7 @@ const Dashboard = () => {
                 <CardContent className="pt-6">
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm text-muted-foreground">
-                      <span>🔬 Analisando com IA...</span>
+                      <span>🔬 Analisando com IA e banco de dados PubMed...</span>
                       <span className="font-medium">{progress}%</span>
                     </div>
                     <Progress value={progress} className="h-2" />
