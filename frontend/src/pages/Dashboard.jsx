@@ -39,10 +39,10 @@ const Dashboard = () => {
         '/ai/consensus/diagnosis',
         formData,
         (task) => {
-          // Update progress based on real status
+          // Update progress based on real status (never decrease)
           if (task.status === 'processing' && task.progress > 0) {
-            setProgress(task.progress);
-            toast.loading(`🔬 Analisando ${task.progress}%`, { id: progressToast });
+            setProgress(prev => Math.max(prev, task.progress));
+            toast.loading(`🔬 Analisando ${Math.max(progress, task.progress)}%`, { id: progressToast });
           }
         }
       );

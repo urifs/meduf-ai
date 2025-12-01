@@ -48,8 +48,8 @@ const SimpleDashboard = () => {
         { queixa: anamnese, idade: 'N/I', sexo: 'N/I' },
         (task) => {
           if (task.status === 'processing' && task.progress > 0) {
-            setProgress(task.progress);
-            toast.loading(`🔬 Analisando ${task.progress}%`, { id: progressToast });
+            setProgress(prev => Math.max(prev, task.progress));
+            toast.loading(`🔬 Analisando ${Math.max(progress, task.progress)}%`, { id: progressToast });
           }
         }
       );
