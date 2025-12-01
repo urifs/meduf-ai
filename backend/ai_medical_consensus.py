@@ -307,6 +307,10 @@ async def get_ai_consensus_diagnosis(patient_data: Dict[str, Any]) -> Dict[str, 
             ],
             "conduct": {
                 "advice": "Por favor, tente novamente ou consulte um médico presencialmente.",
+                "procedures": []
+            },
+            "medications": []
+        }
 
 
 
