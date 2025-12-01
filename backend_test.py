@@ -419,19 +419,19 @@ class BackendTester:
         if self.test_consensus_diagnosis_detailed():
             tests_passed += 1
         
-        # Test 2: Consensus Drug Interaction  
+        # Test 3: Consensus Drug Interaction  
         total_tests += 1
         if self.test_consensus_drug_interaction():
             tests_passed += 1
         
-        # Test 3: Consensus Toxicology (bonus test)
-        total_tests += 1
-        if self.test_consensus_toxicology():
-            tests_passed += 1
-        
-        # Test 4: Consensus Medication Guide (bonus test)
+        # Test 4: Consensus Medication Guide
         total_tests += 1
         if self.test_consensus_medication_guide():
+            tests_passed += 1
+        
+        # Test 5: Consensus Toxicology
+        total_tests += 1
+        if self.test_consensus_toxicology():
             tests_passed += 1
         
         # Summary
