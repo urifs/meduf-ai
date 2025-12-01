@@ -20,9 +20,9 @@ const Dashboard = () => {
 
     try {
       // Call AI Consensus Engine (3 AIs + PubMed)
-      toast.info("🔬 Consultando 3 IAs + bases médicas (PubMed)...", { duration: 8000 });
+      toast.info("🔬 Analisando com IA...", { duration: 8000 });
       
-      const response = await api.post('/ai/consensus/diagnosis', formData);
+      const response = await api.post('/ai/diagnosis/detailed', formData);
       const aiReport = response.data;
       
       // Save to consultation history
@@ -49,7 +49,7 @@ const Dashboard = () => {
       existingHistory.unshift(historyEntry);
       localStorage.setItem('meduf_history', JSON.stringify(existingHistory.slice(0, 50)));
       
-      toast.success("✅ Análise completa! Consenso de 3 IAs + literatura médica");
+      toast.success("✅ Análise completa! Análise concluída!");
       
     } catch (error) {
       console.error("AI Consensus Error:", error);
