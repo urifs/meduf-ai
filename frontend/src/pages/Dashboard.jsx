@@ -21,10 +21,11 @@ const Dashboard = () => {
   const handleAnalyze = async (formData) => {
     setIsLoading(true);
     setReportData(null);
+    setProgress(10); // Start with 10% immediately
 
     try {
       // Call AI Consensus Engine with polling
-      const progressToast = toast.loading("🔬 Analisando...");
+      const progressToast = toast.loading("🔬 Analisando 10%...");
       
       const aiReport = await startAITask(
         '/ai/consensus/diagnosis',
