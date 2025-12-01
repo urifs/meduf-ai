@@ -72,11 +72,17 @@ const Dashboard = () => {
       existingHistory.unshift(historyEntry);
       localStorage.setItem('meduf_history', JSON.stringify(existingHistory.slice(0, 50)));
       
-      toast.success("✅ Análise completa! Análise concluída!");
+      // Analysis completed successfully
       
     } catch (error) {
       console.error("AI Consensus Error:", error);
-      toast.error("Erro ao processar análise. Tente novamente.");
+      console.error("Error details:", error.message, error.response);
+      
+      // Show user-friendly error message
+      const errorMsg = error.message || "Erro ao processar análise. Por favor, tente novamente.";
+      toast.error(errorMsg);
+      
+      // Don't reset form on error - keep user data
     } finally {
       setIsLoading(false);
       setProgress(0);
