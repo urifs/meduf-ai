@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { useNavigate } from 'react-router-dom';
 import { Badge } from "@/components/ui/badge";
 import api from '@/lib/api';
@@ -18,6 +19,7 @@ const MedicationGuide = () => {
   const [result, setResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [symptoms, setSymptoms] = useState("");
+  const [progress, setProgress] = useState(0);
   const reportRef = useRef(null);
 
   const handleAnalyze = async (e) => {
@@ -39,6 +41,7 @@ const MedicationGuide = () => {
         { symptoms: symptoms },
         (task) => {
           if (task.status === 'processing') {
+            setProgress(task.progress);
             toast.loading(`🔬 Analisando ${task.progress}%`, { id: progressToast });
           }
         }
