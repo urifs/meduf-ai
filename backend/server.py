@@ -742,6 +742,31 @@ async def ai_toxicology(data: dict, user: UserInDB = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail="Error processing toxicology")
 
 
+# --- AI Consensus Engine (3 AIs + PubMed) ---
+from ai_medical_consensus import get_ai_consensus_diagnosis
+
+
+@app.post("/api/ai/consensus/diagnosis", response_model=dict)
+async def ai_consensus_diagnosis(patient_data: dict, user: UserInDB = Depends(get_current_user)):
+    """
+    Advanced AI Diagnosis using 3 LLMs + PubMed research
+    - Queries: GPT-5, Claude Sonnet 4, Gemini 2.0
+    - Searches: PubMed for relevant medical literature
+    - Returns: Consensus diagnosis from all sources
+    """
+    try:
+        print(f"🔬 Starting AI Consensus Diagnosis for: {patient_data.get('queixa', 'N/A')}")
+        result = await get_ai_consensus_diagnosis(patient_data)
+        print(f"✅ Consensus diagnosis completed")
+        return result
+    except Exception as e:
+        print(f"AI Consensus Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error processing consensus diagnosis: {str(e)}")
+
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
