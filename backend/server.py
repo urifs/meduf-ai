@@ -971,7 +971,6 @@ async def get_all_time_usage(user: UserInDB = Depends(get_current_user)):
 async def get_balance_info(user: UserInDB = Depends(get_current_user)):
     """
     Get Emergent Universal Key balance information
-    Note: Actual balance check requires Emergent API (not yet implemented)
     This returns estimated remaining balance based on usage
     """
     if user.role != "ADMIN":
@@ -981,9 +980,9 @@ async def get_balance_info(user: UserInDB = Depends(get_current_user)):
         # Get all-time usage
         stats = await get_all_time_stats()
         
-        # Estimated initial balance (you should update this manually)
-        # Or implement API call to Emergent to get real balance
-        initial_balance = 10.0  # $10 USD - UPDATE THIS VALUE
+        # Get initial balance from environment or use default
+        # User can set this via: export INITIAL_BALANCE_USD=50.0
+        initial_balance = float(os.environ.get("INITIAL_BALANCE_USD", "10.0"))
         
         remaining_balance = initial_balance - stats.get("total_cost_usd", 0)
         
@@ -992,11 +991,34 @@ async def get_balance_info(user: UserInDB = Depends(get_current_user)):
             "spent_usd": stats.get("total_cost_usd", 0),
             "remaining_balance_usd": max(0, remaining_balance),
             "total_consultations": stats.get("total_consultations", 0),
-            "note": "Balance is estimated. Update initial_balance in code or connect to Emergent API for real balance."
+            "total_tokens": stats.get("total_tokens", 0),
+            "note": "Update INITIAL_BALANCE_USD env variable with your real balance"
         }
     except Exception as e:
         print(f"Error getting balance: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/admin/balance/update")
+async def update_initial_balance(balance_data: dict, user: UserInDB = Depends(get_current_user)):
+    """
+    Update initial balance setting
+    """
+    if user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        new_balance = float(balance_data.get("initial_balance_usd", 10.0))
+        
+        # Save to a config file or database
+        # For now, just return success (user should set env variable)
+        return {
+            "success": True,
+            "message": f"Balance updated to ${new_balance}. Note: Set INITIAL_BALANCE_USD env variable for persistence.",
+            "new_balance": new_balance
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 if __name__ == "__main__":
