@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import api from '@/lib/api';
 import html2canvas from 'html2canvas';
+import { startAITask } from '@/lib/aiPolling';
 
 const Toxicology = () => {
   const navigate = useNavigate();
@@ -31,14 +32,20 @@ const Toxicology = () => {
     setResult(null);
 
     try {
-      // Call AI Consensus Engine (3 AIs + PubMed)
-      toast.info("🔬 Analisando protocolo toxicológico...", { duration: 8000 });
+      // Call AI Consensus Engine (3 AIs + PubMed) with polling
+      const progressToast = toast.loading("🔬 Analisando com 3 IAs + PubMed...");
       
-      const response = await api.post('/ai/toxicology', {
-        substance: substance
-      });
-
-      const aiResponse = response.data;
+      const aiResponse = await startAITask(
+        '/api/ai/consensus/toxicology',
+        { substance: substance },
+        (task) => {
+          if (task.status === 'processing') {
+            toast.loading(`🔬 Processando... ${task.progress}%`, { id: progressToast });
+          }
+        }
+      );
+      
+      toast.success("✅ Análise concluída!", { id: progressToast });
       
       // Save to consultation history
       try {
