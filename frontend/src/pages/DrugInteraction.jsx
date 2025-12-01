@@ -217,12 +217,11 @@ const DrugInteraction = () => {
         });
       }, 1500);
 
-      // Call AI Consensus Engine with polling
+      // Call AI Consensus Engine with polling - send ALL medications
       const interactionData = await startAITask(
         '/ai/consensus/drug-interaction',
         {
-          drug1: activeMeds[0],
-          drug2: activeMeds[1]
+          medications: activeMeds  // Send all medications as an array
         },
         (task) => {
           if (task.status === 'processing' && task.progress > 0) {
