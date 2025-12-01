@@ -581,9 +581,9 @@ const DrugInteraction = () => {
                 </div>
               </div>
             ) : (
-              <Card className="h-full border-dashed border-2 flex items-center justify-center bg-muted/20 min-h-[400px]">
+              <Card className="h-full border-dashed border-2 flex items-center justify-center bg-gradient-to-br from-orange-50/30 to-red-50/30 min-h-[400px] rounded-xl">
                 <div className="text-center p-8 text-muted-foreground">
-                  <Activity className="h-16 w-16 mx-auto mb-4 opacity-20" />
+                  <Activity className="h-16 w-16 mx-auto mb-4 opacity-20 animate-float" />
                   <h3 className="text-lg font-medium">Aguardando Medicamentos</h3>
                   <p className="text-sm max-w-xs mx-auto mt-2">
                     Adicione os medicamentos na lista ao lado para verificar possíveis interações e recomendações.
