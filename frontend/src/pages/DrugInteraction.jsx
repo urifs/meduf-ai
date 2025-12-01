@@ -452,16 +452,17 @@ const DrugInteraction = () => {
               </Card>
             )}
             {result ? (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+              <div className="space-y-6 animate-scale-in">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                    <Activity className="h-6 w-6 text-primary" /> Resultado da Análise
+                  <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+                    <Activity className="h-6 w-6 text-orange-600" /> 
+                    <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Resultado da Análise</span>
                   </h2>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={copyToClipboard} className="gap-2">
+                    <Button variant="outline" size="sm" onClick={copyToClipboard} className="gap-2 hover:bg-orange-50">
                       <Copy className="h-4 w-4" /> Copiar
                     </Button>
-                    <Button variant="default" size="sm" onClick={handleSaveImage} className="gap-2">
+                    <Button variant="default" size="sm" onClick={handleSaveImage} className="gap-2 bg-gradient-to-r from-orange-600 to-red-600">
                       <Download className="h-4 w-4" /> Salvar Imagem
                     </Button>
                   </div>
