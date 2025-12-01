@@ -443,6 +443,40 @@ const Admin = () => {
               </p>
             </CardContent>
           </Card>
+
+          <Card className="border-l-4 border-l-emerald-500 shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Saldo Universal Key</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div className="text-3xl font-bold text-emerald-600">
+                  ${balance ? balance.remaining_balance_usd.toFixed(2) : '0.00'}
+                </div>
+                <DollarSign className="h-8 w-8 text-emerald-100" />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {balance ? `Gasto: $${balance.spent_usd.toFixed(4)}` : 'Carregando...'}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-l-4 border-l-orange-500 shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Gasto deste Mês</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div className="text-3xl font-bold text-orange-600">
+                  ${monthlyUsage ? monthlyUsage.total_cost_usd.toFixed(4) : '0.00'}
+                </div>
+                <TrendingUp className="h-8 w-8 text-orange-100" />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {monthlyUsage ? `${monthlyUsage.total_consultations} consultas` : 'Nenhuma consulta'}
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Main Content Grid */}
