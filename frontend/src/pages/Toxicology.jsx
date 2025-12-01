@@ -36,7 +36,7 @@ const Toxicology = () => {
       const progressToast = toast.loading("🔬 Analisando com 3 IAs + PubMed...");
       
       const aiResponse = await startAITask(
-        '/api/ai/consensus/toxicology',
+        '/ai/consensus/toxicology',
         { substance: substance },
         (task) => {
           if (task.status === 'processing') {

@@ -209,7 +209,7 @@ const DrugInteraction = () => {
       const progressToast = toast.loading("🔬 Analisando com 3 IAs + PubMed...");
       
       const interactionData = await startAITask(
-        '/api/ai/consensus/drug-interaction',
+        '/ai/consensus/drug-interaction',
         {
           drug1: activeMeds[0],
           drug2: activeMeds[1]

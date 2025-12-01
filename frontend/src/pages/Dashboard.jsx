@@ -24,7 +24,7 @@ const Dashboard = () => {
       const progressToast = toast.loading("🔬 Analisando com 3 IAs + PubMed...");
       
       const aiReport = await startAITask(
-        '/api/ai/consensus/diagnosis',
+        '/ai/consensus/diagnosis',
         formData,
         (task) => {
           // Update progress

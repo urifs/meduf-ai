@@ -35,7 +35,7 @@ const MedicationGuide = () => {
       const progressToast = toast.loading("🔬 Analisando com 3 IAs + PubMed...");
       
       const aiMedications = await startAITask(
-        '/api/ai/consensus/medication-guide',
+        '/ai/consensus/medication-guide',
         { symptoms: symptoms },
         (task) => {
           if (task.status === 'processing') {
