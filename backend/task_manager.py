@@ -82,8 +82,25 @@ class TaskManager:
             self.update_status(task_id, TaskStatus.PROCESSING, progress=10)
             print(f"🔄 Task {task_id} started")
             
+            # Create a background task to simulate progress updates
+            async def update_progress():
+                await asyncio.sleep(5)
+                self.update_status(task_id, TaskStatus.PROCESSING, progress=30)
+                await asyncio.sleep(10)
+                self.update_status(task_id, TaskStatus.PROCESSING, progress=50)
+                await asyncio.sleep(10)
+                self.update_status(task_id, TaskStatus.PROCESSING, progress=70)
+                await asyncio.sleep(10)
+                self.update_status(task_id, TaskStatus.PROCESSING, progress=85)
+            
+            # Start progress updater
+            progress_task = asyncio.create_task(update_progress())
+            
             # Execute the actual function
             result = await func(*args, **kwargs)
+            
+            # Cancel progress updater if still running
+            progress_task.cancel()
             
             # Mark as completed
             self.complete_task(task_id, result)
