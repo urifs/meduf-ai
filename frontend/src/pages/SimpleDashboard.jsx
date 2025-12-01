@@ -37,7 +37,7 @@ const SimpleDashboard = () => {
         { queixa: anamnese, idade: 'N/I', sexo: 'N/I' },
         (task) => {
           if (task.status === 'processing') {
-            toast.loading(`🔬 Processando... ${task.progress}%`, { id: progressToast });
+            toast.loading(`🔬 Analisando ${task.progress}%`, { id: progressToast });
           }
         }
       );

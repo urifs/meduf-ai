@@ -39,7 +39,7 @@ const MedicationGuide = () => {
         { symptoms: symptoms },
         (task) => {
           if (task.status === 'processing') {
-            toast.loading(`🔬 Processando... ${task.progress}%`, { id: progressToast });
+            toast.loading(`🔬 Analisando ${task.progress}%`, { id: progressToast });
           }
         }
       );
