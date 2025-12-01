@@ -264,10 +264,9 @@ async def get_ai_consensus_diagnosis(patient_data: Dict[str, Any]) -> Dict[str, 
     Main function: Get consensus diagnosis from 3 AIs
     """
     try:
-        # Query all 3 AIs in parallel
-        print("🤖 Querying 3 AIs in parallel...")
+        # Query 2 AIs in parallel
+        print("🤖 Querying AIs in parallel...")
         tasks = [
-            get_ai_diagnosis("openai", "gpt-5", patient_data, ""),
             get_ai_diagnosis("anthropic", "claude-sonnet-4-20250514", patient_data, ""),
             get_ai_diagnosis("gemini", "gemini-2.0-flash", patient_data, "")
         ]
@@ -277,7 +276,7 @@ async def get_ai_consensus_diagnosis(patient_data: Dict[str, Any]) -> Dict[str, 
         # Filter out errors and None values
         valid_diagnoses = [r for r in results if r and not isinstance(r, Exception)]
         
-        print(f"✅ Got {len(valid_diagnoses)}/3 AI responses")
+        print(f"✅ Got {len(valid_diagnoses)}/2 AI responses")
         
         # Create consensus
         print("🧠 Creating consensus...")
