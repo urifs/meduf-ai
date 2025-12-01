@@ -50,40 +50,45 @@ Forneça informações REAIS e ATUAIS baseadas em dados epidemiológicos recente
 Seja factual e preciso. Use apenas dados de fontes confiáveis."""
         ).with_model("gemini", "gemini-2.5-flash")
         
-        prompt = f"""**DATA DE HOJE: {datetime.utcnow().strftime('%d/%m/%Y')}**
+        prompt = f"""**DATA DE HOJE: {datetime.utcnow().strftime('%d/%m/%Y')} ({datetime.utcnow().strftime('%B %Y')})**
 
 Por favor, forneça alertas epidemiológicos REAIS e ATUALIZADOS para:
 
 **1. BRASIL (Top 5 alertas mais relevantes):**
-   Para cada estado/região com surto ou alerta:
+   Para cada estado/região com surto ou alerta atual:
    - Estado/Região
    - Doença
    - Nível (Alto/Médio/Baixo)
-   - Data do alerta (use "Hoje", "Ontem", "Esta semana", etc)
+   - Data do alerta (use "Hoje", "Esta semana", "Dezembro 2025", etc)
 
 **2. MUNDO (Top 3 alertas mais relevantes internacionais):**
-   Para cada país/região:
+   Para cada país/região com surto atual:
    - País/Região
    - Doença
    - Nível (Alto/Médio/Baixo)
    - Data
 
 **IMPORTANTE:**
-- Use APENAS informações reais de novembro/dezembro 2024
-- Se não houver alertas significativos, informe doenças sazonais típicas
-- Priorize dengue, covid, influenza, sarampo, malária conforme relevância atual
+- Use APENAS informações REAIS e ATUAIS de dezembro 2025
+- Priorize: Dengue (verão no Brasil), COVID-19, Influenza, Sarampo, Mpox, outras relevantes
+- Para Brasil: considere que é VERÃO (dengue, chikungunya em alta)
+- Seja factual - baseie-se em padrões epidemiológicos conhecidos
 - Seja breve e direto
 
-**FORMATO DE RESPOSTA (JSON):**
+**FORMATO DE RESPOSTA (APENAS JSON, SEM TEXTO EXTRA):**
 ```json
 {{
   "brazil": [
-    {{"state": "São Paulo", "disease": "Dengue", "level": "Alto", "date": "Hoje"}},
-    ...
+    {{"state": "Rio de Janeiro", "disease": "Dengue", "level": "Alto", "date": "Dezembro 2025"}},
+    {{"state": "São Paulo", "disease": "Dengue", "level": "Alto", "date": "Dezembro 2025"}},
+    {{"state": "Minas Gerais", "disease": "Chikungunya", "level": "Médio", "date": "Esta semana"}},
+    {{"state": "Bahia", "disease": "Dengue", "level": "Médio", "date": "Dezembro 2025"}},
+    {{"state": "Nacional", "disease": "COVID-19", "level": "Baixo", "date": "Estável"}}
   ],
   "world": [
-    {{"country": "Europa", "disease": "Influenza", "level": "Médio", "date": "Esta semana"}},
-    ...
+    {{"country": "Europa", "disease": "Influenza", "level": "Alto", "date": "Inverno 2025"}},
+    {{"country": "África Central", "disease": "Mpox", "level": "Médio", "date": "Dezembro 2025"}},
+    {{"country": "Sudeste Asiático", "disease": "Dengue", "level": "Médio", "date": "Dezembro 2025"}}
   ]
 }}
 ```"""
