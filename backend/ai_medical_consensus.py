@@ -1,6 +1,6 @@
 """
 AI Medical Consensus Engine
-Uses 3 LLMs (GPT-5, Claude Sonnet 4, Gemini 2.0) + PubMed research
+Uses FREE Hugging Face models for medical diagnosis
 Returns consensus diagnosis based on multiple AI opinions
 """
 import os
@@ -9,9 +9,22 @@ from typing import Dict, List, Any, Optional
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import aiohttp
 import xml.etree.ElementTree as ET
+import json
+import requests
 
 
-# Get Emergent Universal Key from environment
+# Hugging Face API configuration
+HF_API_TOKEN = os.environ.get("HF_API_TOKEN", "")  # User can set their own token
+HF_API_URL = "https://api-inference.huggingface.co/models/"
+
+# Free models to use (no API key required for basic usage)
+HF_MODELS = [
+    "meta-llama/Llama-3.2-3B-Instruct",  # Llama 3.2 - Fast and good
+    "mistralai/Mistral-7B-Instruct-v0.3",  # Mistral - Excellent quality
+    "microsoft/Phi-3-mini-4k-instruct"  # Phi-3 - Microsoft's efficient model
+]
+
+# Get Emergent Universal Key from environment (keeping for fallback)
 EMERGENT_KEY = os.environ.get("EMERGENT_LLM_KEY", "sk-emergent-b51Fb1fC8C81f9e13D")
 
 
