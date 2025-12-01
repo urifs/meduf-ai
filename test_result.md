@@ -493,15 +493,18 @@ frontend:
 
   - task: "Drug Interaction - Moderate Interaction Test (Metformina + Enalapril)"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/pages/DrugInteraction.jsx"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "MODERATE TEST CASE: Need to verify that metformina + enalapril combination shows moderate interaction with renal impact warnings and appropriate monitoring recommendations including renal function tests through backend /api/ai/drug-interaction endpoint."
+      - working: false
+        agent: "testing"
+        comment: "❌ SAME CRITICAL JAVASCRIPT ERROR: Cannot test metformina + enalapril due to same frontend crash. Backend API integration working correctly but frontend fails to display any results due to undefined 'result.interactions' array access."
         comment: "Need comprehensive testing of all substance protocols: Paracetamol, Cocaine, Unknown substances (dengue), and Opioids (morfina) to ensure no cross-contamination between protocols."
       - working: true
         agent: "testing"
