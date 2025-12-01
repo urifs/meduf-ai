@@ -30,6 +30,9 @@
       - working: true
         agent: "testing"
         comment: "✅ VERIFIED: Consensus diagnosis endpoint working perfectly. Response time: 0.004s (well under 1s requirement). Task ID returned immediately: 1cbd2058-bd0c-4eff-bbac-6b455f520f0c. Background processing initiated successfully. Authentication with ur1fs/@Fred1807 successful."
+      - working: true
+        agent: "testing"
+        comment: "✅ RE-VERIFIED AFTER BUG FIX: Critical background task system bug fixed. Detailed diagnosis (febre e tosse) now returns task_id in 0.01s (immediate response). Task completed successfully in 26.21s with proper diagnoses array structure. Progress bar system working with 10% → 100% progression. ThreadPoolExecutor implementation resolved blocking issue."
 
   - task: "Background Task System - Task Polling Endpoint"
     implemented: true
