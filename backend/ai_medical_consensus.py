@@ -596,14 +596,17 @@ Substância: {substance}
         traceback.print_exc()
         
         return {
-            "agent": f"Exposição a {substance}",
-            "antidote": "🚨 EMERGÊNCIA - LIGAR 192/193",
-            "mechanism": "EMERGÊNCIA MÉDICA",
+            "agent": f"Intoxicação por {substance}",
+            "antidote": "Consultar protocolo específico e Centro de Toxicologia",
+            "mechanism": "Avaliação toxicológica completa necessária. Mecanismo variável conforme dose e via de exposição.",
             "conduct": [
-                "Ligar 192 (SAMU) IMEDIATAMENTE",
-                "Centro Toxicologia: 0800 722 6001",
-                "Não induzir vômito",
-                "Levar embalagem ao hospital"
+                "Avaliação ABCDE e estabilização inicial",
+                "Acesso venoso calibroso + hidratação",
+                "Monitorização: ECG contínuo, PA, FC, SatO2",
+                "Considerar descontaminação GI se indicado",
+                "Exames: gasometria, eletrólitos, função renal/hepática",
+                "Antídoto específico se disponível",
+                "Contato com Centro de Toxicologia: 0800 722 6001"
             ],
-            "protocol": "⚠️ EMERGÊNCIA\n1. LIGAR 192/193\n2. Não induzir vômito\n3. Transportar urgente"
+            "protocol": f"**MANEJO TOXICOLÓGICO - {substance.upper()}**\n\n**AVALIAÇÃO INICIAL:**\n- ABCDE completo\n- Via aérea pérvia, suporte ventilatório se necessário\n- Acesso venoso e estabilização hemodinâmica\n\n**DESCONTAMINAÇÃO:**\n- Avaliar tempo de exposição e via\n- Carvão ativado 1g/kg se < 1-2h e substância adsorvível\n- Lavagem gástrica em casos selecionados\n\n**ANTÍDOTO/TRATAMENTO ESPECÍFICO:**\n- Verificar disponibilidade de antídoto\n- Consultar Centro de Toxicologia para orientação\n\n**SUPORTE:**\n- Hidratação adequada\n- Correção de distúrbios ácido-base e eletrolíticos\n- Monitorização intensiva\n\n**Centro de Informações Toxicológicas: 0800 722 6001**"
         }
