@@ -434,16 +434,19 @@ const DrugInteraction = () => {
           </div>
 
           {/* Output Section */}
-          <div className="lg:col-span-7 xl:col-span-8">
+          <div className="lg:col-span-7 xl:col-span-8 animate-slide-in-right">
             {isLoading && progress > 0 && (
-              <Card className="mb-4">
+              <Card className="mb-4 glass-card border-2 border-orange-200 shadow-xl animate-pulse-glow">
                 <CardContent className="pt-6">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                      <span>🔬 Analisando com IA e banco de dados PubMed...</span>
-                      <span className="font-medium">{progress}%</span>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm font-medium">
+                      <span className="flex items-center gap-2 text-orange-700">
+                        <span className="animate-spin">🔬</span>
+                        Analisando com IA e banco de dados PubMed...
+                      </span>
+                      <span className="font-bold text-orange-600">{progress}%</span>
                     </div>
-                    <Progress value={progress} className="h-2" />
+                    <Progress value={progress} className="h-3 bg-orange-100 [&>div]:bg-gradient-to-r [&>div]:from-orange-500 [&>div]:to-red-600 shadow-lg" />
                   </div>
                 </CardContent>
               </Card>
