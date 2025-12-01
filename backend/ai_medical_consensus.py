@@ -554,14 +554,30 @@ async def get_ai_consensus_drug_interaction(medications) -> Dict[str, Any]:
         
         consensus_severity = max(severity_counts.items(), key=lambda x: x[1])[0]
         
-        # Combine details
+        # Helper function to safely convert to string
+        def to_string(value):
+            if isinstance(value, list):
+                return "\n".join(str(item) for item in value)
+            return str(value) if value else ""
+        
+        # Combine details - safely handle lists and strings
+        details_list = []
+        for r in valid_responses[:2]:
+            detail = r.get('details', '')
+            details_list.append(to_string(detail))
+        
+        recommendations_list = []
+        for r in valid_responses[:2]:
+            rec = r.get('recommendations', '')
+            recommendations_list.append(to_string(rec))
+        
         return {
             "severity": consensus_severity,
-            "summary": valid_responses[0].get("summary", ""),
-            "details": "\n\n".join([r.get('details', '') for r in valid_responses[:2]]),
-            "recommendations": "\n\n".join([r.get('recommendations', '') for r in valid_responses[:2]]),
-            "renal_impact": valid_responses[0].get("renal_impact", "Não disponível"),
-            "hepatic_impact": valid_responses[0].get("hepatic_impact", "Não disponível"),
+            "summary": to_string(valid_responses[0].get("summary", "")),
+            "details": "\n\n".join(details_list),
+            "recommendations": "\n\n".join(recommendations_list),
+            "renal_impact": to_string(valid_responses[0].get("renal_impact", "Não disponível")),
+            "hepatic_impact": to_string(valid_responses[0].get("hepatic_impact", "Não disponível")),
             "monitoring": {
                 "renal": ["Creatinina sérica", "TFG (Taxa de Filtração Glomerular)"],
                 "hepatic": ["TGO/TGP (Transaminases)", "Bilirrubinas"],
