@@ -600,30 +600,28 @@ Substância: {substance}
 ```
 """
         
-        # Query 2 FREE Hugging Face models
-        tasks = []
-        for model in HF_MODELS[:2]:  # Use first 2 models
-            tasks.append(call_huggingface_api(model, toxicology_prompt, max_tokens=1200))
+        # Query Gemini
+        chat = LlmChat(
+            api_key=EMERGENT_KEY,
+            session_id=f"meduf-tox-gemini",
+            system_message="Você é um toxicologista clínico especializado. Forneça protocolos baseados em diretrizes internacionais."
+        ).with_model("gemini", "gemini-2.0-flash")
         
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+        response = await chat.send_message(UserMessage(text=toxicology_prompt))
         
-        # Parse and create consensus
+        # Parse response
         valid_responses = []
-        for response_text in results:
-            if isinstance(response_text, Exception) or not response_text:
-                continue
-            try:
-                # Extract JSON
-                response_text = response_text.strip()
-                if "```json" in response_text:
-                    response_text = response_text.split("```json")[1].split("```")[0].strip()
-                elif "```" in response_text:
-                    response_text = response_text.split("```")[1].split("```")[0].strip()
-                
-                data = json.loads(response_text)
-                valid_responses.append(data)
-            except:
-                continue
+        try:
+            response_text = response.strip()
+            if "```json" in response_text:
+                response_text = response_text.split("```json")[1].split("```")[0].strip()
+            elif "```" in response_text:
+                response_text = response_text.split("```")[1].split("```")[0].strip()
+            
+            data = json.loads(response_text)
+            valid_responses.append(data)
+        except Exception as e:
+            print(f"⚠️ Error parsing Gemini response: {e}")
         
         if not valid_responses:
             return {
