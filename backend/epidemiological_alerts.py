@@ -158,14 +158,23 @@ Por favor, forneça alertas epidemiológicos REAIS e ATUALIZADOS para:
 def get_cache_info() -> Dict[str, Any]:
     """Get information about the cache status (1 hour updates)"""
     if not _alerts_cache["last_updated"]:
-        return {"cached": False, "last_updated": None}
+        return {
+            "cached": False, 
+            "last_updated": None,
+            "update_frequency": "A cada 1 hora",
+            "model": "Gemini 2.5 Flash"
+        }
     
     time_diff = datetime.utcnow() - _alerts_cache["last_updated"]
     minutes_old = int(time_diff.total_seconds() / 60)
+    minutes_until_next = 60 - minutes_old
     
     return {
         "cached": True,
         "last_updated": _alerts_cache["last_updated"].isoformat(),
         "minutes_old": minutes_old,
-        "valid": is_cache_valid()
+        "minutes_until_next_update": max(0, minutes_until_next),
+        "valid": is_cache_valid(),
+        "update_frequency": "A cada 1 hora",
+        "model": "Gemini 2.5 Flash"
     }
