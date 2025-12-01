@@ -478,15 +478,18 @@ frontend:
 
   - task: "Drug Interaction - Serious Interaction Test (Ibuprofeno + Varfarina)"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/pages/DrugInteraction.jsx"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "CRITICAL TEST CASE: Need to verify that ibuprofeno + varfarina combination shows GRAVE severity and displays comprehensive renal/hepatic impact information plus monitoring recommendations through backend /api/ai/drug-interaction endpoint."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL JAVASCRIPT ERROR: Frontend crashes with 'Cannot read properties of undefined (reading 'map')' when trying to display results. Backend API works correctly (Status: 200) and returns proper data structure with severity, renal_impact, hepatic_impact, and monitoring fields. Issue: Frontend code expects 'result.interactions' array (old system) but backend returns individual fields (new system). Lines 520+ try to map over undefined 'result.interactions' causing crash. NEW renal/hepatic sections (lines 448-518) are implemented correctly but never display due to JavaScript error."
 
   - task: "Drug Interaction - Moderate Interaction Test (Metformina + Enalapril)"
     implemented: true
