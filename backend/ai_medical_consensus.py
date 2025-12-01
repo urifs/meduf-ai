@@ -574,13 +574,19 @@ async def get_ai_consensus_drug_interaction(medications) -> Dict[str, Any]:
         import traceback
         traceback.print_exc()
         
+        meds_text = " + ".join(medications) if isinstance(medications, list) else str(medications)
         return {
             "severity": "Avaliar Individualmente",
-            "summary": f"Interação {drug1} + {drug2} requer avaliação farmacocinética/farmacodinâmica individualizada.",
+            "summary": f"Interação {meds_text} requer avaliação farmacocinética/farmacodinâmica individualizada.",
             "details": f"Considerar: metabolização compartilhada (CYP450), clearance renal/hepático, janela terapêutica, dose, timing de administração. Revisar Micromedex/UpToDate para dados específicos.",
             "recommendations": "• Avaliar TFG e função hepática (Child-Pugh)\n• Considerar ajuste posológico se metabolização compartilhada\n• Monitorizar níveis séricos se fármacos de janela estreita\n• Espaçar horários se interação na absorção\n• Consultar farmácia clínica para orientação específica\n• Monitorar sinais de toxicidade/ineficácia",
             "renal_impact": "Avaliar clearance creatinina. Ajustar doses conforme TFG. Atenção a nefrotoxicidade aditiva.",
-            "hepatic_impact": "Considerar Child-Pugh. Reduzir dose em cirrose. Monitorar transaminases se hepatotóxicos."
+            "hepatic_impact": "Considerar Child-Pugh. Reduzir dose em cirrose. Monitorar transaminases se hepatotóxicos.",
+            "monitoring": {
+                "renal": ["Creatinina sérica", "TFG (Taxa de Filtração Glomerular)"],
+                "hepatic": ["TGO/TGP (Transaminases)", "Bilirrubinas"],
+                "outros": ["Conforme recomendação médica"]
+            }
         }
 
 
