@@ -81,8 +81,8 @@ async def track_usage(
         input_tokens = count_tokens(input_text)
         output_tokens = count_tokens(output_text)
         
-        # Calculate cost with REAL token counts
-        cost_usd = calculate_cost(input_tokens, output_tokens)
+        # Calculate cost with REAL token counts (pass model for correct pricing)
+        cost_usd = calculate_cost(input_tokens, output_tokens, model)
         
         # Create usage record
         usage_record = {
