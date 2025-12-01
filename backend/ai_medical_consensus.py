@@ -452,7 +452,7 @@ Medicamento 2: {drug2}
         # Combine details
         return {
             "severity": consensus_severity,
-            "summary": f"Consenso de {len(valid_responses)}/3 IAs: " + valid_responses[0].get("summary", ""),
+            "summary": valid_responses[0].get("summary", ""),
             "details": "\n\n".join([f"[IA {i+1}] {r.get('details', '')}" for i, r in enumerate(valid_responses[:2])]),
             "recommendations": "\n\n".join([f"[IA {i+1}] {r.get('recommendations', '')}" for i, r in enumerate(valid_responses[:2])]),
             "renal_impact": valid_responses[0].get("renal_impact", "Não disponível"),
@@ -546,7 +546,7 @@ Substância: {substance}
         return {
             "agent": valid_responses[0].get("agent", "Agente não identificado"),
             "antidote": valid_responses[0].get("antidote", "Suporte clínico"),
-            "mechanism": f"Consenso de {len(valid_responses)}/3 IAs: " + valid_responses[0].get("mechanism", ""),
+            "mechanism": valid_responses[0].get("mechanism", ""),
             "conduct": list(set(all_conduct))[:6],  # Unique, top 6
             "protocol": "\n\n".join([f"[IA {i+1}] {r.get('protocol', '')}" for i, r in enumerate(valid_responses[:2])])
         }
