@@ -5,7 +5,7 @@ Fetches real-time outbreak and disease surveillance data using AI
 import os
 from datetime import datetime, timedelta
 from typing import Dict, List, Any
-from emergentintegrations.llms import LlmChat, UserMessage
+from emergentintegrations import LlmChat, UserMessage
 
 # Get Emergent LLM Key
 EMERGENT_KEY = os.environ.get("EMERGENT_LLM_KEY", "")
