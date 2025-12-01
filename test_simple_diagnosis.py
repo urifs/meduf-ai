@@ -5,7 +5,7 @@ Test Simple Diagnosis endpoint
 import requests
 import time
 
-BACKEND_URL = "https://clinical-helper-ai.preview.emergentagent.com/api"
+BACKEND_URL = "https://clinical-assist-6.preview.emergentagent.com/api"
 TEST_USERNAME = "ur1fs"
 TEST_PASSWORD = "@Fred1807"
 
