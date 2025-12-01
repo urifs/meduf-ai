@@ -92,7 +92,7 @@ async def track_usage(
         # Save to database
         await usage_stats_collection.insert_one(usage_record)
         
-        print(f"💰 Usage tracked: {input_tokens + output_tokens} tokens, ${cost_usd:.6f}")
+        print(f"💰 Usage tracked (ACCURATE): {input_tokens + output_tokens} tokens (input: {input_tokens}, output: {output_tokens}), cost: ${cost_usd:.6f}")
         
         return usage_record
         
