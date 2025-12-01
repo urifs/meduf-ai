@@ -472,15 +472,18 @@ frontend:
 
   - task: "Drug Interaction - Monitoring Exams Section Display"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/pages/DrugInteraction.jsx"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "REFACTORED DRUG INTERACTION TESTING: Need to verify that new monitoring section (📊 Exames de Monitoramento Recomendados) displays correctly with specific organ function tests for renal and hepatic monitoring for drug combinations ibuprofeno+varfarina and metformina+enalapril."
+      - working: false
+        agent: "testing"
+        comment: "❌ CANNOT DISPLAY: Monitoring Exams section code exists (lines 476-518) and is correctly implemented to show monitoring.renal, monitoring.hepatic, and monitoring.outros from backend, but JavaScript error prevents any results from displaying. Backend returns proper monitoring data structure but frontend crashes before rendering."
 
   - task: "Drug Interaction - Serious Interaction Test (Ibuprofeno + Varfarina)"
     implemented: true
