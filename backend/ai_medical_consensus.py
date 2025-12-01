@@ -263,23 +263,19 @@ async def create_consensus_diagnosis(
 
 async def get_ai_consensus_diagnosis(patient_data: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Main function: Get consensus diagnosis using FREE Hugging Face models
+    Main function: Get diagnosis using Gemini
     """
     try:
-        # Query 3 FREE Hugging Face models in parallel
-        print("🤖 Querying FREE Hugging Face AI models in parallel...")
-        tasks = [
-            get_huggingface_diagnosis(HF_MODELS[0], patient_data, ""),  # Llama
-            get_huggingface_diagnosis(HF_MODELS[1], patient_data, ""),  # Mistral
-            get_huggingface_diagnosis(HF_MODELS[2], patient_data, "")   # Phi-3
-        ]
+        # Query Gemini
+        print("🤖 Querying Gemini AI...")
+        diagnosis = await get_ai_diagnosis("gemini", "gemini-2.0-flash", patient_data, "")
         
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-        
-        # Filter out errors and None values
-        valid_diagnoses = [r for r in results if r and not isinstance(r, Exception)]
-        
-        print(f"✅ Got {len(valid_diagnoses)}/3 FREE AI responses")
+        if not diagnosis:
+            print("⚠️ Gemini response failed, using fallback")
+            valid_diagnoses = []
+        else:
+            valid_diagnoses = [diagnosis]
+            print(f"✅ Got Gemini response")
         
         # Create consensus
         print("🧠 Creating consensus...")
