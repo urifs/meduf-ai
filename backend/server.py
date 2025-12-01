@@ -759,6 +759,7 @@ from ai_medical_consensus import (
     get_ai_consensus_drug_interaction,
     get_ai_consensus_toxicology
 )
+from epidemiological_alerts import fetch_real_epidemiological_alerts, get_cache_info
 
 
 @app.post("/api/ai/consensus/diagnosis", response_model=dict)
@@ -897,6 +898,27 @@ async def get_task_status(task_id: str, user: UserInDB = Depends(get_current_use
     
     return response
 
+
+
+# --- Epidemiological Alerts Endpoint ---
+@app.get("/api/epidemiological-alerts", response_model=dict)
+async def get_epidemiological_alerts():
+    """
+    Get real-time epidemiological alerts
+    Updates every hour automatically
+    """
+    try:
+        alerts = await fetch_real_epidemiological_alerts()
+        cache_info = get_cache_info()
+        
+        return {
+            "alerts": alerts,
+            "cache_info": cache_info,
+            "message": "Dados atualizados a cada hora"
+        }
+    except Exception as e:
+        print(f"Error fetching alerts: {e}")
+        raise HTTPException(status_code=500, detail=f"Error fetching alerts: {str(e)}")
 
 
 if __name__ == "__main__":
