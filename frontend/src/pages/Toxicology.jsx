@@ -196,31 +196,35 @@ const Toxicology = () => {
           </div>
 
           {/* Output Section */}
-          <div className="lg:col-span-7 xl:col-span-8">
+          <div className="lg:col-span-7 xl:col-span-8 animate-slide-in-right">
             {isLoading && progress > 0 && (
-              <Card className="mb-4">
+              <Card className="mb-4 glass-card border-2 border-rose-200 shadow-xl animate-pulse-glow">
                 <CardContent className="pt-6">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                      <span>🔬 Analisando com IA e banco de dados PubMed...</span>
-                      <span className="font-medium">{progress}%</span>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm font-medium">
+                      <span className="flex items-center gap-2 text-rose-700">
+                        <span className="animate-spin">🔬</span>
+                        Analisando com IA e banco de dados PubMed...
+                      </span>
+                      <span className="font-bold text-rose-600">{progress}%</span>
                     </div>
-                    <Progress value={progress} className="h-2" />
+                    <Progress value={progress} className="h-3 bg-rose-100 [&>div]:bg-gradient-to-r [&>div]:from-rose-500 [&>div]:to-pink-600 shadow-lg" />
                   </div>
                 </CardContent>
               </Card>
             )}
             {result ? (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+              <div className="space-y-6 animate-scale-in">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                    <Activity className="h-6 w-6 text-orange-600" /> Protocolo de Manejo
+                  <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+                    <Activity className="h-6 w-6 text-rose-600" /> 
+                    <span className="bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">Protocolo de Manejo</span>
                   </h2>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={copyToClipboard} className="gap-2">
+                    <Button variant="outline" size="sm" onClick={copyToClipboard} className="gap-2 hover:bg-rose-50">
                       <Copy className="h-4 w-4" /> Copiar
                     </Button>
-                    <Button variant="default" size="sm" onClick={handleSaveImage} className="gap-2">
+                    <Button variant="default" size="sm" onClick={handleSaveImage} className="gap-2 bg-gradient-to-r from-rose-600 to-pink-600">
                       <Download className="h-4 w-4" /> Salvar Imagem
                     </Button>
                   </div>
