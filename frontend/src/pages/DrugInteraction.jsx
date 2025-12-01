@@ -205,8 +205,8 @@ const DrugInteraction = () => {
     setResult(null);
 
     try {
-      // Call AI Consensus Engine (3 AIs) with polling
-      const progressToast = toast.loading("🔬 Analisando com 3 IAs (GPT-5, Claude, Gemini)...");
+      // Call AI Consensus Engine with polling
+      const progressToast = toast.loading("🔬 Analisando...");
       
       const interactionData = await startAITask(
         '/ai/consensus/drug-interaction',
