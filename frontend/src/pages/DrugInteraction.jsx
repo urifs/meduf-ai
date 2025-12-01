@@ -217,8 +217,6 @@ const DrugInteraction = () => {
       }, 1500);
 
       // Call AI Consensus Engine with polling
-      const progressToast = toast.loading("🔬 Analisando 10%...");
-      
       const interactionData = await startAITask(
         '/ai/consensus/drug-interaction',
         {
@@ -228,7 +226,6 @@ const DrugInteraction = () => {
         (task) => {
           if (task.status === 'processing' && task.progress > 0) {
             setProgress(prev => Math.max(prev, task.progress));
-            toast.loading(`🔬 Analisando ${Math.max(progress, task.progress)}%`, { id: progressToast });
           }
         }
       );
@@ -236,8 +233,6 @@ const DrugInteraction = () => {
       // Clear interval and set to 100%
       clearInterval(progressInterval);
       setProgress(100);
-      
-      toast.success("✅ Análise concluída!", { id: progressToast });
       
       // Format for display
       const mockResponse = {

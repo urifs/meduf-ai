@@ -33,8 +33,6 @@ const Dashboard = () => {
       }, 1500);
 
       // Call AI Consensus Engine with polling
-      const progressToast = toast.loading("🔬 Analisando 10%...");
-      
       const aiReport = await startAITask(
         '/ai/consensus/diagnosis',
         formData,
@@ -42,7 +40,6 @@ const Dashboard = () => {
           // Update progress based on real status (never decrease)
           if (task.status === 'processing' && task.progress > 0) {
             setProgress(prev => Math.max(prev, task.progress));
-            toast.loading(`🔬 Analisando ${Math.max(progress, task.progress)}%`, { id: progressToast });
           }
         }
       );
@@ -50,8 +47,6 @@ const Dashboard = () => {
       // Clear interval and set to 100%
       clearInterval(progressInterval);
       setProgress(100);
-      
-      toast.success("✅ Análise concluída!", { id: progressToast });
       
       // Save to consultation history
       try {
