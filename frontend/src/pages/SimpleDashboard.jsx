@@ -307,27 +307,42 @@ const SimpleDashboard = () => {
         };
       }
 
+      // Save to consultation history
       try {
-        // Save to Backend
         await api.post('/consultations', {
           patient: {
             idade: "N/I",
             sexo: "N/I",
             queixa: anamnese
           },
-          report: mockResponse
+          report: aiReport
         });
-        
-        setReportData(mockResponse);
-        toast.success("Análise concluída!");
       } catch (error) {
-        console.error("Error saving consultation:", error);
-        toast.error("Erro ao salvar análise no banco de dados.");
-        setReportData(mockResponse);
-      } finally {
-        setIsLoading(false);
+        console.error("Error saving:", error);
       }
-    }, 2000);
+      
+      setReportData(aiReport);
+      
+      // Save to localStorage for history
+      const historyEntry = {
+        id: Date.now().toString(),
+        date: new Date().toISOString(),
+        patient: { queixa: anamnese },
+        report: aiReport
+      };
+      
+      const existingHistory = JSON.parse(localStorage.getItem('meduf_history') || '[]');
+      existingHistory.unshift(historyEntry);
+      localStorage.setItem('meduf_history', JSON.stringify(existingHistory.slice(0, 50)));
+      
+      toast.success("✅ Análise completa! Consenso de 3 IAs + literatura médica");
+      
+    } catch (error) {
+      console.error("AI Consensus Error:", error);
+      toast.error("Erro ao processar análise. Tente novamente.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
