@@ -33,7 +33,7 @@ const MedicationGuide = () => {
     setResult(null);
     setProgress(10); // Start with 10% immediately
 
-    try:
+    try {
       // Call AI Consensus Engine with polling
       const progressToast = toast.loading("🔬 Analisando 10%...");
       
