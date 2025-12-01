@@ -26,6 +26,7 @@ class TaskManager:
     def __init__(self):
         self.tasks: Dict[str, Dict[str, Any]] = {}
         self.cleanup_interval = 3600  # 1 hour
+        self.executor = ThreadPoolExecutor(max_workers=4)
         
     def create_task(self, task_type: str) -> str:
         """Create a new task and return its ID"""
