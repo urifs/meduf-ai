@@ -92,6 +92,7 @@ const Toxicology = () => {
       toast.error("Erro ao processar análise. Tente novamente.");
     } finally {
       setIsLoading(false);
+      setProgress(0);
     }
   };
 
