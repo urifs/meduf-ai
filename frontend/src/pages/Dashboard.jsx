@@ -348,17 +348,17 @@ const Dashboard = () => {
           report: mockResponse
         });
         
-        setReportData(mockResponse);
-        toast.success("Análise concluída e salva no histórico!");
+        // setReportData(mockResponse);
+        // toast.success("Análise concluída e salva no histórico!");
       } catch (error) {
         console.error("Error saving consultation:", error);
-        toast.error("Erro ao salvar análise no banco de dados.");
-        setReportData(mockResponse); // Show result anyway
+        // toast.error("Erro ao salvar análise no banco de dados.");
+        // setReportData(mockResponse); // Show result anyway
       } finally {
-        setIsLoading(false);
+        // setIsLoading(false);
       }
     }, 2000);
-  };
+  }; // END OLD MOCK FUNCTION
 
   return (
     <div className="min-h-screen bg-background font-sans">
