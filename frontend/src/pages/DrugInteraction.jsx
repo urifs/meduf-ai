@@ -264,18 +264,31 @@ const DrugInteraction = () => {
     if (!result) return;
     
     let text = `## Análise de Interação Medicamentosa\n\n`;
-    text += `Medicamentos: ${result.medications.join(", ")}\n\n`;
+    text += `Medicamentos: ${result.medications.join(" + ")}\n\n`;
+    text += `### Gravidade: ${result.severity}\n\n`;
+    text += `**Resumo**: ${result.summary}\n\n`;
+    text += `**Detalhes**: ${result.details}\n\n`;
+    text += `**Recomendações**: ${result.recommendations}\n\n`;
     
-    if (result.interactions.length > 0) {
-      result.interactions.forEach(item => {
-        text += `### ${item.pair}\n`;
-        text += `* **Gravidade:** ${item.severity}\n`;
-        text += `* **Efeito:** ${item.effect}\n`;
-        text += `* **Toxicidade:** ${item.toxicity}\n`;
-        text += `* **Conduta:** ${item.conduct}\n\n`;
-      });
-    } else {
-      text += "Nenhuma interação grave encontrada.\n";
+    if (result.renal_impact) {
+      text += `### 🫘 Impacto Renal\n${result.renal_impact}\n\n`;
+    }
+    
+    if (result.hepatic_impact) {
+      text += `### 🫁 Impacto Hepático\n${result.hepatic_impact}\n\n`;
+    }
+    
+    if (result.monitoring) {
+      text += `### 📊 Monitoramento\n`;
+      if (result.monitoring.renal?.length > 0) {
+        text += `**Função Renal**: ${result.monitoring.renal.join(", ")}\n`;
+      }
+      if (result.monitoring.hepatic?.length > 0) {
+        text += `**Função Hepática**: ${result.monitoring.hepatic.join(", ")}\n`;
+      }
+      if (result.monitoring.outros?.length > 0) {
+        text += `**Outros**: ${result.monitoring.outros.join(", ")}\n`;
+      }
     }
     
     navigator.clipboard.writeText(text);
