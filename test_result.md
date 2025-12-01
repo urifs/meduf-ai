@@ -501,23 +501,25 @@ frontend:
 
 metadata:
   created_by: "testing_agent"
-  version: "1.8"
-  test_sequence: 10
-  run_ui: false
+  version: "1.9"
+  test_sequence: 11
+  run_ui: true
   test_completed: true
   all_tests_passed: true
-  last_test_date: "2025-01-02"
+  last_test_date: "2025-12-01"
   critical_bug_fixed: true
   consensus_endpoints_verified: 5
   review_request_testing_completed: true
   exact_test_data_verified: true
+  deploy_corrections_verified: true
+  analysis_functionality_confirmed: true
 
 test_plan:
   current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "completed"
-  test_summary: "COMPREHENSIVE MEDUF AI ANALYSIS TESTING COMPLETED: All 5 consensus AI functionalities tested with exact data from review request. ✅ AUTHENTICATION: ur1fs/@Fred1807 login successful (0.27s) ✅ DIAGNÓSTICO SIMPLES: 'Dor de cabeça intensa há 3 dias' - immediate task_id (0.04s), completed in 26s ✅ DIAGNÓSTICO DETALHADO: Complete patient data - immediate task_id (0.04s), completed in 32s ✅ INTERAÇÃO MEDICAMENTOSA: Paracetamol+Ibuprofeno - immediate task_id (0.04s), completed in 26s ✅ GUIA TERAPÊUTICO: 'Dor lombar aguda' - immediate task_id (0.04s), completed in 20s ✅ TOXICOLOGIA: 'Paracetamol overdose' - immediate task_id (0.04s), completed in 34s. All tasks complete WITHOUT ERRORS, results are valid (not empty), immediate response requirement (<1s) met. Background task system working perfectly in deployment."
+  test_summary: "REVIEW REQUEST TESTING COMPLETED SUCCESSFULLY - MEDUF AI ANALYSIS FUNCTIONALITY AFTER DEPLOY CORRECTIONS: ✅ COMPLETE END-TO-END TEST PASSED: All 8 success criteria met including login (ur1fs/@Fred1807), navigation to /simple, form filling with exact anamnese text, analysis button click, 30+ second processing, NO processing errors, and all required result sections (Hipóteses Diagnósticas, Conduta e Investigação, Sugestão Farmacológica) verified. Medical analysis properly processed respiratory symptoms (febre, tosse, falta de ar) with relevant diagnoses (Pneumonia Bacteriana, COVID-19, Pneumonia Atípica, Bronquite Aguda, Tromboembolismo Pulmonar). Screenshots captured at each step for documentation. CRITICAL SUCCESS: Analysis functionality working perfectly after all deploy corrections."
 
 frontend:
   - task: "Toxicology Feature - Backend AI Engine Integration - Paracetamol"
