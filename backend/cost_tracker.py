@@ -80,11 +80,18 @@ async def track_usage(
         return None
 
 
-async def get_monthly_stats(year: int = None, month: int = None) -> Dict[str, Any]:
+def get_monthly_stats_sync(year: int = None, month: int = None) -> Dict[str, Any]:
     """
-    Get usage statistics for a specific month
+    Get usage statistics for a specific month (synchronous version)
     """
     try:
+        from pymongo import MongoClient
+        
+        # Create sync MongoDB client
+        sync_client = MongoClient(MONGO_URL)
+        sync_db = sync_client[db_name]
+        sync_collection = sync_db.usage_stats
+        
         # Default to current month
         if not year or not month:
             now = datetime.now(timezone.utc)
@@ -108,7 +115,8 @@ async def get_monthly_stats(year: int = None, month: int = None) -> Dict[str, An
             }
         ]
         
-        result = await usage_stats_collection.aggregate(pipeline).to_list(1)
+        result = list(sync_collection.aggregate(pipeline))
+        sync_client.close()
         
         if result:
             stats = result[0]
@@ -132,13 +140,21 @@ async def get_monthly_stats(year: int = None, month: int = None) -> Dict[str, An
             
     except Exception as e:
         print(f"⚠️ Error getting monthly stats: {e}")
+        now = datetime.now(timezone.utc)
         return {
-            "month": f"{year}-{month:02d}",
+            "month": f"{now.year}-{now.month:02d}",
             "total_consultations": 0,
             "total_tokens": 0,
             "total_cost_usd": 0.0,
             "error": str(e)
         }
+
+
+async def get_monthly_stats(year: int = None, month: int = None) -> Dict[str, Any]:
+    """
+    Get usage statistics for a specific month (async wrapper)
+    """
+    return get_monthly_stats_sync(year, month)
 
 
 async def get_all_time_stats() -> Dict[str, Any]:
