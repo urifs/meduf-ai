@@ -932,6 +932,73 @@ async def get_epidemiological_alerts():
         raise HTTPException(status_code=500, detail=f"Error fetching alerts: {str(e)}")
 
 
+# --- Usage Stats & Billing Endpoints ---
+from cost_tracker import get_monthly_stats, get_all_time_stats
+
+@app.get("/api/admin/usage-stats/monthly")
+async def get_monthly_usage(user: UserInDB = Depends(get_current_user)):
+    """
+    Get current month usage statistics (Admin only)
+    """
+    if user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        stats = await get_monthly_stats()
+        return stats
+    except Exception as e:
+        print(f"Error getting monthly stats: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/admin/usage-stats/all-time")
+async def get_all_time_usage(user: UserInDB = Depends(get_current_user)):
+    """
+    Get all-time usage statistics (Admin only)
+    """
+    if user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        stats = await get_all_time_stats()
+        return stats
+    except Exception as e:
+        print(f"Error getting all-time stats: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/admin/balance")
+async def get_balance_info(user: UserInDB = Depends(get_current_user)):
+    """
+    Get Emergent Universal Key balance information
+    Note: Actual balance check requires Emergent API (not yet implemented)
+    This returns estimated remaining balance based on usage
+    """
+    if user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        # Get all-time usage
+        stats = await get_all_time_stats()
+        
+        # Estimated initial balance (you should update this manually)
+        # Or implement API call to Emergent to get real balance
+        initial_balance = 10.0  # $10 USD - UPDATE THIS VALUE
+        
+        remaining_balance = initial_balance - stats.get("total_cost_usd", 0)
+        
+        return {
+            "initial_balance_usd": initial_balance,
+            "spent_usd": stats.get("total_cost_usd", 0),
+            "remaining_balance_usd": max(0, remaining_balance),
+            "total_consultations": stats.get("total_consultations", 0),
+            "note": "Balance is estimated. Update initial_balance in code or connect to Emergent API for real balance."
+        }
+    except Exception as e:
+        print(f"Error getting balance: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
