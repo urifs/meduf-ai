@@ -138,6 +138,62 @@ async def search_pubmed(query: str, max_results: int = 5) -> List[Dict[str, str]
         return []
 
 
+async def call_huggingface_api(
+    model_name: str,
+    prompt: str,
+    max_tokens: int = 1500
+) -> Optional[str]:
+    """
+    Generic function to call Hugging Face Inference API (FREE)
+    """
+    try:
+        headers = {"Content-Type": "application/json"}
+        if HF_API_TOKEN:
+            headers["Authorization"] = f"Bearer {HF_API_TOKEN}"
+        
+        payload = {
+            "inputs": prompt,
+            "parameters": {
+                "max_new_tokens": max_tokens,
+                "temperature": 0.7,
+                "top_p": 0.95,
+                "return_full_text": False
+            }
+        }
+        
+        # Use asyncio to run the request
+        loop = asyncio.get_event_loop()
+        response = await loop.run_in_executor(
+            None,
+            lambda: requests.post(
+                HF_API_URL + model_name,
+                headers=headers,
+                json=payload,
+                timeout=45
+            )
+        )
+        
+        if response.status_code != 200:
+            print(f"⚠️ HF API error {response.status_code}: {response.text[:200]}")
+            return None
+        
+        result = response.json()
+        
+        # Extract text from response
+        if isinstance(result, list) and len(result) > 0:
+            response_text = result[0].get("generated_text", "")
+        elif isinstance(result, dict):
+            response_text = result.get("generated_text", "")
+        else:
+            response_text = str(result)
+        
+        return response_text
+        
+    except Exception as e:
+        print(f"⚠️ HF API call error: {e}")
+        return None
+
+
 async def get_huggingface_diagnosis(
     model_name: str,
     patient_data: Dict[str, Any],
@@ -163,46 +219,9 @@ async def get_huggingface_diagnosis(
 **Forneça sua análise clínica em formato JSON conforme especificado.**
 """
         
-        # Call Hugging Face Inference API
-        headers = {"Content-Type": "application/json"}
-        if HF_API_TOKEN:
-            headers["Authorization"] = f"Bearer {HF_API_TOKEN}"
-        
-        payload = {
-            "inputs": prompt,
-            "parameters": {
-                "max_new_tokens": 1500,
-                "temperature": 0.7,
-                "top_p": 0.95,
-                "return_full_text": False
-            }
-        }
-        
-        # Use asyncio to run the request
-        loop = asyncio.get_event_loop()
-        response = await loop.run_in_executor(
-            None,
-            lambda: requests.post(
-                HF_API_URL + model_name,
-                headers=headers,
-                json=payload,
-                timeout=30
-            )
-        )
-        
-        if response.status_code != 200:
-            print(f"⚠️ HF API error {response.status_code}: {response.text}")
+        response_text = await call_huggingface_api(model_name, prompt)
+        if not response_text:
             return None
-        
-        result = response.json()
-        
-        # Extract text from response
-        if isinstance(result, list) and len(result) > 0:
-            response_text = result[0].get("generated_text", "")
-        elif isinstance(result, dict):
-            response_text = result.get("generated_text", "")
-        else:
-            response_text = str(result)
         
         # Extract JSON from markdown code blocks if present
         response_text = response_text.strip()
@@ -212,11 +231,11 @@ async def get_huggingface_diagnosis(
             response_text = response_text.split("```")[1].split("```")[0].strip()
         
         diagnosis = json.loads(response_text)
-        diagnosis["provider"] = f"huggingface/{model_name.split('/')[-1]}"
+        diagnosis["provider"] = f"HF-{model_name.split('/')[-1]}"
         return diagnosis
         
     except Exception as e:
-        print(f"⚠️ Error with HuggingFace {model_name}: {e}")
+        print(f"⚠️ Error parsing HF response: {e}")
         return None
 
 
