@@ -263,19 +263,19 @@ async def create_consensus_diagnosis(
 
 async def get_ai_consensus_diagnosis(patient_data: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Main function: Get diagnosis using Gemini
+    Main function: Get diagnosis using Gemini 2.0 Flash (cheaper model)
     """
     try:
-        # Query Gemini
-        print("🤖 Querying Gemini AI...")
-        diagnosis = await get_ai_diagnosis("gemini", "gemini-2.5-flash", patient_data, "")
+        # Query Gemini 2.0 Flash (cheaper than 2.5)
+        print("🤖 Querying Gemini 2.0 Flash...")
+        diagnosis = await get_ai_diagnosis("gemini", "gemini-2.0-flash", patient_data, "")
         
         if not diagnosis:
             print("⚠️ Gemini response failed, using fallback")
             valid_diagnoses = []
         else:
             valid_diagnoses = [diagnosis]
-            print(f"✅ Got Gemini response")
+            print(f"✅ Got Gemini 2.0 Flash response")
         
         # Create consensus
         print("🧠 Creating consensus...")
@@ -349,7 +349,7 @@ async def get_ai_consensus_diagnosis(patient_data: Dict[str, Any]) -> Dict[str, 
 
 async def get_ai_consensus_medication_guide(symptoms: str) -> Dict[str, Any]:
     """
-    Get medication recommendations using 3 AIs
+    Get medication recommendations using Gemini 2.0 Flash
     """
     try:
         # Create prompt for medication recommendations
@@ -372,12 +372,12 @@ async def get_ai_consensus_medication_guide(symptoms: str) -> Dict[str, Any]:
 ```
 """
         
-        # Query Gemini
+        # Query Gemini 2.0 Flash
         chat = LlmChat(
             api_key=EMERGENT_KEY,
             session_id=f"meduf-med-gemini",
             system_message="Você é um farmacêutico clínico especializado. Recomende medicamentos baseados em evidências científicas."
-        ).with_model("gemini", "gemini-2.5-flash")
+        ).with_model("gemini", "gemini-2.0-flash")
         
         response = await chat.send_message(UserMessage(text=medication_prompt))
         
@@ -448,7 +448,7 @@ async def get_ai_consensus_medication_guide(symptoms: str) -> Dict[str, Any]:
 
 async def get_ai_consensus_drug_interaction(medications) -> Dict[str, Any]:
     """
-    Analyze drug interaction using 3 AIs
+    Analyze drug interaction using Gemini 2.0 Flash
     Accepts either a list of medications or two string parameters (for backward compatibility)
     """
     try:
@@ -482,12 +482,12 @@ async def get_ai_consensus_drug_interaction(medications) -> Dict[str, Any]:
 ```
 """
         
-        # Query Gemini
+        # Query Gemini 2.0 Flash
         chat = LlmChat(
             api_key=EMERGENT_KEY,
             session_id=f"meduf-interaction-gemini",
             system_message="Você é um farmacologista especializado em interações medicamentosas. Baseie suas respostas em evidências científicas."
-        ).with_model("gemini", "gemini-2.5-flash")
+        ).with_model("gemini", "gemini-2.0-flash")
         
         response = await chat.send_message(UserMessage(text=interaction_prompt))
         
@@ -582,7 +582,7 @@ async def get_ai_consensus_drug_interaction(medications) -> Dict[str, Any]:
 
 async def get_ai_consensus_toxicology(substance: str) -> Dict[str, Any]:
     """
-    Get toxicology protocol using 3 AIs
+    Get toxicology protocol using Gemini 2.0 Flash
     """
     try:
         toxicology_prompt = f"""**ANÁLISE TOXICOLÓGICA:**
@@ -600,12 +600,12 @@ Substância: {substance}
 ```
 """
         
-        # Query Gemini
+        # Query Gemini 2.0 Flash
         chat = LlmChat(
             api_key=EMERGENT_KEY,
             session_id=f"meduf-tox-gemini",
             system_message="Você é um toxicologista clínico especializado. Forneça protocolos baseados em diretrizes internacionais."
-        ).with_model("gemini", "gemini-2.5-flash")
+        ).with_model("gemini", "gemini-2.0-flash")
         
         response = await chat.send_message(UserMessage(text=toxicology_prompt))
         
