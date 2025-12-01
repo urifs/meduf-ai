@@ -120,6 +120,21 @@
       - working: true
         agent: "testing"
         comment: "✅ VERIFIED: Authentication integration working perfectly. Login successful with ur1fs/@Fred1807 credentials. User authenticated as 'Administrador'. All consensus endpoints properly protected and require Bearer token authentication."
+      - working: true
+        agent: "testing"
+        comment: "✅ RE-VERIFIED: Authentication working consistently across all 5 consensus endpoint tests. Login response time: 0.28s. Bearer token authentication properly enforced. All endpoints require valid authentication before processing requests."
+
+  - task: "Background Task System - Simple Diagnosis Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE VERIFICATION: Simple diagnosis endpoint tested with N/I data (dor de cabeça forte, idade: N/I, sexo: N/I) as specified in review request. Task_id returned in 0.041s (immediate response). Task completed in 24.5s with 5 diagnoses including 'Cefaleia Tensional' and 'Cefaleia em Salvas'. Proper handling of incomplete patient data. Background processing working perfectly."
 
 backend:
 ##   - task: "Task name"
