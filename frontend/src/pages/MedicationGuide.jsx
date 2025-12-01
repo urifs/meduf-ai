@@ -77,6 +77,7 @@ const MedicationGuide = () => {
       toast.error("Erro ao processar guia. Tente novamente.");
     } finally {
       setIsLoading(false);
+      setProgress(0);
     }
   };
 
