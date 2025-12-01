@@ -72,8 +72,6 @@ const SimpleDashboard = () => {
       existingHistory.unshift(historyEntry);
       localStorage.setItem('meduf_history', JSON.stringify(existingHistory.slice(0, 50)));
       
-      toast.success("✅ Análise concluída!");
-      
     } catch (error) {
       console.error("AI Consensus Error:", error);
       toast.error("Erro ao processar análise. Tente novamente.");
