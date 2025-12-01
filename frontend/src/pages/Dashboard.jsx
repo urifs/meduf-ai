@@ -18,7 +18,53 @@ const Dashboard = () => {
     setIsLoading(true);
     setReportData(null);
 
-    // Simulate AI Processing Delay
+    try {
+      // Call AI Consensus Engine (3 AIs + PubMed)
+      toast.info("🔬 Consultando 3 IAs + bases médicas (PubMed)...", { duration: 8000 });
+      
+      const response = await api.post('/ai/consensus/diagnosis', formData);
+      const aiReport = response.data;
+      
+      // Save to consultation history
+      try {
+        await api.post('/consultations', {
+          patient: formData,
+          report: aiReport
+        });
+      } catch (error) {
+        console.error("Error saving:", error);
+      }
+      
+      setReportData(aiReport);
+      
+      // Save to localStorage for history
+      const historyEntry = {
+        id: Date.now().toString(),
+        date: new Date().toISOString(),
+        patient: formData,
+        report: aiReport
+      };
+      
+      const existingHistory = JSON.parse(localStorage.getItem('meduf_history') || '[]');
+      existingHistory.unshift(historyEntry);
+      localStorage.setItem('meduf_history', JSON.stringify(existingHistory.slice(0, 50)));
+      
+      toast.success("✅ Análise completa! Consenso de 3 IAs + literatura médica");
+      
+    } catch (error) {
+      console.error("AI Consensus Error:", error);
+      toast.error("Erro ao processar análise. Tente novamente.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // OLD MOCK VERSION (commented out)
+  const handleAnalyze_OLD_MOCK = async (formData) => {
+    setIsLoading(true);
+    setReportData(null);
+
+    // OLD: Simulate AI Processing Delay
     setTimeout(async () => {
       
       let mockResponse;
