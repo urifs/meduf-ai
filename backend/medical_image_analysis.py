@@ -200,10 +200,12 @@ Analise a imagem radiográfica fornecida e identifique:
 ```"""
 
         # Create prompt with context
+        region_text = f"**Região do Corpo:** {body_region}\n" if body_region else ""
+        clinical_info = f"**Informações Clínicas:**\n{additional_info}\n" if additional_info else ""
+        
         user_prompt = f"""Analise a imagem de raio-X fornecida.
 
-{f"**Região do Corpo:** {body_region}\n" if body_region else ""}
-{f"**Informações Clínicas:**\n{additional_info}\n" if additional_info else ""}
+{region_text}{clinical_info}
 
 Por favor, forneça uma análise radiológica completa identificando alterações e sua relevância clínica."""
 
