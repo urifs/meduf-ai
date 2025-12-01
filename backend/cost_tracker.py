@@ -9,9 +9,12 @@ from typing import Dict, Any
 from motor.motor_asyncio import AsyncIOMotorClient
 import tiktoken
 
-# Gemini 2.0 Flash pricing (per 1M tokens)
-GEMINI_INPUT_COST = 0.075  # $0.075 per 1M input tokens (2.0 Flash is cheaper)
-GEMINI_OUTPUT_COST = 0.30  # $0.30 per 1M output tokens (2.0 Flash is cheaper)
+# Gemini pricing (per 1M tokens)
+GEMINI_2_0_INPUT_COST = 0.075  # $0.075 per 1M input tokens (2.0 Flash)
+GEMINI_2_0_OUTPUT_COST = 0.30  # $0.30 per 1M output tokens (2.0 Flash)
+
+GEMINI_2_5_INPUT_COST = 0.15  # $0.15 per 1M input tokens (2.5 Flash - with vision)
+GEMINI_2_5_OUTPUT_COST = 0.60  # $0.60 per 1M output tokens (2.5 Flash - with vision)
 
 # MongoDB connection
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
