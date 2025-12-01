@@ -33,6 +33,9 @@ class InteractionResult(BaseModel):
     summary: str
     details: str
     recommendations: str
+    renal_impact: Optional[str] = None
+    hepatic_impact: Optional[str] = None
+    monitoring: Optional[Dict[str, List[str]]] = None
 
 
 def normalize_text(text: str) -> str:
