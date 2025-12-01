@@ -31,9 +31,9 @@ const MedicationGuide = () => {
 
     try {
       // Call AI Consensus Engine (3 AIs + PubMed)
-      toast.info("🔬 Consultando 3 IAs + bases médicas para medicamentos...", { duration: 8000 });
+      toast.info("🔬 Analisando medicamentos...", { duration: 8000 });
       
-      const response = await api.post('/ai/consensus/medication-guide', {
+      const response = await api.post('/ai/medication-guide', {
         symptoms: symptoms
       });
       
@@ -209,7 +209,7 @@ const MedicationGuide = () => {
             })) || []
           }
         });
-        toast.success("✅ Guia completo! Consenso de 3 IAs + literatura médica");
+        toast.success("✅ Guia completo! Análise concluída");
       } catch (error) {
         console.error("Error saving:", error);
         toast.success("Guia gerado (não salvo no histórico).");
