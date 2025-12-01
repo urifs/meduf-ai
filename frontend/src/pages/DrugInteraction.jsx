@@ -341,15 +341,21 @@ const DrugInteraction = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-red-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 relative">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-10 left-10 w-96 h-96 bg-orange-400/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-10 right-10 w-80 h-80 bg-red-400/10 rounded-full blur-3xl animate-float" style={{animationDelay: '1.5s'}}></div>
+      </div>
+
       <Header />
-      <main className="container mx-auto px-4 py-8 md:px-8">
+      <main className="container mx-auto px-4 py-8 md:px-8 relative z-10">
         <Button 
           variant="ghost" 
-          className="mb-6 pl-0 hover:pl-2 transition-all" 
+          className="mb-6 pl-0 hover:pl-2 transition-all group animate-fade-in-up" 
           onClick={() => navigate('/')}
         >
-          <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Seleção
+          <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" /> Voltar para Seleção
         </Button>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
