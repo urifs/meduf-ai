@@ -29,7 +29,7 @@ const Dashboard = () => {
         (task) => {
           // Update progress
           if (task.status === 'processing') {
-            toast.loading(`🔬 Processando... ${task.progress}%`, { id: progressToast });
+            toast.loading(`🔬 Analisando ${task.progress}%`, { id: progressToast });
           }
         }
       );
