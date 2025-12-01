@@ -249,11 +249,16 @@ metadata:
   all_tests_passed: true
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Drug Interaction - Renal Impact Section Display"
+    - "Drug Interaction - Hepatic Impact Section Display"
+    - "Drug Interaction - Monitoring Exams Section Display"
+    - "Drug Interaction - Serious Interaction Test (Ibuprofeno + Varfarina)"
+    - "Drug Interaction - Moderate Interaction Test (Metformina + Enalapril)"
   stuck_tasks: []
   test_all: false
-  test_priority: "completed"
-  test_summary: "REFACTORED TOXICOLOGY BACKEND INTEGRATION TESTING COMPLETED SUCCESSFULLY: All 3 critical test scenarios verified through comprehensive Playwright testing. Backend AI engine integration working perfectly - paracetamol and cocaine protocols return correct agents and antidotes from /api/ai/toxicology endpoint. Response times excellent (0.27-0.28s). No console errors. Refactoring successful."
+  test_priority: "high_first"
+  test_summary: "DRUG INTERACTION REFACTORED WITH RENAL/HEPATIC IMPACT: Need to test new organ impact sections and monitoring recommendations with specific drug combinations through backend /api/ai/drug-interaction endpoint."
 
 frontend:
   - task: "Patient Analysis Form Functionality"
