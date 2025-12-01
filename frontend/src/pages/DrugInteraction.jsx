@@ -485,7 +485,7 @@ const DrugInteraction = () => {
                       <Card className="border-l-4 border-l-blue-500 shadow-sm">
                         <CardHeader className="pb-2">
                           <CardTitle className="text-lg text-blue-700">
-                            {result.medications[0]} + {result.medications[1]}
+                            {result.medications.join(' + ')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
