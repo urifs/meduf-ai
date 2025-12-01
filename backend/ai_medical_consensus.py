@@ -723,29 +723,21 @@ Substância: {substance}
 ```
 """
         
-        # Query 2 AIs
+        # Query 2 FREE Hugging Face models
         tasks = []
-        for provider, model in [
-            ("anthropic", "claude-sonnet-4-20250514"),
-            ("gemini", "gemini-2.0-flash")
-        ]:
-            chat = LlmChat(
-                api_key=EMERGENT_KEY,
-                session_id=f"meduf-tox-{provider}",
-                system_message="Você é um toxicologista clínico especializado. Forneça protocolos baseados em diretrizes internacionais."
-            ).with_model(provider, model)
-            tasks.append(chat.send_message(UserMessage(text=toxicology_prompt)))
+        for model in HF_MODELS[:2]:  # Use first 2 models
+            tasks.append(call_huggingface_api(model, toxicology_prompt, max_tokens=1200))
         
         results = await asyncio.gather(*tasks, return_exceptions=True)
         
         # Parse and create consensus
         valid_responses = []
-        for response in results:
-            if isinstance(response, Exception):
+        for response_text in results:
+            if isinstance(response_text, Exception) or not response_text:
                 continue
             try:
-                import json
-                response_text = response.strip()
+                # Extract JSON
+                response_text = response_text.strip()
                 if "```json" in response_text:
                     response_text = response_text.split("```json")[1].split("```")[0].strip()
                 elif "```" in response_text:
