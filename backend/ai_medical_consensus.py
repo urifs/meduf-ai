@@ -307,6 +307,305 @@ async def get_ai_consensus_diagnosis(patient_data: Dict[str, Any]) -> Dict[str, 
             ],
             "conduct": {
                 "advice": "Por favor, tente novamente ou consulte um médico presencialmente.",
+
+
+
+async def get_ai_consensus_medication_guide(symptoms: str) -> Dict[str, Any]:
+    """
+    Get medication recommendations using 3 AIs + PubMed
+    """
+    try:
+        # Search PubMed
+        print("🔍 Searching PubMed for medication guidance...")
+        pubmed_articles = await search_pubmed(f"treatment {symptoms} medication", max_results=3)
+        
+        pubmed_context = ""
+        if pubmed_articles:
+            pubmed_context = "\n**LITERATURA MÉDICA RELEVANTE (PubMed):**\n"
+            for i, article in enumerate(pubmed_articles, 1):
+                pubmed_context += f"\n{i}. **{article['title']}**\n   {article['abstract']}\n"
+        
+        # Create prompt for medication recommendations
+        medication_prompt = f"""**SINTOMAS DO PACIENTE:**
+{symptoms}
+
+{pubmed_context}
+
+**Forneça recomendações de medicamentos em formato JSON:**
+```json
+{{
+  "medications": [
+    {{
+      "name": "Nome do medicamento",
+      "dose": "Dose recomendada",
+      "frequency": "Frequência",
+      "notes": "Observações clínicas",
+      "contraindications": "Contraindicações principais"
+    }}
+  ]
+}}
+```
+"""
+        
+        # Query 3 AIs
+        tasks = []
+        for provider, model in [
+            ("openai", "gpt-5"),
+            ("anthropic", "claude-sonnet-4-20250514"),
+            ("gemini", "gemini-2.0-flash")
+        ]:
+            chat = LlmChat(
+                api_key=EMERGENT_KEY,
+                session_id=f"meduf-med-{provider}",
+                system_message="Você é um farmacêutico clínico especializado. Recomende medicamentos baseados em evidências científicas."
+            ).with_model(provider, model)
+            tasks.append(chat.send_message(UserMessage(text=medication_prompt)))
+        
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        # Parse responses
+        all_medications = []
+        for i, response in enumerate(results):
+            if isinstance(response, Exception):
+                continue
+            try:
+                import json
+                response_text = response.strip()
+                if "```json" in response_text:
+                    response_text = response_text.split("```json")[1].split("```")[0].strip()
+                elif "```" in response_text:
+                    response_text = response_text.split("```")[1].split("```")[0].strip()
+                
+                data = json.loads(response_text)
+                for med in data.get("medications", []):
+                    if med not in all_medications:
+                        all_medications.append(med)
+            except:
+                continue
+        
+        return {"medications": all_medications[:8]}  # Top 8
+        
+    except Exception as e:
+        print(f"Medication guide error: {e}")
+        return {"medications": []}
+
+
+async def get_ai_consensus_drug_interaction(drug1: str, drug2: str) -> Dict[str, Any]:
+    """
+    Analyze drug interaction using 3 AIs + PubMed
+    """
+    try:
+        # Search PubMed for interactions
+        print(f"🔍 Searching PubMed for {drug1} + {drug2} interaction...")
+        pubmed_articles = await search_pubmed(f"{drug1} {drug2} drug interaction", max_results=3)
+        
+        pubmed_context = ""
+        if pubmed_articles:
+            pubmed_context = "\n**LITERATURA MÉDICA RELEVANTE (PubMed):**\n"
+            for i, article in enumerate(pubmed_articles, 1):
+                pubmed_context += f"\n{i}. **{article['title']}**\n   {article['abstract']}\n"
+        
+        interaction_prompt = f"""**ANÁLISE DE INTERAÇÃO MEDICAMENTOSA:**
+Medicamento 1: {drug1}
+Medicamento 2: {drug2}
+
+{pubmed_context}
+
+**Forneça análise completa em formato JSON:**
+```json
+{{
+  "severity": "GRAVE/MODERADA/BAIXA",
+  "summary": "Resumo da interação",
+  "details": "Detalhes farmacocinéticos e farmacodinâmicos",
+  "recommendations": "Recomendações clínicas",
+  "renal_impact": "Impacto renal de ambos os medicamentos",
+  "hepatic_impact": "Impacto hepático de ambos os medicamentos"
+}}
+```
+"""
+        
+        # Query 3 AIs
+        tasks = []
+        for provider, model in [
+            ("openai", "gpt-5"),
+            ("anthropic", "claude-sonnet-4-20250514"),
+            ("gemini", "gemini-2.0-flash")
+        ]:
+            chat = LlmChat(
+                api_key=EMERGENT_KEY,
+                session_id=f"meduf-interaction-{provider}",
+                system_message="Você é um farmacologista especializado em interações medicamentosas. Baseie suas respostas em evidências científicas."
+            ).with_model(provider, model)
+            tasks.append(chat.send_message(UserMessage(text=interaction_prompt)))
+        
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        # Parse and create consensus
+        valid_responses = []
+        for response in results:
+            if isinstance(response, Exception):
+                continue
+            try:
+                import json
+                response_text = response.strip()
+                if "```json" in response_text:
+                    response_text = response_text.split("```json")[1].split("```")[0].strip()
+                elif "```" in response_text:
+                    response_text = response_text.split("```")[1].split("```")[0].strip()
+                
+                data = json.loads(response_text)
+                valid_responses.append(data)
+            except:
+                continue
+        
+        if not valid_responses:
+            return {
+                "severity": "DESCONHECIDA",
+                "summary": "Não foi possível analisar a interação",
+                "details": "Erro ao processar dados das IAs",
+                "recommendations": "Consulte um farmacêutico ou médico",
+                "renal_impact": "Não disponível",
+                "hepatic_impact": "Não disponível"
+            }
+        
+        # Get most common severity
+        severities = [r.get("severity", "").upper() for r in valid_responses]
+        severity_counts = {}
+        for s in severities:
+            if "GRAVE" in s:
+                severity_counts["GRAVE"] = severity_counts.get("GRAVE", 0) + 1
+            elif "MODERADA" in s:
+                severity_counts["MODERADA"] = severity_counts.get("MODERADA", 0) + 1
+            else:
+                severity_counts["BAIXA"] = severity_counts.get("BAIXA", 0) + 1
+        
+        consensus_severity = max(severity_counts.items(), key=lambda x: x[1])[0]
+        
+        # Combine details
+        return {
+            "severity": consensus_severity,
+            "summary": f"Consenso de {len(valid_responses)}/3 IAs: " + valid_responses[0].get("summary", ""),
+            "details": "\n\n".join([f"[IA {i+1}] {r.get('details', '')}" for i, r in enumerate(valid_responses[:2])]),
+            "recommendations": "\n\n".join([f"[IA {i+1}] {r.get('recommendations', '')}" for i, r in enumerate(valid_responses[:2])]),
+            "renal_impact": valid_responses[0].get("renal_impact", "Não disponível"),
+            "hepatic_impact": valid_responses[0].get("hepatic_impact", "Não disponível"),
+            "monitoring": {
+                "renal": ["Creatinina sérica", "TFG (Taxa de Filtração Glomerular)"],
+                "hepatic": ["TGO/TGP (Transaminases)", "Bilirrubinas"],
+                "outros": ["Conforme recomendação médica"]
+            }
+        }
+        
+    except Exception as e:
+        print(f"Drug interaction consensus error: {e}")
+        return {
+            "severity": "ERRO",
+            "summary": "Erro ao processar análise",
+            "details": str(e),
+            "recommendations": "Tente novamente",
+            "renal_impact": "Não disponível",
+            "hepatic_impact": "Não disponível"
+        }
+
+
+async def get_ai_consensus_toxicology(substance: str) -> Dict[str, Any]:
+    """
+    Get toxicology protocol using 3 AIs + PubMed
+    """
+    try:
+        # Search PubMed for toxicology
+        print(f"🔍 Searching PubMed for {substance} poisoning...")
+        pubmed_articles = await search_pubmed(f"{substance} poisoning intoxication treatment", max_results=3)
+        
+        pubmed_context = ""
+        if pubmed_articles:
+            pubmed_context = "\n**LITERATURA MÉDICA RELEVANTE (PubMed):**\n"
+            for i, article in enumerate(pubmed_articles, 1):
+                pubmed_context += f"\n{i}. **{article['title']}**\n   {article['abstract']}\n"
+        
+        toxicology_prompt = f"""**ANÁLISE TOXICOLÓGICA:**
+Substância: {substance}
+
+{pubmed_context}
+
+**Forneça protocolo toxicológico em formato JSON:**
+```json
+{{
+  "agent": "Nome do agente tóxico identificado",
+  "antidote": "Antídoto específico",
+  "mechanism": "Mecanismo de toxicidade",
+  "conduct": ["Conduta 1", "Conduta 2", "Conduta 3"],
+  "protocol": "Protocolo de tratamento detalhado"
+}}
+```
+"""
+        
+        # Query 3 AIs
+        tasks = []
+        for provider, model in [
+            ("openai", "gpt-5"),
+            ("anthropic", "claude-sonnet-4-20250514"),
+            ("gemini", "gemini-2.0-flash")
+        ]:
+            chat = LlmChat(
+                api_key=EMERGENT_KEY,
+                session_id=f"meduf-tox-{provider}",
+                system_message="Você é um toxicologista clínico especializado. Forneça protocolos baseados em diretrizes internacionais."
+            ).with_model(provider, model)
+            tasks.append(chat.send_message(UserMessage(text=toxicology_prompt)))
+        
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        # Parse and create consensus
+        valid_responses = []
+        for response in results:
+            if isinstance(response, Exception):
+                continue
+            try:
+                import json
+                response_text = response.strip()
+                if "```json" in response_text:
+                    response_text = response_text.split("```json")[1].split("```")[0].strip()
+                elif "```" in response_text:
+                    response_text = response_text.split("```")[1].split("```")[0].strip()
+                
+                data = json.loads(response_text)
+                valid_responses.append(data)
+            except:
+                continue
+        
+        if not valid_responses:
+            return {
+                "agent": "Agente Desconhecido",
+                "antidote": "Suporte clínico (ABCDE)",
+                "mechanism": "Não foi possível determinar",
+                "conduct": ["Estabilização", "Suporte ventilatório", "Monitorização"],
+                "protocol": "Protocolo básico de suporte"
+            }
+        
+        # Combine the best responses
+        all_conduct = []
+        for r in valid_responses:
+            all_conduct.extend(r.get("conduct", []))
+        
+        return {
+            "agent": valid_responses[0].get("agent", "Agente não identificado"),
+            "antidote": valid_responses[0].get("antidote", "Suporte clínico"),
+            "mechanism": f"Consenso de {len(valid_responses)}/3 IAs: " + valid_responses[0].get("mechanism", ""),
+            "conduct": list(set(all_conduct))[:6],  # Unique, top 6
+            "protocol": "\n\n".join([f"[IA {i+1}] {r.get('protocol', '')}" for i, r in enumerate(valid_responses[:2])])
+        }
+        
+    except Exception as e:
+        print(f"Toxicology consensus error: {e}")
+        return {
+            "agent": "Erro na análise",
+            "antidote": "Suporte clínico",
+            "mechanism": str(e),
+            "conduct": ["Contatar Centro de Toxicologia"],
+            "protocol": "Erro ao processar protocolo"
+        }
+
                 "procedures": []
             },
             "medications": []
