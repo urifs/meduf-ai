@@ -138,6 +138,88 @@ async def search_pubmed(query: str, max_results: int = 5) -> List[Dict[str, str]
         return []
 
 
+async def get_huggingface_diagnosis(
+    model_name: str,
+    patient_data: Dict[str, Any],
+    pubmed_context: str = ""
+) -> Optional[Dict[str, Any]]:
+    """
+    Get diagnosis from Hugging Face model (FREE)
+    """
+    try:
+        # Build prompt
+        prompt = f"""{MEDICAL_SYSTEM_PROMPT}
+
+**DADOS DO PACIENTE:**
+- Idade: {patient_data.get('idade', 'N/I')}
+- Sexo: {patient_data.get('sexo', 'N/I')}
+- Queixa Principal: {patient_data.get('queixa', 'Não informada')}
+- História Clínica: {patient_data.get('historia', 'Não informada')}
+- Exame Físico: {patient_data.get('exame_fisico', 'Não informado')}
+- Exames Complementares: {patient_data.get('exames', 'Não informados')}
+
+{pubmed_context}
+
+**Forneça sua análise clínica em formato JSON conforme especificado.**
+"""
+        
+        # Call Hugging Face Inference API
+        headers = {"Content-Type": "application/json"}
+        if HF_API_TOKEN:
+            headers["Authorization"] = f"Bearer {HF_API_TOKEN}"
+        
+        payload = {
+            "inputs": prompt,
+            "parameters": {
+                "max_new_tokens": 1500,
+                "temperature": 0.7,
+                "top_p": 0.95,
+                "return_full_text": False
+            }
+        }
+        
+        # Use asyncio to run the request
+        loop = asyncio.get_event_loop()
+        response = await loop.run_in_executor(
+            None,
+            lambda: requests.post(
+                HF_API_URL + model_name,
+                headers=headers,
+                json=payload,
+                timeout=30
+            )
+        )
+        
+        if response.status_code != 200:
+            print(f"⚠️ HF API error {response.status_code}: {response.text}")
+            return None
+        
+        result = response.json()
+        
+        # Extract text from response
+        if isinstance(result, list) and len(result) > 0:
+            response_text = result[0].get("generated_text", "")
+        elif isinstance(result, dict):
+            response_text = result.get("generated_text", "")
+        else:
+            response_text = str(result)
+        
+        # Extract JSON from markdown code blocks if present
+        response_text = response_text.strip()
+        if "```json" in response_text:
+            response_text = response_text.split("```json")[1].split("```")[0].strip()
+        elif "```" in response_text:
+            response_text = response_text.split("```")[1].split("```")[0].strip()
+        
+        diagnosis = json.loads(response_text)
+        diagnosis["provider"] = f"huggingface/{model_name.split('/')[-1]}"
+        return diagnosis
+        
+    except Exception as e:
+        print(f"⚠️ Error with HuggingFace {model_name}: {e}")
+        return None
+
+
 async def get_ai_diagnosis(
     provider: str,
     model: str,
@@ -145,7 +227,7 @@ async def get_ai_diagnosis(
     pubmed_context: str = ""
 ) -> Optional[Dict[str, Any]]:
     """
-    Get diagnosis from a single AI provider
+    Get diagnosis from a single AI provider (kept for compatibility)
     """
     try:
         # Create chat instance
@@ -173,7 +255,6 @@ async def get_ai_diagnosis(
         response = await chat.send_message(message)
         
         # Try to parse JSON response
-        import json
         
         # Extract JSON from markdown code blocks if present
         response_text = response.strip()
