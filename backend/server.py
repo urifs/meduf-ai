@@ -32,6 +32,7 @@ db_name = os.environ.get("DB_NAME", "meduf_ai")
 db = client[db_name]
 users_collection = db.users
 consultations_collection = db.consultations
+usage_stats_collection = db.usage_stats  # Track API usage and costs
 
 # --- Security ---
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
