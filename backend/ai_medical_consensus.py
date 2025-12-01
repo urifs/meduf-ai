@@ -609,8 +609,3 @@ Substância: {substance}
             "conduct": ["Contatar Centro de Toxicologia"],
             "protocol": "Erro ao processar protocolo"
         }
-
-                "procedures": []
-            },
-            "medications": []
-        }
