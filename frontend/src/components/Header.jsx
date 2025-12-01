@@ -18,22 +18,11 @@ export const Header = () => {
   const userExpiration = localStorage.getItem('userExpiration');
   const userAvatar = localStorage.getItem('userAvatar');
   const [timeLeft, setTimeLeft] = useState(null);
-
-  // Mock Outbreak Data (In a real app, this would fetch from an external API daily)
-  const outbreaks = {
-    brazil: [
-      { state: "Minas Gerais", disease: "Dengue", level: "Alto", date: "Hoje" },
-      { state: "São Paulo", disease: "Dengue", level: "Alto", date: "Hoje" },
-      { state: "Rio de Janeiro", disease: "Covid-19 (Nova Variante)", level: "Médio", date: "Ontem" },
-      { state: "Amazonas", disease: "Malária", level: "Médio", date: "2 dias atrás" },
-      { state: "Rio Grande do Sul", disease: "Influenza", level: "Baixo", date: "3 dias atrás" },
-    ],
-    world: [
-      { country: "Europa", disease: "Sarampo", level: "Médio", date: "Hoje" },
-      { country: "EUA", disease: "Covid-19", level: "Baixo", date: "Ontem" },
-      { country: "África Subsaariana", disease: "Cólera", level: "Alto", date: "Semana passada" },
-    ]
-  };
+  const [outbreaks, setOutbreaks] = useState({
+    brazil: [],
+    world: []
+  });
+  const [alertsLoading, setAlertsLoading] = useState(true);
 
   // Helper to resolve avatar URL
   const getAvatarUrl = (url) => {
@@ -41,6 +30,41 @@ export const Header = () => {
     if (url.startsWith('http')) return url;
     return `${process.env.REACT_APP_BACKEND_URL}${url}`;
   };
+
+  // Fetch real epidemiological alerts
+  useEffect(() => {
+    const fetchAlerts = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/epidemiological-alerts`);
+        if (response.ok) {
+          const data = await response.json();
+          setOutbreaks(data.alerts);
+          console.log('✅ Alertas epidemiológicos atualizados:', data.cache_info);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar alertas:', error);
+        // Fallback to basic data
+        setOutbreaks({
+          brazil: [
+            { state: "São Paulo", disease: "Dengue", level: "Alto", date: "Hoje" },
+            { state: "Rio de Janeiro", disease: "Dengue", level: "Médio", date: "Hoje" }
+          ],
+          world: [
+            { country: "Global", disease: "Monitoramento Ativo", level: "Médio", date: "Hoje" }
+          ]
+        });
+      } finally {
+        setAlertsLoading(false);
+      }
+    };
+
+    fetchAlerts();
+    
+    // Update alerts every hour
+    const interval = setInterval(fetchAlerts, 60 * 60 * 1000); // 1 hour
+    
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (userExpiration) {
