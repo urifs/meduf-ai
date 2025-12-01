@@ -457,15 +457,18 @@ frontend:
 
   - task: "Drug Interaction - Hepatic Impact Section Display"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/pages/DrugInteraction.jsx"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "REFACTORED DRUG INTERACTION TESTING: Need to verify that new hepatic impact section (🫁 Impacto Hepático) displays correctly with specific warnings like 'hepatotoxicidade', 'TGO/TGP' for drug combinations ibuprofeno+varfarina and metformina+enalapril."
+      - working: false
+        agent: "testing"
+        comment: "❌ CANNOT DISPLAY: Hepatic Impact section code exists (lines 462-473) and is correctly implemented to show hepatic_impact from backend, but JavaScript error prevents any results from displaying. Backend returns proper hepatic_impact data but frontend crashes before rendering."
 
   - task: "Drug Interaction - Monitoring Exams Section Display"
     implemented: true
