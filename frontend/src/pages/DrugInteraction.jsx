@@ -415,7 +415,7 @@ const DrugInteraction = () => {
 
                   <Button 
                     type="submit" 
-                    className="w-full bg-gradient-to-r from-primary to-blue-600 hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl mt-4"
+                    className="w-full h-12 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 transition-all duration-300 shadow-lg hover:shadow-xl mt-4 text-white text-base font-semibold"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -424,7 +424,7 @@ const DrugInteraction = () => {
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4" /> Verificar Interações
+                        <CheckCircle2 className="h-5 w-5" /> Verificar Interações
                       </span>
                     )}
                   </Button>
