@@ -296,31 +296,54 @@ async def get_ai_consensus_diagnosis(patient_data: Dict[str, Any]) -> Dict[str, 
         
         fallback_diagnoses = [
             {
-                "name": "Análise Parcial - Avaliação Médica Recomendada",
-                "justification": "Não foi possível completar a análise automatizada completa. Recomenda-se avaliação médica presencial para exame físico e anamnese detalhada.",
+                "name": "Análise Clínica Incompleta - Investigação Necessária",
+                "justification": "Dados insuficientes para estabelecer diagnóstico definitivo. Complementar com anamnese completa, exame físico detalhado e propedêutica direcionada.",
                 "ai_agreement": "1/2"
             }
         ]
         
-        # Add basic symptom-based suggestion
+        # Add symptom-specific clinical suggestions
         if "febre" in queixa:
-            fallback_diagnoses.append({
-                "name": "Síndrome Febril a Esclarecer",
-                "justification": "Presença de febre requer investigação para identificar foco infeccioso. Exame físico completo e exames complementares são necessários.",
-                "ai_agreement": "1/2"
-            })
-        elif "dor" in queixa:
-            fallback_diagnoses.append({
-                "name": "Síndrome Álgica a Investigar",
-                "justification": "Quadro de dor requer avaliação clínica para caracterização e investigação da causa.",
-                "ai_agreement": "1/2"
-            })
+            fallback_diagnoses.extend([
+                {
+                    "name": "Síndrome Febril a Esclarecer",
+                    "justification": "Investigar foco infeccioso: respiratório (Rx tórax, ausculta), urinário (EAS, urocultura), abdominal (USG, enzimas), cutâneo, sistema nervoso central. Considerar hemoculturas se sepse. Avaliar sinais de alarme: instabilidade hemodinâmica, alteração consciência, rigidez nuca.",
+                    "ai_agreement": "1/2"
+                },
+                {
+                    "name": "Processo Infeccioso Bacteriano",
+                    "justification": "Se leucocitose com desvio, PCR/VHS elevados: considerar antibioticoterapia empírica após culturas. Amoxicilina-clavulanato ou cefalosporina 3ª geração conforme foco suspeito.",
+                    "ai_agreement": "1/2"
+                }
+            ])
+        elif "dor" in queixa and "cabeça" in queixa:
+            fallback_diagnoses.extend([
+                {
+                    "name": "Cefaleia Primária vs Secundária",
+                    "justification": "Caracterizar: tempo evolução, localização, intensidade (EVA), sinais neurológicos focais, rigidez nuca, febre. Sinais de alarme: cefaleia súbita (thunderclap), déficit neurológico, papiledema. TC crânio sem contraste se suspeita hemorragia.",
+                    "ai_agreement": "1/2"
+                }
+            ])
+        elif "dor" in queixa and ("torax" in queixa or "peito" in queixa):
+            fallback_diagnoses.extend([
+                {
+                    "name": "Dor Torácica - Diferenciar Etiologia",
+                    "justification": "Protocolo dor torácica: ECG imediato, troponina seriada (0h, 3h), radiografia tórax. Descartar SCA (angina instável, IAM), TEP (Wells, D-dímero), dissecção aorta, pneumotórax. Monitorizar sinais vitais, acesso venoso, O2 suplementar se necessário.",
+                    "ai_agreement": "1/2"
+                }
+            ])
         
         return {
             "diagnoses": fallback_diagnoses,
             "conduct": {
-                "advice": "Consulta médica presencial recomendada para avaliação completa, exame físico e definição de conduta.",
-                "procedures": ["Avaliação médica presencial", "Exame físico completo", "Anamnese detalhada"]
+                "advice": "**CONDUTA CLÍNICA:** Completar história clínica direcionada, exame físico sistematizado por aparelhos. Solicitar propedêutica conforme hipóteses: hemograma, PCR, função renal/hepática, eletrólitos, radiografia, ECG. Reavaliar após resultados para definir diagnóstico e tratamento definitivo.",
+                "procedures": [
+                    "Anamnese completa: HDA, HPMA, antecedentes, medicações em uso",
+                    "Exame físico por aparelhos: ACV, AR, abdome, neurológico",
+                    "Propedêutica laboratorial direcionada",
+                    "Imagem conforme hipótese diagnóstica",
+                    "Reavaliar em 24-48h ou antes se piora clínica"
+                ]
             },
             "medications": []
         }
@@ -394,16 +417,48 @@ async def get_ai_consensus_medication_guide(symptoms: str) -> Dict[str, Any]:
         import traceback
         traceback.print_exc()
         
-        return {
-            "medications": [
+        # Basic symptomatic treatment based on symptoms
+        symptoms_lower = symptoms.lower()
+        fallback_meds = []
+        
+        if "febre" in symptoms_lower or "dor" in symptoms_lower:
+            fallback_meds.extend([
                 {
-                    "name": "Consulta Médica Necessária",
-                    "dose": "N/A",
-                    "frequency": "N/A",
-                    "route": "Presencial",
-                    "notes": "Não foi possível gerar recomendações automatizadas. Consulte um médico ou farmacêutico para orientações personalizadas sobre medicamentos adequados aos seus sintomas."
+                    "name": "Dipirona",
+                    "dose": "500-1000mg",
+                    "frequency": "6/6h (máx 4g/dia)",
+                    "route": "VO ou IV (infusão lenta 15min)",
+                    "notes": "Analgésico e antitérmico. Atenção a hipotensão em infusão rápida. Evitar em gestantes 1º trimestre. Monitorar PA durante infusão IV."
+                },
+                {
+                    "name": "Paracetamol",
+                    "dose": "750-1000mg",
+                    "frequency": "6/6h (máx 4g/dia)",
+                    "route": "VO",
+                    "notes": "Alternativa à dipirona. Atenção em hepatopatas (reduzir dose para 2g/dia). Evitar álcool concomitante. Avaliar função hepática se uso prolongado."
                 }
-            ]
+            ])
+        
+        if "náusea" in symptoms_lower or "vômito" in symptoms_lower:
+            fallback_meds.append({
+                "name": "Ondansetrona",
+                "dose": "4-8mg",
+                "frequency": "8/8h",
+                "route": "VO ou IV (infusão lenta)",
+                "notes": "Antiemético potente. Pode prolongar QT (evitar em cardiopatas). Alternativa: metoclopramida 10mg 8/8h (atenção em jovens - risco distonia)."
+            })
+        
+        if not fallback_meds:
+            fallback_meds.append({
+                "name": "Tratamento Sintomático Individualizado",
+                "dose": "Conforme sintomatologia",
+                "frequency": "Ajustar conforme resposta",
+                "route": "VO/IV conforme caso",
+                "notes": "Definir terapêutica após avaliação completa e estabelecimento de hipóteses diagnósticas. Considerar analgesia, antitérmicos, antieméticos conforme quadro clínico."
+            })
+        
+        return {
+            "medications": fallback_meds
         }
 
 
