@@ -156,7 +156,7 @@ Por favor, forneça alertas epidemiológicos REAIS e ATUALIZADOS para:
 
 
 def get_cache_info() -> Dict[str, Any]:
-    """Get information about the cache status"""
+    """Get information about the cache status (1 hour updates)"""
     if not _alerts_cache["last_updated"]:
         return {"cached": False, "last_updated": None}
     
