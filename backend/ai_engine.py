@@ -531,10 +531,84 @@ def get_medication_guide(symptoms: str) -> List[MedicationItem]:
         ]
 
 
+def get_drug_organ_impact(drug_name: str) -> Dict[str, str]:
+    """Get renal and hepatic impact information for a drug"""
+    drug = normalize_text(drug_name)
+    
+    # Database of common drug impacts on organs
+    drug_impacts = {
+        # Antibiotics
+        "gentamicina": {"renal": "ALTA nefrotoxicidade (tubular renal). Risco de IRA.", "hepatic": "Baixo impacto hepático."},
+        "vancomicina": {"renal": "Nefrotoxicidade moderada. Monitorar creatinina.", "hepatic": "Baixo impacto hepático."},
+        "amicacina": {"renal": "ALTA nefrotoxicidade. Ajustar dose pela TFG.", "hepatic": "Mínimo impacto hepático."},
+        
+        # NSAIDs
+        "ibuprofeno": {"renal": "Pode causar IRA em doses altas. Reduz TFG. Evitar em IRC.", "hepatic": "Hepatotoxicidade rara, mas possível."},
+        "diclofenaco": {"renal": "Nefrotoxicidade dose-dependente. Risco de IRA.", "hepatic": "HEPATOTOXICIDADE significativa. Monitorar TGO/TGP."},
+        "nimesulida": {"renal": "Moderada nefrotoxicidade.", "hepatic": "ALTO risco de hepatite medicamentosa."},
+        "aine": {"renal": "Classe: redução da TFG, risco de IRA.", "hepatic": "Hepatotoxicidade variável por droga."},
+        
+        # Analgesics
+        "paracetamol": {"renal": "Nefrotoxicidade em overdose crônica.", "hepatic": "HEPATOTOXICIDADE grave em overdose (>4g/dia). Necrose hepática."},
+        "dipirona": {"renal": "Baixo impacto renal.", "hepatic": "Baixo impacto hepático."},
+        
+        # Anticoagulants
+        "varfarina": {"renal": "Ajustar dose em IRC moderada/grave.", "hepatic": "Metabolização hepática. Risco de sangramento se disfunção."},
+        "heparina": {"renal": "Segura em IRC.", "hepatic": "Não requer ajuste hepático."},
+        
+        # Cardiovascular
+        "enalapril": {"renal": "Pode piorar função renal em estenose bilateral. Monitorar creatinina.", "hepatic": "Baixo impacto hepático."},
+        "losartana": {"renal": "Reduz pressão glomerular. Monitorar K+ e creatinina.", "hepatic": "Metabolização hepática. Ajustar em cirrose."},
+        "espironolactona": {"renal": "CONTRAINDICADO se TFG < 30. Risco de hipercalemia.", "hepatic": "Usar com cautela em cirrose."},
+        "furosemida": {"renal": "Pode causar azotemia pré-renal se hipovolemia.", "hepatic": "Usar com cautela em cirrose (risco de encefalopatia)."},
+        "hidroclorotiazida": {"renal": "Ineficaz se TFG < 30. Ajustar dose.", "hepatic": "Pode precipitar encefalopatia hepática."},
+        
+        # Statins
+        "atorvastatina": {"renal": "Segura em IRC. Não requer ajuste.", "hepatic": "HEPATOTOXICIDADE. Monitorar TGO/TGP. Contraindicado em hepatopatia ativa."},
+        "sinvastatina": {"renal": "Segura em IRC leve/moderada.", "hepatic": "HEPATOTOXICIDADE. Monitorar transaminases."},
+        "rosuvastatina": {"renal": "Ajustar dose se TFG < 30.", "hepatic": "HEPATOTOXICIDADE. Contraindicado em cirrose."},
+        
+        # Antidiabetics
+        "metformina": {"renal": "CONTRAINDICADO se TFG < 30. Risco de acidose láctica.", "hepatic": "Contraindicado em insuficiência hepática."},
+        "glibenclamida": {"renal": "Risco de hipoglicemia prolongada em IRC. Evitar.", "hepatic": "Metabolização hepática. Ajustar dose."},
+        
+        # Antibiotics
+        "ciprofloxacino": {"renal": "Ajustar dose se TFG < 30.", "hepatic": "Hepatotoxicidade rara."},
+        "azitromicina": {"renal": "Segura em IRC.", "hepatic": "Hepatotoxicidade rara mas possível."},
+        "amoxicilina": {"renal": "Ajustar dose se TFG < 30.", "hepatic": "Hepatite colestática rara (especialmente com clavulanato)."},
+        
+        # Anticonvulsants
+        "fenitoina": {"renal": "Ajustar em IRC avançada.", "hepatic": "HEPATOTOXICIDADE. Monitorar níveis e função hepática."},
+        "carbamazepina": {"renal": "Hiponatremia em IRC.", "hepatic": "HEPATOTOXICIDADE. Monitorar TGO/TGP."},
+        "valproato": {"renal": "Seguro em IRC.", "hepatic": "HEPATOTOXICIDADE grave (rara). Monitorar amônia."},
+        
+        # Psychiatric
+        "fluoxetina": {"renal": "Segura em IRC leve/moderada.", "hepatic": "Metabolização hepática. Ajustar em cirrose."},
+        "sertralina": {"renal": "Segura em IRC.", "hepatic": "Ajustar dose em hepatopatia."},
+        
+        # Immunosuppressants
+        "ciclosporina": {"renal": "ALTA nefrotoxicidade. Fibrose intersticial.", "hepatic": "Hepatotoxicidade. Monitorar níveis e função hepática."},
+        "tacrolimus": {"renal": "NEFROTOXICIDADE significativa.", "hepatic": "Hepatotoxicidade. Monitorar níveis."},
+        
+        # Others
+        "omeprazol": {"renal": "Nefrite intersticial (rara). Seguro geralmente.", "hepatic": "Metabolização hepática. Geralmente seguro."},
+        "ranitidina": {"renal": "Ajustar dose se TFG < 50.", "hepatic": "Hepatotoxicidade rara."},
+    }
+    
+    return drug_impacts.get(drug, {
+        "renal": "Impacto renal não catalogado. Consultar bula/Micromedex.",
+        "hepatic": "Impacto hepático não catalogado. Consultar bula/Micromedex."
+    })
+
+
 def analyze_drug_interaction(drug1: str, drug2: str) -> InteractionResult:
-    """Check interactions between two drugs"""
+    """Check interactions between two drugs + renal and hepatic impact"""
     d1 = normalize_text(drug1)
     d2 = normalize_text(drug2)
+    
+    # Get organ impact for both drugs
+    drug1_impact = get_drug_organ_impact(d1)
+    drug2_impact = get_drug_organ_impact(d2)
     
     # Known dangerous interactions
     if (("varfarina" in d1 or "warfarin" in d1) and ("aine" in d2 or "aspirina" in d2 or "ibuprofeno" in d2)) or \
