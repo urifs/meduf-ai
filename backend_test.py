@@ -219,9 +219,9 @@ class BackendTester:
         """Test consensus toxicology endpoint"""
         print(f"\n☠️ Testing Consensus Toxicology...")
         
-        # Test data from review request
+        # Test data from review request - Toxicologia
         test_data = {
-            "substance": "paracetamol"
+            "substance": "Paracetamol overdose"
         }
         
         start_time = time.time()
