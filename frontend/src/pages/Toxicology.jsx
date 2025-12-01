@@ -130,27 +130,35 @@ const Toxicology = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-rose-50 to-pink-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 relative">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-10 right-10 w-96 h-96 bg-rose-400/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-10 left-10 w-80 h-80 bg-pink-400/10 rounded-full blur-3xl animate-float" style={{animationDelay: '1.5s'}}></div>
+      </div>
+
       <Header />
-      <main className="container mx-auto px-4 py-8 md:px-8">
+      <main className="container mx-auto px-4 py-8 md:px-8 relative z-10">
         <Button 
           variant="ghost" 
-          className="mb-6 pl-0 hover:pl-2 transition-all" 
+          className="mb-6 pl-0 hover:pl-2 transition-all group animate-fade-in-up" 
           onClick={() => navigate('/')}
         >
-          <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Seleção
+          <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" /> Voltar para Seleção
         </Button>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Input Section */}
-          <div className="lg:col-span-5 xl:col-span-4 space-y-6">
-            <Card className="h-full border-none shadow-md bg-card/50 backdrop-blur-sm">
+          <div className="lg:col-span-5 xl:col-span-4 space-y-6 animate-slide-in-left">
+            <Card className="h-full glass-card border-2 border-rose-200 shadow-xl hover:shadow-2xl transition-all duration-500">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl text-primary">
-                  <Skull className="h-5 w-5" />
-                  Toxicologia
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 text-white">
+                    <Skull className="h-5 w-5" />
+                  </div>
+                  <span className="bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">Toxicologia</span>
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-base">
                   Informe a substância ingerida ou o quadro clínico para obter o protocolo de desintoxicação.
                 </CardDescription>
               </CardHeader>
