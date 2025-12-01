@@ -453,8 +453,8 @@ Medicamento 2: {drug2}
         return {
             "severity": consensus_severity,
             "summary": valid_responses[0].get("summary", ""),
-            "details": "\n\n".join([f"[IA {i+1}] {r.get('details', '')}" for i, r in enumerate(valid_responses[:2])]),
-            "recommendations": "\n\n".join([f"[IA {i+1}] {r.get('recommendations', '')}" for i, r in enumerate(valid_responses[:2])]),
+            "details": "\n\n".join([r.get('details', '') for r in valid_responses[:2]]),
+            "recommendations": "\n\n".join([r.get('recommendations', '') for r in valid_responses[:2]]),
             "renal_impact": valid_responses[0].get("renal_impact", "Não disponível"),
             "hepatic_impact": valid_responses[0].get("hepatic_impact", "Não disponível"),
             "monitoring": {
@@ -548,7 +548,7 @@ Substância: {substance}
             "antidote": valid_responses[0].get("antidote", "Suporte clínico"),
             "mechanism": valid_responses[0].get("mechanism", ""),
             "conduct": list(set(all_conduct))[:6],  # Unique, top 6
-            "protocol": "\n\n".join([f"[IA {i+1}] {r.get('protocol', '')}" for i, r in enumerate(valid_responses[:2])])
+            "protocol": "\n\n".join([r.get('protocol', '') for r in valid_responses[:2]])
         }
         
     except Exception as e:
