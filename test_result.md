@@ -544,3 +544,41 @@ agent_communication:
     message: "DRUG INTERACTION REFACTORED WITH RENAL/HEPATIC IMPACT: Successfully upgraded Drug Interaction module to show detailed renal and hepatic impact information plus monitoring exams. Backend now provides comprehensive organ impact analysis through /api/ai/drug-interaction endpoint. Need comprehensive testing to verify new renal/hepatic sections are displaying correctly with specific test cases: ibuprofeno+varfarina (GRAVE) and metformina+enalapril (moderate)."
   - agent: "testing"
     message: "CRITICAL DRUG INTERACTION JAVASCRIPT ERROR FOUND: Comprehensive testing revealed critical frontend bug preventing all Drug Interaction results from displaying. Backend API integration working perfectly (Status: 200) and returns correct data structure with severity, renal_impact, hepatic_impact, and monitoring fields. However, frontend crashes with 'Cannot read properties of undefined (reading 'map')' because code expects 'result.interactions' array (old system) but backend returns individual fields (new system). All new renal/hepatic impact sections (lines 448-518) are correctly implemented but never display due to JavaScript error on line 520+. URGENT FIX NEEDED: Remove or fix lines 520-565 that try to map over undefined 'result.interactions' array."
+---
+## MAJOR FIX - 01 Dec 2025
+
+### Issue: Infinite Loading Fixed ✅
+**Problem:** All consensus features were hanging infinitely due to synchronous AI calls blocking the server.
+
+**Root Cause:** The AI consensus endpoints were making long-running calls to 3 AIs + PubMed (30-60s) synchronously, causing HTTP timeouts.
+
+**Solution Implemented:**
+1. **Backend - Background Task System**
+   - Created `/app/backend/task_manager.py` with async task management
+   - Modified all `/api/ai/consensus/*` endpoints to return `task_id` immediately
+   - Created `/api/ai/tasks/{task_id}` polling endpoint
+   - Background tasks process AI calls without blocking the server
+
+2. **Frontend - Polling Integration**
+   - Created `/app/frontend/src/lib/aiPolling.js` utility for polling
+   - Updated all pages to use polling:
+     - `Dashboard.jsx` (Detailed Diagnosis)
+     - `SimpleDashboard.jsx` (Simple Diagnosis)
+     - `MedicationGuide.jsx`
+     - `DrugInteraction.jsx`
+     - `Toxicology.jsx`
+   - Added progress feedback with toast notifications
+
+**Testing Results:**
+- ✅ Backend task system working - tasks complete in 40s with 2/3 AI responses
+- ✅ Polling system functional - status updates every 2s
+- ✅ Frontend responsive - no more infinite loading
+- ✅ All consensus features now operational
+
+**Files Modified:**
+- `/app/backend/task_manager.py` (NEW)
+- `/app/backend/server.py` (Task integration)
+- `/app/frontend/src/lib/aiPolling.js` (NEW)
+- `/app/frontend/src/pages/*.jsx` (5 files updated)
+
+**Status:** RESOLVED ✅
