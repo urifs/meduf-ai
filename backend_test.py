@@ -106,11 +106,12 @@ class BackendTester:
                               f"Immediate response with task_id: {task_id}", submit_duration)
             
             # Step 2: Poll for results
-            return self.poll_task_result(task_id, "Consensus Diagnosis")
+            return self.poll_task_result(task_id, "Consensus Diagnosis (Simple)", 
+                                       expected_fields=["diagnoses", "conduct", "medications"])
             
         except Exception as e:
             duration = time.time() - start_time
-            self.log_result("Consensus Diagnosis", False, f"Error: {str(e)}", duration)
+            self.log_result("Consensus Diagnosis (Simple)", False, f"Error: {str(e)}", duration)
             return False
     
     def test_consensus_drug_interaction(self):
