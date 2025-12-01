@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Header } from '@/components/Header';
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import { Pill, Sparkles, ArrowLeft, Syringe, Download, Copy } from 'lucide-react';
+import { Pill, ArrowLeft, Syringe, Download, Copy } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import api from '@/lib/api';
 import html2canvas from 'html2canvas';
 import { startAITask } from '@/lib/aiPolling';
+import '../styles/animations.css';
 
 const MedicationGuide = () => {
   const navigate = useNavigate();
@@ -31,18 +32,16 @@ const MedicationGuide = () => {
 
     setIsLoading(true);
     setResult(null);
-    setProgress(10); // Start with 10% immediately
+    setProgress(10);
 
     try {
-      // Simulate smooth progress animation
       const progressInterval = setInterval(() => {
         setProgress(prev => {
-          if (prev >= 85) return prev; // Cap at 85% until real completion
-          return prev + 5; // Increment by 5% every 1.5 seconds
+          if (prev >= 85) return prev;
+          return prev + 5;
         });
       }, 1500);
 
-      // Call AI Consensus Engine with polling
       const aiMedications = await startAITask(
         '/ai/consensus/medication-guide',
         { symptoms: symptoms },
@@ -53,13 +52,9 @@ const MedicationGuide = () => {
         }
       );
       
-      // Clear interval and set to 100%
       clearInterval(progressInterval);
       setProgress(100);
 
-      // Removed malformed mock code
-
-      // Save to consultation history
       try {
         await api.post('/consultations', {
           patient: { queixa: `[Guia Terapêutico] ${symptoms}`, idade: "N/I", sexo: "N/I" },
@@ -110,7 +105,7 @@ const MedicationGuide = () => {
     
     try {
       const canvas = await html2canvas(reportRef.current, {
-        scale: 2, // Higher quality
+        scale: 2,
         backgroundColor: "#ffffff",
         useCORS: true
       });
@@ -129,38 +124,46 @@ const MedicationGuide = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50 to-teal-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 relative">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-10 right-10 w-96 h-96 bg-emerald-400/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-10 left-10 w-80 h-80 bg-teal-400/10 rounded-full blur-3xl animate-float" style={{animationDelay: '1s'}}></div>
+      </div>
+
       <Header />
-      <main className="container mx-auto px-4 py-8 md:px-8">
+      <main className="container mx-auto px-4 py-8 md:px-8 relative z-10">
         <Button 
           variant="ghost" 
-          className="mb-6 pl-0 hover:pl-2 transition-all" 
+          className="mb-6 pl-0 hover:pl-2 transition-all group animate-fade-in-up" 
           onClick={() => navigate('/')}
         >
-          <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Seleção
+          <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" /> Voltar para Seleção
         </Button>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Input Section */}
-          <div className="lg:col-span-5 xl:col-span-4 space-y-6">
-            <Card className="h-full border-none shadow-md bg-card/50 backdrop-blur-sm">
+          <div className="lg:col-span-5 xl:col-span-4 space-y-6 animate-slide-in-left">
+            <Card className="h-full glass-card border-2 border-emerald-200 shadow-xl hover:shadow-2xl transition-all duration-500">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl text-primary">
-                  <Syringe className="h-5 w-5" />
-                  Guia Terapêutico
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
+                    <Syringe className="h-5 w-5" />
+                  </div>
+                  <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Guia Terapêutico</span>
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-base">
                   Descreva os sintomas para receber sugestões de prescrição detalhadas.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleAnalyze} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="symptoms">Sintomas / Quadro Clínico</Label>
+                    <Label htmlFor="symptoms" className="text-sm font-bold">Sintomas / Quadro Clínico</Label>
                     <Textarea 
                       id="symptoms" 
                       placeholder="Ex: Dor lombar aguda intensa, náuseas..." 
-                      className="min-h-[300px] resize-none text-base leading-relaxed"
+                      className="min-h-[300px] resize-none text-base leading-relaxed border-2 border-emerald-100 focus:border-emerald-400 transition-colors"
                       value={symptoms}
                       onChange={(e) => setSymptoms(e.target.value)}
                     />
@@ -168,7 +171,7 @@ const MedicationGuide = () => {
 
                   <Button 
                     type="submit" 
-                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl text-white"
+                    className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 transition-all duration-300 shadow-lg hover:shadow-xl text-white text-base font-semibold"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -177,7 +180,7 @@ const MedicationGuide = () => {
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
-                        <Pill className="h-4 w-4" /> Gerar Prescrição
+                        <Pill className="h-5 w-5" /> Gerar Prescrição
                       </span>
                     )}
                   </Button>
@@ -187,52 +190,56 @@ const MedicationGuide = () => {
           </div>
 
           {/* Output Section */}
-          <div className="lg:col-span-7 xl:col-span-8">
+          <div className="lg:col-span-7 xl:col-span-8 animate-slide-in-right">
             {isLoading && progress > 0 && (
-              <Card className="mb-4">
+              <Card className="mb-4 glass-card border-2 border-emerald-200 shadow-xl animate-pulse-glow">
                 <CardContent className="pt-6">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                      <span>🔬 Analisando com IA e banco de dados PubMed...</span>
-                      <span className="font-medium">{progress}%</span>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm font-medium">
+                      <span className="flex items-center gap-2 text-emerald-700">
+                        <span className="animate-spin">🔬</span>
+                        Analisando com IA e banco de dados PubMed...
+                      </span>
+                      <span className="font-bold text-emerald-600">{progress}%</span>
                     </div>
-                    <Progress value={progress} className="h-2" />
+                    <Progress value={progress} className="h-3 bg-emerald-100 [&>div]:bg-gradient-to-r [&>div]:from-emerald-500 [&>div]:to-teal-600 shadow-lg" />
                   </div>
                 </CardContent>
               </Card>
             )}
             {result ? (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+              <div className="space-y-6 animate-scale-in">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                    <Pill className="h-6 w-6 text-green-600" /> Sugestão Terapêutica
+                  <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+                    <Pill className="h-6 w-6 text-emerald-600" /> 
+                    <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Sugestão Terapêutica</span>
                   </h2>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={copyToClipboard} className="gap-2">
+                    <Button variant="outline" size="sm" onClick={copyToClipboard} className="gap-2 hover:bg-emerald-50">
                       <Copy className="h-4 w-4" /> Copiar
                     </Button>
-                    <Button variant="default" size="sm" onClick={handleSaveImage} className="gap-2">
+                    <Button variant="default" size="sm" onClick={handleSaveImage} className="gap-2 bg-gradient-to-r from-emerald-600 to-teal-600">
                       <Download className="h-4 w-4" /> Salvar Imagem
                     </Button>
                   </div>
                 </div>
                 
-                <div ref={reportRef} className="space-y-4 p-4 bg-white rounded-lg">
+                <div ref={reportRef} className="space-y-4 p-6 bg-white rounded-xl shadow-lg">
                   <div className="grid gap-4">
                     {result.map((med, index) => (
-                      <Card key={index} className="border-l-4 border-l-green-500 shadow-sm overflow-hidden">
+                      <Card key={index} className="border-l-4 border-l-emerald-500 shadow-md hover:shadow-xl transition-all duration-300 interactive-card">
                         <CardContent className="pt-6">
                           <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
                             <div>
-                              <h3 className="text-lg font-bold text-green-800 dark:text-green-400">{med.name}</h3>
+                              <h3 className="text-lg font-bold text-emerald-800 dark:text-emerald-400">{med.name}</h3>
                               <p className="text-sm text-muted-foreground mt-1">{med.notes}</p>
                             </div>
-                            <Badge variant="outline" className="w-fit h-fit text-base px-3 py-1 border-green-200 bg-green-50 text-green-700">
+                            <Badge variant="outline" className="w-fit h-fit text-base px-3 py-1 border-emerald-200 bg-emerald-50 text-emerald-700">
                               {med.route}
                             </Badge>
                           </div>
                           
-                          <div className="grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg">
+                          <div className="grid grid-cols-2 gap-4 bg-emerald-50/50 p-4 rounded-lg">
                             <div>
                               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Dose</span>
                               <p className="font-medium text-foreground">{med.dose}</p>
@@ -253,9 +260,9 @@ const MedicationGuide = () => {
                 </div>
               </div>
             ) : (
-              <Card className="h-full border-dashed border-2 flex items-center justify-center bg-muted/20 min-h-[400px]">
+              <Card className="h-full border-dashed border-2 flex items-center justify-center bg-gradient-to-br from-emerald-50/30 to-teal-50/30 min-h-[400px] rounded-xl">
                 <div className="text-center p-8 text-muted-foreground">
-                  <Syringe className="h-16 w-16 mx-auto mb-4 opacity-20" />
+                  <Syringe className="h-16 w-16 mx-auto mb-4 opacity-20 animate-float" />
                   <h3 className="text-lg font-medium">Aguardando Dados</h3>
                   <p className="text-sm max-w-xs mx-auto mt-2">
                     Preencha os sintomas ao lado para receber sugestões de medicamentos, doses e vias de administração.
