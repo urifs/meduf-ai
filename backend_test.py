@@ -64,14 +64,14 @@ class BackendTester:
             self.log_result("Authentication", False, f"Login error: {str(e)}", duration)
             return False
     
-    def test_consensus_diagnosis(self):
-        """Test consensus diagnosis endpoint"""
-        print(f"\n🧠 Testing Consensus Diagnosis...")
+    def test_consensus_diagnosis_simple(self):
+        """Test consensus diagnosis endpoint - Simple case"""
+        print(f"\n🧠 Testing Consensus Diagnosis (Simple)...")
         
-        # Test data from review request
+        # Test data from review request - Diagnóstico Simples
         test_data = {
-            "queixa": "febre e tosse",
-            "idade": "30", 
+            "queixa": "Dor de cabeça intensa há 3 dias",
+            "idade": "35", 
             "sexo": "M"
         }
         
