@@ -198,7 +198,7 @@ const MedicationGuide = () => {
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm font-medium">
                       <span className="flex items-center gap-2 text-emerald-700">
-                        <span className="animate-spin">🔬</span>
+                        <CustomLoader size="sm" className="text-emerald-600" />
                         Analisando com IA e banco de dados PubMed...
                       </span>
                       <span className="font-bold text-emerald-600">{progress}%</span>
