@@ -212,6 +212,14 @@ const MedicationGuide = () => {
                     <strong>Atenção:</strong> Estas são sugestões baseadas em protocolos padrão. Verifique sempre alergias, contraindicações e interações medicamentosas antes de prescrever.
                   </div>
                 </div>
+
+                {/* ResultActions Component */}
+                <ResultActions 
+                  resultRef={reportRef}
+                  resultData={result}
+                  analysisType="medication-guide"
+                  fileName={`guia-terapeutico-${new Date().toISOString().slice(0,10)}.png`}
+                />
               </div>
             ) : (
               <Card className="h-full border-dashed border-2 flex items-center justify-center bg-gradient-to-br from-emerald-50/30 to-teal-50/30 min-h-[400px] rounded-xl">
