@@ -480,7 +480,7 @@ const DrugInteraction = () => {
                             <div className="grid md:grid-cols-3 gap-4">
                               {result.monitoring.renal.length > 0 && (
                                 <div className="bg-white p-3 rounded border border-amber-100">
-                                  <span className="text-xs font-bold text-amber-800 block mb-2">🫘 Função Renal</span>
+                                  <span className="text-xs font-bold text-amber-800 block mb-2">Função Renal</span>
                                   <ul className="text-xs text-amber-900 space-y-1">
                                     {result.monitoring.renal.map((exam, i) => (
                                       <li key={i}>• {exam}</li>
