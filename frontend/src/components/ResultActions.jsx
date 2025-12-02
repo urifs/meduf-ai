@@ -145,18 +145,36 @@ export const ResultActions = ({
             <Button
               onClick={() => handleFeedback(true)}
               variant="outline"
-              className="gap-2 hover:bg-green-50 hover:text-green-700 hover:border-green-300 dark:hover:bg-green-900/20"
+              disabled={isSubmittingFeedback}
+              className={`gap-2 transition-all duration-300 ${
+                feedbackType === 'helpful' 
+                  ? 'bg-green-100 text-green-700 border-green-400 dark:bg-green-900/40 scale-105' 
+                  : 'hover:bg-green-50 hover:text-green-700 hover:border-green-300 dark:hover:bg-green-900/20'
+              }`}
             >
-              <ThumbsUp className="h-4 w-4" />
+              {feedbackType === 'helpful' ? (
+                <Check className="h-4 w-4 animate-in zoom-in duration-300" />
+              ) : (
+                <ThumbsUp className="h-4 w-4" />
+              )}
               Sim, me ajudou
             </Button>
 
             <Button
               onClick={() => handleFeedback(false)}
               variant="outline"
-              className="gap-2 hover:bg-red-50 hover:text-red-700 hover:border-red-300 dark:hover:bg-red-900/20"
+              disabled={isSubmittingFeedback}
+              className={`gap-2 transition-all duration-300 ${
+                feedbackType === 'not-helpful' 
+                  ? 'bg-red-100 text-red-700 border-red-400 dark:bg-red-900/40 scale-105' 
+                  : 'hover:bg-red-50 hover:text-red-700 hover:border-red-300 dark:hover:bg-red-900/20'
+              }`}
             >
-              <ThumbsDown className="h-4 w-4" />
+              {feedbackType === 'not-helpful' ? (
+                <Check className="h-4 w-4 animate-in zoom-in duration-300" />
+              ) : (
+                <ThumbsDown className="h-4 w-4" />
+              )}
               Não me ajudou
             </Button>
           </div>
