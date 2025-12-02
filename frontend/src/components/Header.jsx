@@ -14,6 +14,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 export const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { theme, toggleTheme, isDark } = useTheme();
   const userName = localStorage.getItem('userName') || 'Dr. Silva';
   const userRole = localStorage.getItem('userRole');
   const userExpiration = localStorage.getItem('userExpiration');
