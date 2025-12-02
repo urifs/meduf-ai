@@ -295,7 +295,7 @@ const ExamReader = () => {
                 >
                   {isAnalyzing ? (
                     <>
-                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                      <CustomLoader className="mr-2" />
                       Analisando...
                     </>
                   ) : (
