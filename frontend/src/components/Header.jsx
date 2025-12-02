@@ -272,6 +272,26 @@ export const Header = () => {
                   )}
                 </nav>
 
+                {/* Theme Toggle */}
+                <div className="px-4 py-2">
+                  <button
+                    onClick={toggleTheme}
+                    className="flex items-center gap-2 w-full px-4 py-3 rounded-md transition-colors hover:bg-muted text-foreground/80"
+                  >
+                    {isDark ? (
+                      <>
+                        <Sun className="h-4 w-4" />
+                        Modo Claro
+                      </>
+                    ) : (
+                      <>
+                        <Moon className="h-4 w-4" />
+                        Modo Escuro
+                      </>
+                    )}
+                  </button>
+                </div>
+
                 {/* Support Button */}
                 <div className="mt-auto pt-4 border-t space-y-2">
                   <a 
