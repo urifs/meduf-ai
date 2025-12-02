@@ -517,11 +517,13 @@ metadata:
   feedback_backend_fixed: true
 
 test_plan:
-  current_focus: []
-  stuck_tasks: []
+  current_focus:
+    - "Exam Reader - Frontend Progress Bar Issue Investigation"
+  stuck_tasks:
+    - "Exam Reader - Frontend Progress Bar Issue Investigation"
   test_all: false
-  test_priority: "completed"
-  test_summary: "FEEDBACK SYSTEM TESTING COMPLETED SUCCESSFULLY - MEDUF AI FEEDBACK AND ACTION BUTTONS: ✅ COMPREHENSIVE TESTING OF ALL 3 SCENARIOS COMPLETED: 1) Feedback Visual nos Botões (Diagnóstico Simples): Login successful, anamnese filled with 'Paciente 35 anos, febre 39°C há 2 dias, dor de garganta intensa', analysis completed, feedback buttons appeared ('Sim, me ajudou' and 'Não me ajudou'), visual feedback working (green color change), success toast displayed ✅ 2) ResultActions em Interação Medicamentosa: Navigation successful, medications added (Varfarina + Aspirina), analysis completed, 'Copiar Resultado' and 'Salvar como Imagem' buttons found, feedback buttons present, 'Não me ajudou' clicked with red visual feedback ✅ 3) Admin Panel - Visualização de Feedbacks: Navigation to /admin successful, '💬 Feedbacks dos Usuários' section found, statistics displayed (Útil/Não útil counts), feedback table with proper headers (Usuário, Tipo de Análise, Feedback, Data, Ações), 2 feedback entries detected with user emails, analysis types, and action buttons ✅. CRITICAL BUG FIXED: Resolved backend error 'UserInDB object has no attribute username' by updating feedback creation to use user.email and user.name. Added missing /api/feedbacks endpoint for admin panel. All feedback functionality now working perfectly with proper visual feedback, success messages, and admin visualization."
+  test_priority: "high_first"
+  test_summary: "EXAM READER TESTING COMPLETED - PROGRESS BAR ISSUE IDENTIFIED: ✅ BACKEND FUNCTIONALITY: All exam reader backend tests passed. Medical image analysis working correctly with Gemini 2.5 Flash, proper task management, and JSON response parsing. Multiple test scenarios completed successfully (simple, complex, concurrent uploads). ❌ FRONTEND PROGRESS ISSUE: Identified root cause of reported '25% stuck' problem. Issue is frontend/backend progress reporting mismatch, not actual backend failure. Frontend uses time-based artificial progress calculation while backend stays at 10% during processing. Users perceive this as stuck progress when frontend shows 25-50% but backend appears frozen at 10%. REQUIRES FRONTEND FIX: Update progress calculation in ExamReader.jsx lines 131-132 to use actual backend progress instead of time-based estimation."
 
 frontend:
   - task: "Toxicology Feature - Backend AI Engine Integration - Paracetamol"
