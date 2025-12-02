@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import Dashboard from "@/pages/Dashboard";
 import SimpleDashboard from "@/pages/SimpleDashboard";
 import MedicationGuide from "@/pages/MedicationGuide";
