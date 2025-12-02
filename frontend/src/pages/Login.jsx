@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Loader2, LogIn, ExternalLink } from 'lucide-react';
+import { LogIn, ExternalLink } from 'lucide-react';
 import api from '@/lib/api';
+import { CustomLoader } from '@/components/ui/custom-loader';
 
 const Login = () => {
   const navigate = useNavigate();
