@@ -347,7 +347,33 @@ Por favor, forneça uma análise INTEGRADA em formato JSON considerando TODAS as
         else:
             # Text only - combine and analyze
             combined_text = "\n\n".join(all_text)
-            return await analyze_exam_image(combined_text, "text/plain", additional_info)
+            result = await analyze_exam_image(combined_text, "text/plain", additional_info)
+        
+        # Save consultation to database if user_id provided
+        if user_id and result:
+            try:
+                from motor.motor_asyncio import AsyncIOMotorClient
+                import os
+                from datetime import datetime
+                
+                mongo_url = os.getenv("MONGO_URL", "mongodb://localhost:27017")
+                client = AsyncIOMotorClient(mongo_url)
+                db = client.meduf_ai
+                
+                consultation_doc = {
+                    "user_id": user_id,
+                    "patient": {"name": "Análise de Exame"},
+                    "report": result,
+                    "type": "exam-analysis",
+                    "created_at": datetime.utcnow()
+                }
+                
+                await db.consultations.insert_one(consultation_doc)
+                print(f"💾 Consulta de exame salva para user {user_id}")
+            except Exception as save_error:
+                print(f"⚠️ Erro ao salvar consulta de exame: {save_error}")
+        
+        return result
         
     except Exception as e:
         print(f"❌ Erro na análise de múltiplas páginas: {e}")
