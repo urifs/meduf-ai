@@ -389,7 +389,8 @@ const ExamReader = () => {
                 <Alert>
                   <Info className="h-4 w-4" />
                   <AlertDescription className="text-xs">
-                    ⚠️ Esta análise é auxiliar e não substitui a avaliação médica profissional.
+                    <AlertTriangle className="h-4 w-4 inline mr-1" />
+                    Esta análise é auxiliar e não substitui a avaliação médica profissional.
                     Sempre consulte um médico para interpretação definitiva.
                   </AlertDescription>
                 </Alert>
