@@ -88,6 +88,11 @@ class Token(BaseModel):
     user_name: str
     user_role: str
     expiration_date: Optional[datetime] = None
+    
+    class Config:
+        json_encoders = {
+            datetime: lambda v: v.isoformat() if v else None
+        }
 
 class ConsultationCreate(BaseModel):
     patient: dict
