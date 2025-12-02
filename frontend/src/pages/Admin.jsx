@@ -687,6 +687,116 @@ const Admin = () => {
 
         </div>
 
+        {/* Feedbacks Section */}
+        <div className="mt-12">
+          <Card className="shadow-lg border-2">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-2xl flex items-center gap-2">
+                    💬 Feedbacks dos Usuários
+                  </CardTitle>
+                  <CardDescription className="mt-2">
+                    Avaliações sobre as análises realizadas pela IA
+                  </CardDescription>
+                </div>
+                {feedbackStats && (
+                  <div className="flex gap-4">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-green-600">{feedbackStats.helpful}</div>
+                      <div className="text-xs text-muted-foreground">👍 Útil</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-red-600">{feedbackStats.notHelpful}</div>
+                      <div className="text-xs text-muted-foreground">👎 Não útil</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-blue-600">
+                        {feedbackStats.total > 0 
+                          ? Math.round((feedbackStats.helpful / feedbackStats.total) * 100) 
+                          : 0}%
+                      </div>
+                      <div className="text-xs text-muted-foreground">Taxa de satisfação</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[180px]">Usuário</TableHead>
+                      <TableHead>Tipo de Análise</TableHead>
+                      <TableHead className="w-[120px] text-center">Feedback</TableHead>
+                      <TableHead className="w-[150px]">Data</TableHead>
+                      <TableHead className="w-[100px] text-center">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {feedbacks.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                          Nenhum feedback registrado ainda.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      feedbacks.map((feedback, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">{feedback.user_email}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline">
+                              {feedback.analysis_type === 'diagnosis' && '🩺 Diagnóstico'}
+                              {feedback.analysis_type === 'simple-diagnosis' && '📋 Diagnóstico Simples'}
+                              {feedback.analysis_type === 'drug-interaction' && '💊 Interação'}
+                              {feedback.analysis_type === 'medication-guide' && '💉 Guia Terapêutico'}
+                              {feedback.analysis_type === 'toxicology' && '☠️ Toxicologia'}
+                              {feedback.analysis_type === 'exam-reader' && '📄 Leitor de Exames'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {feedback.is_helpful ? (
+                              <Badge className="bg-green-100 text-green-700 hover:bg-green-200 border-green-200">
+                                👍 Útil
+                              </Badge>
+                            ) : (
+                              <Badge className="bg-red-100 text-red-700 hover:bg-red-200 border-red-200">
+                                👎 Não útil
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {formatDate(feedback.timestamp)}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                // Set feedback analysis data to show in a dialog
+                                setSelectedConsultation({
+                                  doctor: feedback.user_email,
+                                  date: feedback.timestamp,
+                                  patient: {},
+                                  report: feedback.analysis_data
+                                });
+                                setIsConsultationOpen(true);
+                              }}
+                            >
+                              <FileText className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Expiration Dialog */}
         <Dialog open={isExpirationOpen} onOpenChange={setIsExpirationOpen}>
           <DialogContent>
