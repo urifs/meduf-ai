@@ -294,7 +294,7 @@ export const Header = () => {
                 </div>
 
                 {/* Support Button */}
-                <div className="mt-auto pt-4 border-t space-y-2">
+                <div className="pt-4 border-t space-y-2">
                   <a 
                     href="https://api.whatsapp.com/send/?phone=551152868823&text&type=phone_number&app_absent=0" 
                     target="_blank" 
@@ -315,6 +315,7 @@ export const Header = () => {
                   </Button>
                 </div>
               </div>
+              </ScrollArea>
             </SheetContent>
           </Sheet>
         </div>
