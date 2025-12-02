@@ -302,7 +302,7 @@ export const Header = () => {
                     href="https://api.whatsapp.com/send/?phone=551152868823&text&type=phone_number&app_absent=0" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-3 rounded-md transition-colors hover:bg-green-50 text-green-700 font-medium"
+                    className="flex items-center gap-2 px-4 py-3 rounded-md transition-colors hover:bg-blue-50 text-blue-500 font-medium"
                   >
                     <HelpCircle className="h-4 w-4" />
                     Suporte (WhatsApp)
