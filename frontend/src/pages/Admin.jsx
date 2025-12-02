@@ -872,6 +872,61 @@ const Admin = () => {
           </Card>
         </div>
 
+        {/* Deleted/Expired Users Section */}
+        <div className="mt-12">
+          <Card className="shadow-lg border-2 border-red-100">
+            <CardHeader>
+              <CardTitle className="text-2xl flex items-center gap-2 text-red-700">
+                <Trash2 className="h-6 w-6" />
+                Contas Excluídas (Expiradas)
+              </CardTitle>
+              <CardDescription className="mt-2">
+                Usuários que foram automaticamente removidos após a expiração do tempo de acesso
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border max-h-[500px] overflow-y-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Data de Criação</TableHead>
+                      <TableHead>Data de Expiração</TableHead>
+                      <TableHead>Data de Exclusão</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {deletedUsers.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                          Nenhuma conta excluída ainda.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      deletedUsers.map((user) => (
+                        <TableRow key={user.id} className="bg-red-50/30">
+                          <TableCell className="font-medium">{user.name}</TableCell>
+                          <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                          <TableCell className="text-sm">
+                            {user.created_at ? formatDate(user.created_at) : '-'}
+                          </TableCell>
+                          <TableCell className="text-sm text-red-600">
+                            {user.expiration_date ? formatDate(user.expiration_date) : '-'}
+                          </TableCell>
+                          <TableCell className="text-sm font-semibold text-red-700">
+                            {user.deleted_at ? formatDate(user.deleted_at) : '-'}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Expiration Dialog */}
         <Dialog open={isExpirationOpen} onOpenChange={setIsExpirationOpen}>
           <DialogContent>
