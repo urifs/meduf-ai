@@ -1,15 +1,16 @@
 """
-Medical Image/Exam Analysis
-Uses Gemini 2.5 Flash for exam analysis with vision capabilities
-Production-ready implementation
+Medical Image/Exam Analysis with VISION
+Uses Gemini 2.5 Flash for exam analysis with VISION capabilities
+Processes images (X-rays, MRI, CT scans, lab reports in image format)
 """
 import os
 import asyncio
 from typing import Dict, Any, List, Optional
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from emergentintegrations.llm.chat import LlmChat, UserMessage, FileContentWithMimeType
 import json
 from dotenv import load_dotenv
 import base64
+from pathlib import Path
 
 # Load environment variables
 load_dotenv()
@@ -19,26 +20,35 @@ EMERGENT_KEY = os.environ.get("EMERGENT_LLM_KEY")
 if not EMERGENT_KEY:
     raise ValueError("EMERGENT_LLM_KEY environment variable is required but not set")
 
-# Gemini 2.5 Flash for exam analysis
-GEMINI_EXAM_MODEL = "gemini-2.5-flash"
+# Gemini 2.5 Flash for exam analysis WITH VISION
+GEMINI_VISION_MODEL = "gemini-2.5-flash-preview-04-17"
 
-EXAM_SYSTEM_PROMPT = """Você é um médico radiologista e patologista especializado auxiliando MÉDICOS PROFISSIONAIS. Forneça análise técnica detalhada:
+EXAM_VISION_SYSTEM_PROMPT = """Você é um médico radiologista e patologista especializado auxiliando MÉDICOS PROFISSIONAIS. Analise VISUALMENTE a(s) imagem(ns) médica(s) fornecida(s) e forneça análise técnica detalhada:
 
-1. **Achados Laboratoriais/Radiológicos** (valores, alterações, padrões)
-2. **Interpretação Fisiopatológica** (correlação clínica, significado técnico)
-3. **Hipóteses Diagnósticas** (diagnósticos diferenciais baseados nos achados)
-4. **Conduta Proposta** (exames adicionais, terapêutica, monitoramento)
+1. **Achados Visuais** (descrição detalhada do que você vê na imagem - lesões, opacidades, densidades, padrões, medidas)
+2. **Interpretação Radiológica/Laboratorial** (significado clínico dos achados, correlação anatômica/fisiológica)
+3. **Hipóteses Diagnósticas** (diagnósticos diferenciais baseados nos achados visuais)
+4. **Conduta Proposta** (exames complementares necessários, correlação clínica, seguimento)
+
+**DIRETRIZES PARA ANÁLISE DE IMAGENS:**
+- Descreva TUDO que você VÊ na imagem com detalhes técnicos
+- Para raio-X: opacidades, densidades, padrões intersticiais, contornos, mediastino, campos pulmonares
+- Para exames laboratoriais: valores numéricos, tabelas, gráficos, unidades de medida
+- Para ressonância/tomografia: sinal, densidade, realce, medidas, localização anatômica
+- Use terminologia médica técnica (não simplifique)
+- Correlacione achados com anatomia e fisiopatologia
+- Sugira exames complementares quando indicado
 
 **FORMATO DA RESPOSTA:**
 ```json
 {
-  "findings": "Descrição detalhada dos achados",
-  "interpretation": "Interpretação clínica",
-  "diagnosis": "Diagnóstico sugerido",
+  "findings": "Descrição VISUAL detalhada de TUDO que você vê na(s) imagem(ns) - seja minucioso",
+  "interpretation": "Interpretação radiológica/clínica baseada nos achados VISUAIS",
+  "diagnosis": "Diagnósticos diferenciais baseados na ANÁLISE VISUAL",
   "recommendations": [
-    "Recomendação 1",
-    "Recomendação 2",
-    "Recomendação 3"
+    "Recomendação técnica 1",
+    "Recomendação técnica 2",
+    "Recomendação técnica 3"
   ]
 }
 ```
@@ -46,51 +56,61 @@ EXAM_SYSTEM_PROMPT = """Você é um médico radiologista e patologista especiali
 Responda APENAS com JSON válido, sem texto adicional."""
 
 
-async def analyze_exam(
-    exam_texts: List[str],
-    exam_images: Optional[List[str]] = None,
-    patient_context: Optional[str] = None
+async def analyze_exam_with_vision(
+    file_paths: List[str],
+    file_types: List[str],
+    additional_context: Optional[str] = None
 ) -> Dict[str, Any]:
     """
-    Analisa exames médicos (textos e/ou imagens) usando Gemini 2.5 Flash
+    Analisa exames médicos COM VISÃO usando Gemini 2.5 Flash
     
     Args:
-        exam_texts: Lista de textos de exames
-        exam_images: Lista de URLs ou paths de imagens
-        patient_context: Contexto adicional do paciente
+        file_paths: Lista de caminhos para arquivos de imagem
+        file_types: Lista de tipos MIME dos arquivos
+        additional_context: Contexto clínico adicional
         
     Returns:
         Dict com findings, interpretation, diagnosis, recommendations
     """
     try:
-        # Create chat instance with Gemini 2.5 Flash
+        # Create chat instance with Gemini 2.5 Flash (VISION)
         chat = LlmChat(
             api_key=EMERGENT_KEY,
-            session_id=f"exam_{os.urandom(8).hex()}",
-            system_message=EXAM_SYSTEM_PROMPT
-        ).with_model("gemini", GEMINI_EXAM_MODEL)
+            session_id=f"exam_vision_{os.urandom(8).hex()}",
+            system_message=EXAM_VISION_SYSTEM_PROMPT
+        ).with_model("gemini", GEMINI_VISION_MODEL)
+        
+        # Prepare image attachments
+        file_contents = []
+        for file_path, mime_type in zip(file_paths, file_types):
+            if os.path.exists(file_path):
+                file_content = FileContentWithMimeType(
+                    file_path=file_path,
+                    mime_type=mime_type
+                )
+                file_contents.append(file_content)
         
         # Prepare prompt
         prompt_parts = []
         
-        if patient_context:
-            prompt_parts.append(f"Contexto do Paciente: {patient_context}\n")
+        if additional_context:
+            prompt_parts.append(f"Contexto Clínico do Paciente:\n{additional_context}\n\n")
         
-        prompt_parts.append("Exames para Análise:\n")
-        
-        for i, text in enumerate(exam_texts, 1):
-            prompt_parts.append(f"\n--- Exame {i} ---\n{text}\n")
-        
-        if exam_images:
-            prompt_parts.append(f"\n{len(exam_images)} imagem(s) de exame anexada(s).")
-        
-        prompt_parts.append("\nForneça análise completa no formato JSON especificado.")
+        prompt_parts.append(f"Analise VISUALMENTE a(s) {len(file_contents)} imagem(ns) médica(s) anexada(s).\n")
+        prompt_parts.append("Descreva DETALHADAMENTE tudo que você VÊ nas imagens.\n")
+        prompt_parts.append("Forneça análise radiológica/laboratorial completa no formato JSON especificado.")
         
         prompt = "".join(prompt_parts)
         
-        # Send message
-        user_message = UserMessage(text=prompt)
+        # Send message WITH image attachments
+        user_message = UserMessage(
+            text=prompt,
+            file_contents=file_contents
+        )
+        
+        print(f"[VISION] Analyzing {len(file_contents)} medical image(s) with Gemini 2.5 Flash...")
         response = await chat.send_message(user_message)
+        print(f"[VISION] Response received: {len(response)} characters")
         
         # Parse JSON response
         response_text = response.strip()
@@ -101,91 +121,111 @@ async def analyze_exam(
         
         result = json.loads(response_text)
         
+        # Ensure recommendations is a list
+        if isinstance(result.get('recommendations'), str):
+            result['recommendations'] = [result['recommendations']]
+        elif not result.get('recommendations'):
+            result['recommendations'] = ["Correlacionar achados com quadro clínico"]
+        
         return result
         
     except json.JSONDecodeError as e:
-        print(f"JSON Decode Error in exam analysis: {e}")
-        print(f"Response was: {response}")
+        print(f"[VISION] JSON Decode Error: {e}")
+        print(f"[VISION] Response was: {response}")
         return {
-            "findings": "Erro ao processar resposta da IA",
-            "interpretation": "Sistema temporariamente indisponível. Análise manual recomendada.",
-            "diagnosis": "Análise incompleta - avaliar clinicamente",
-            "recommendations": ["Interpretar resultados manualmente considerando quadro clínico", "Repetir análise ou utilizar outra ferramenta diagnóstica"]
+            "findings": "Erro ao processar resposta da análise visual",
+            "interpretation": f"Sistema processou a imagem mas houve erro no formato da resposta: {str(e)}",
+            "diagnosis": "Análise visual incompleta - revisar imagem manualmente",
+            "recommendations": [
+                "Visualizar imagem diretamente",
+                "Repetir análise",
+                "Considerar análise manual por especialista"
+            ]
         }
     except Exception as e:
-        print(f"Error in analyze_exam: {e}")
+        print(f"[VISION] Error analyzing exam with vision: {e}")
+        import traceback
+        traceback.print_exc()
         raise
 
 
-async def analyze_exam_simple(exam_content: str) -> Dict[str, Any]:
+async def analyze_multiple_exam_images(files, additional_info="", user_id=None, user_name=None):
     """
-    Versão simplificada para análise rápida de um exame
+    Analisa múltiplas imagens de exames médicos COM VISÃO
+    
+    Args:
+        files: Lista de dicts com file_path e mime_type
+        additional_info: Contexto clínico adicional
+        user_id: ID do usuário
+        user_name: Nome do usuário
     """
-    return await analyze_exam(
-        exam_texts=[exam_content],
-        patient_context=None
-    )
-
-
-# Aliases for backward compatibility
-async def analyze_exam_image(files, additional_info="", user_id=None, user_name=None):
-    """Analyze single exam image"""
-    if not files:
+    try:
+        if not files:
+            return {
+                "findings": "Nenhum arquivo fornecido",
+                "interpretation": "Não foi possível realizar análise sem imagens de exame",
+                "diagnosis": "Análise não realizada",
+                "recommendations": ["Anexar imagens de exames médicos"]
+            }
+        
+        # Extract file paths and types
+        file_paths = []
+        file_types = []
+        
+        for file_info in files:
+            if isinstance(file_info, dict):
+                file_path = file_info.get('file_path')
+                mime_type = file_info.get('mime_type', 'application/octet-stream')
+                
+                if file_path and os.path.exists(file_path):
+                    file_paths.append(file_path)
+                    file_types.append(mime_type)
+                    print(f"[VISION] Processing file: {file_path} ({mime_type})")
+        
+        if not file_paths:
+            return {
+                "findings": "Arquivos fornecidos mas não foram encontrados no servidor",
+                "interpretation": "Erro ao acessar arquivos de exame",
+                "diagnosis": "Análise não realizada - erro de upload",
+                "recommendations": [
+                    "Tentar fazer upload novamente",
+                    "Verificar formato do arquivo (PNG, JPG, PDF suportados)",
+                    "Verificar tamanho do arquivo"
+                ]
+            }
+        
+        # Analyze with vision
+        result = await analyze_exam_with_vision(
+            file_paths=file_paths,
+            file_types=file_types,
+            additional_context=additional_info
+        )
+        
+        # Add metadata
+        if user_id:
+            result["_user_id"] = user_id
+        if user_name:
+            result["_user_name"] = user_name
+        
+        return result
+        
+    except Exception as e:
+        print(f"[VISION] Error in analyze_multiple_exam_images: {e}")
+        import traceback
+        traceback.print_exc()
         return {
-            "findings": "Nenhum arquivo fornecido",
-            "interpretation": "Não foi possível realizar análise sem dados de exame",
-            "diagnosis": "Análise não realizada",
-            "recommendations": ["Fornecer arquivos de exame para análise"]
-        }
-    
-    # Convert files to text format
-    exam_texts = []
-    for file in files:
-        if isinstance(file, dict):
-            file_data = file.get('data', '')
-            file_type = file.get('type', '')
-            filename = file.get('filename', 'unknown')
-            
-            # For images, note that it's an image but we can't OCR it directly
-            # The AI model (Gemini 2.5 Flash) can handle text descriptions
-            if file_type.startswith('image/'):
-                exam_texts.append(f"IMAGEM MÉDICA ANEXADA: {filename}\nObs: Análise visual de imagens requer integração OCR adicional. Por favor, forneça descrição textual dos achados da imagem.")
-            else:
-                # For text files, use the content directly
-                if file_data:
-                    exam_texts.append(f"Exame: {filename}\n\nConteúdo:\n{file_data}")
-                else:
-                    exam_texts.append(f"Arquivo {filename} sem conteúdo legível")
-        else:
-            exam_texts.append(str(file))
-    
-    # If no valid text content, return helpful message
-    if not exam_texts or all(not text.strip() for text in exam_texts):
-        return {
-            "findings": "Arquivos carregados mas sem conteúdo de texto",
-            "interpretation": "Os arquivos fornecidos não contêm texto legível para análise",
-            "diagnosis": "Análise incompleta",
+            "findings": f"Erro ao processar imagens: {str(e)}",
+            "interpretation": "Sistema temporariamente indisponível para análise visual",
+            "diagnosis": "Análise não completada - erro técnico",
             "recommendations": [
-                "Fornecer arquivo de texto (.txt) com resultados de exames",
-                "Para imagens, descrever textualmente os achados radiológicos",
-                "Incluir valores laboratoriais em formato texto"
+                "Tentar novamente",
+                "Se persistir, análise manual recomendada",
+                "Verificar logs do sistema"
             ]
         }
-    
-    result = await analyze_exam(
-        exam_texts=exam_texts,
-        patient_context=additional_info
-    )
-    
-    # Add user info if provided
-    if user_id:
-        result["_user_id"] = user_id
-    if user_name:
-        result["_user_name"] = user_name
-    
-    return result
 
 
-async def analyze_multiple_exam_images(files, additional_info="", user_id=None, user_name=None):
-    """Analyze multiple exam images"""
-    return await analyze_exam_image(files, additional_info, user_id, user_name)
+# Backward compatibility alias
+async def analyze_exam_image(files, additional_info="", user_id=None, user_name=None):
+    """Alias for backward compatibility"""
+    return await analyze_multiple_exam_images(files, additional_info, user_id, user_name)
