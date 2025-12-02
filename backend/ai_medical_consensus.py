@@ -184,7 +184,11 @@ Analise a interação medicamentosa.
             "renal_impact": "Análise não disponível",
             "hepatic_impact": "Análise não disponível",
             "mechanism": str(e),
-            "monitoring": "Consulte um farmacêutico"
+            "monitoring": {
+                "renal": ["Consulte um farmacêutico"],
+                "hepatic": ["Consulte um farmacêutico"],
+                "outros": []
+            }
         }
 
 
