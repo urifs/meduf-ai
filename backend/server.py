@@ -24,9 +24,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 # 24 hours
 ADMIN_USER = os.environ.get("ADMIN_USER", "ur1fs")
 ADMIN_PASS = os.environ.get("ADMIN_PASS", "@Fred1807")
 
-# Emergent Universal Key for AI integrations
-os.environ["EMERGENT_LLM_KEY"] = "sk-emergent-b51Fb1fC8C81f9e13D"
-
 # --- Database Setup ---
 client = AsyncIOMotorClient(MONGO_URL)
 db_name = os.environ.get("DB_NAME", "meduf_ai")
