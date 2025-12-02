@@ -612,20 +612,50 @@ async def get_all_consultations(admin: UserInDB = Depends(get_admin_user)):
     # This is a simplified view for the admin dashboard
     consultations = []
     # Join with users to get doctor name would be better, but for now we'll fetch recent ones
-    # User requested NO LIMIT on counters, so we remove the limit.
-    cursor = consultations_collection.find({}).sort("created_at", -1)
+    # Use aggregation pipeline to join with users collection (solves N+1 problem)
+    pipeline = [
+        {
+            "$sort": {"created_at": -1}
+        },
+        {
+            "$limit": 500  # Add reasonable limit for performance
+        },
+        {
+            "$lookup": {
+                "from": "users",
+                "let": {"user_id_str": "$user_id"},
+                "pipeline": [
+                    {
+                        "$match": {
+                            "$expr": {
+                                "$eq": [{"$toString": "$_id"}, "$$user_id_str"]
+                            }
+                        }
+                    },
+                    {"$project": {"name": 1}}
+                ],
+                "as": "user"
+            }
+        },
+        {
+            "$unwind": {
+                "path": "$user",
+                "preserveNullAndEmptyArrays": True
+            }
+        }
+    ]
+    
+    cursor = consultations_collection.aggregate(pipeline)
     
     async for doc in cursor:
-        # Fetch doctor name
-        user = await users_collection.find_one({"_id": ObjectId(doc["user_id"])})
-        doctor_name = user["name"] if user else "Unknown"
+        doctor_name = doc.get("user", {}).get("name", "Unknown") if doc.get("user") else "Unknown"
         
         consultations.append({
             "id": str(doc["_id"]),
             "doctor": doctor_name,
-            "patient": doc['patient'],
-            "report": doc['report'],
-            "created_at": doc['created_at']
+            "patient": doc.get('patient', {}),
+            "report": doc.get('report', {}),
+            "created_at": doc.get('created_at')
         })
     
     return consultations
