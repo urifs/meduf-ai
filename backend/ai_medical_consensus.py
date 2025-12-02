@@ -298,9 +298,16 @@ Analise o caso toxicológico.
         print(f"Error in analyze_toxicology: {e}")
         return {
             "agent": agent,
-            "antidote": "Análise não disponível",
-            "mechanism": str(e),
-            "conduct": ["Procure atendimento médico imediatamente", "Ligue para o Centro de Intoxicações: 0800 722 6001"]
+            "antidote": "Sistema indisponível - consultar CIATOX ou protocolos locais",
+            "mechanism": f"Erro: {str(e)}",
+            "conduct": [
+                "Estabilização ABC (via aérea, respiração, circulação)",
+                "Descontaminação conforme via de exposição e tempo",
+                "Contato com Centro de Informações Toxicológicas: 0800 722 6001",
+                "Monitoramento de sinais vitais e função orgânica",
+                "Suporte específico baseado em toxidrome",
+                "Considerar hemodiálise se indicado"
+            ]
         }
 
 
