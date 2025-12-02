@@ -269,6 +269,24 @@ const ExamReader = () => {
                   />
                 </div>
 
+                {/* Progress Bar */}
+                {isAnalyzing && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-700 font-medium">{progressMessage}</span>
+                      <span className="text-blue-600 font-semibold">{Math.round(progress)}%</span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-500 ease-out rounded-full"
+                        style={{ width: `${progress}%` }}
+                      >
+                        <div className="h-full w-full bg-white/30 animate-pulse"></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Analyze Button */}
                 <Button
                   onClick={handleAnalyze}
