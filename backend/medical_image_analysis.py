@@ -7,7 +7,7 @@ import os
 import base64
 import io
 from typing import Dict, Any, Optional
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from emergentintegrations.llm.chat import LlmChat, UserMessage, FileContent
 from PIL import Image
 import pytesseract
 import json
