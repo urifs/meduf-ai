@@ -94,6 +94,7 @@ const Login = () => {
     <AuthLayout 
       title="Bem-vindo de volta" 
       subtitle="Acesse sua conta para continuar suas análises clínicas."
+      isZooming={isZooming}
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
