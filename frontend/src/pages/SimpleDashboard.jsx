@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { useNavigate } from 'react-router-dom';
 import api from '@/lib/api';
 import { startAITask } from '@/lib/aiPolling';
+import { CustomLoader } from '@/components/ui/custom-loader';
 import '../styles/animations.css';
 
 const SimpleDashboard = () => {
