@@ -142,7 +142,7 @@ const SimpleDashboard = () => {
                   >
                     {isLoading ? (
                       <span className="flex items-center gap-2">
-                        <span className="animate-spin">⏳</span> Analisando...
+                        <CustomLoader size="sm" /> Analisando...
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
