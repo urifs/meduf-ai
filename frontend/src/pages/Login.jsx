@@ -140,7 +140,7 @@ const Login = () => {
           >
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Entrando...
+                <CustomLoader size="sm" className="mr-2" /> Entrando...
               </>
             ) : (
               <>
