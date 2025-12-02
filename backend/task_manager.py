@@ -40,7 +40,7 @@ class TaskManager:
             "status": TaskStatus.PENDING,
             "result": None,
             "error": None,
-            "created_at": datetime.utcnow(),
+            "created_at": now_sao_paulo(),
             "completed_at": None,
             "progress": 0
         }
