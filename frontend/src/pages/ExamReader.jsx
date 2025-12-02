@@ -358,7 +358,7 @@ const ExamReader = () => {
                 {/* Analyze Button */}
                 <Button
                   onClick={handleAnalyze}
-                  disabled={!selectedFile || isAnalyzing}
+                  disabled={selectedFiles.length === 0 || isAnalyzing}
                   className="w-full h-12 text-lg"
                 >
                   {isAnalyzing ? (
@@ -369,7 +369,7 @@ const ExamReader = () => {
                   ) : (
                     <>
                       <FileText className="h-5 w-5 mr-2" />
-                      Analisar Exame
+                      Analisar {selectedFiles.length > 0 ? `(${selectedFiles.length} arquivo${selectedFiles.length > 1 ? 's' : ''})` : 'Exame'}
                     </>
                   )}
                 </Button>
