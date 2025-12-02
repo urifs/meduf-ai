@@ -721,7 +721,10 @@ const Admin = () => {
                   <div className="flex gap-4">
                     <div className="text-center">
                       <div className="text-3xl font-bold text-green-600">{feedbackStats.helpful}</div>
-                      <div className="text-xs text-muted-foreground">👍 Útil</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <ThumbsUp className="h-3 w-3" />
+                        Útil
+                      </div>
                     </div>
                     <div className="text-center">
                       <div className="text-3xl font-bold text-red-600">{feedbackStats.notHelpful}</div>
