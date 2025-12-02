@@ -1028,6 +1028,81 @@ async def get_monthly_usage(user: UserInDB = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+
+# --- Feedback System ---
+class FeedbackCreate(BaseModel):
+    analysis_type: str
+    is_helpful: bool
+    result_data: dict
+
+@app.post("/api/feedback")
+async def create_feedback(
+    feedback: FeedbackCreate,
+    user: UserInDB = Depends(get_current_user)
+):
+    """
+    Create user feedback for analysis results
+    """
+    try:
+        feedback_doc = {
+            "user_id": user.id,
+            "username": user.username,
+            "analysis_type": feedback.analysis_type,
+            "is_helpful": feedback.is_helpful,
+            "result_data": feedback.result_data,
+            "timestamp": datetime.utcnow(),
+            "created_at": datetime.utcnow()
+        }
+        
+        result = await db.feedback.insert_one(feedback_doc)
+        
+        return {
+            "success": True,
+            "feedback_id": str(result.inserted_id),
+            "message": "Feedback registrado com sucesso"
+        }
+    except Exception as e:
+        print(f"Error creating feedback: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/admin/feedback")
+async def get_all_feedback(
+    limit: int = 100,
+    skip: int = 0,
+    user: UserInDB = Depends(get_current_user)
+):
+    """
+    Get all user feedback (Admin only)
+    """
+    if user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        # Get total count
+        total = await db.feedback.count_documents({})
+        
+        # Get feedback with pagination, sorted by most recent
+        feedbacks = await db.feedback.find({}, {"_id": 0}).sort("timestamp", -1).skip(skip).limit(limit).to_list(limit)
+        
+        # Calculate statistics
+        helpful_count = await db.feedback.count_documents({"is_helpful": True})
+        not_helpful_count = await db.feedback.count_documents({"is_helpful": False})
+        
+        return {
+            "feedbacks": feedbacks,
+            "total": total,
+            "statistics": {
+                "helpful": helpful_count,
+                "not_helpful": not_helpful_count,
+                "helpful_percentage": round((helpful_count / total * 100) if total > 0 else 0, 1)
+            }
+        }
+    except Exception as e:
+        print(f"Error getting feedback: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/admin/usage-stats/all-time")
 async def get_all_time_usage(user: UserInDB = Depends(get_current_user)):
     """
