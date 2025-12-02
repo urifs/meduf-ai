@@ -359,7 +359,7 @@ const Admin = () => {
                   </div>
                   <DialogFooter>
                     <Button type="submit" disabled={isCreating}>
-                      {isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Criar Conta"}
+                      {isCreating ? <CustomLoader size="sm" /> : "Criar Conta"}
                     </Button>
                   </DialogFooter>
                 </form>
