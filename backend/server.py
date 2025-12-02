@@ -381,6 +381,16 @@ async def update_user_me(user_update: UserUpdate, current_user: UserInDB = Depen
         return UserInDB(**updated_user)
     return current_user
 
+@app.get("/api/users/me")
+async def get_current_user_info(current_user: UserInDB = Depends(get_current_active_user)):
+    return {
+        "id": current_user.id,
+        "name": current_user.name,
+        "email": current_user.email,
+        "role": current_user.role,
+        "avatar_url": current_user.avatar_url or ""
+    }
+
 @app.post("/api/users/me/avatar")
 async def upload_avatar(file: UploadFile = File(...), current_user: UserInDB = Depends(get_current_active_user)):
     try:
