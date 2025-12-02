@@ -391,8 +391,8 @@ const ExamReader = () => {
                   <Info className="h-4 w-4" />
                   <AlertDescription className="text-xs">
                     <AlertTriangle className="h-4 w-4 inline mr-1" />
-                    Esta análise é auxiliar e não substitui a avaliação médica profissional.
-                    Sempre consulte um médico para interpretação definitiva.
+                    Esta análise é uma ferramenta auxiliar ao julgamento clínico profissional.
+                    A decisão terapêutica final deve considerar o quadro clínico completo do paciente.
                   </AlertDescription>
                 </Alert>
               </CardContent>
