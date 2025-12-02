@@ -878,10 +878,13 @@ const Admin = () => {
               <Label htmlFor="new_days">Dias de Acesso (a partir de hoje)</Label>
               <Input 
                 id="new_days" 
-                type="number" 
-                min="1"
+                type="text" 
+                placeholder="Ex: 30, 60, 365..."
                 value={newDaysValid}
-                onChange={(e) => setNewDaysValid(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, '');
+                  setNewDaysValid(value);
+                }}
               />
             </div>
             <DialogFooter>
