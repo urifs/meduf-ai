@@ -414,8 +414,8 @@ async def delete_consultation(id: str, current_user: UserInDB = Depends(get_curr
 @app.get("/api/admin/users", response_model=List[UserInDB])
 async def get_all_users(admin: UserInDB = Depends(get_admin_user)):
     users = []
-    # Removed limit to show all users
-    cursor = users_collection.find({}).sort("created_at", -1)
+    # Only show active users (not deleted)
+    cursor = users_collection.find({"deleted": {"$ne": True}}).sort("created_at", -1)
     async for document in cursor:
         document["_id"] = str(document["_id"])
         try:
@@ -423,6 +423,24 @@ async def get_all_users(admin: UserInDB = Depends(get_admin_user)):
         except Exception as e:
             print(f"Skipping invalid user document {document.get('_id')}: {e}")
     return users
+
+@app.get("/api/admin/deleted-users")
+async def get_deleted_users(admin: UserInDB = Depends(get_admin_user)):
+    """Get all deleted/expired user accounts"""
+    deleted_users = []
+    cursor = users_collection.find({"deleted": True}).sort("deleted_at", -1)
+    async for document in cursor:
+        document["_id"] = str(document["_id"])
+        deleted_users.append({
+            "id": document["_id"],
+            "name": document.get("name"),
+            "email": document.get("email"),
+            "username": document.get("username"),
+            "deleted_at": document.get("deleted_at"),
+            "expiration_date": document.get("expiration_date"),
+            "created_at": document.get("created_at")
+        })
+    return deleted_users
 
 @app.post("/api/admin/users", response_model=dict)
 async def create_user_admin(user: UserCreate, admin: UserInDB = Depends(get_admin_user)):
