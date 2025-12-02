@@ -975,18 +975,16 @@ async def analyze_medical_exam(
         task_id = task_manager.create_task("exam-analysis")
         
         # Start background analysis with multiple files
-        # Note: analyze_multiple_exam_images only accepts files_data and additional_info
         asyncio.create_task(
             task_manager.execute_task(
                 task_id,
                 analyze_multiple_exam_images,
                 processed_files,
-                additional_info
+                additional_info,
+                user_id=str(user.id),
+                user_name=user.name
             )
         )
-        
-        # Save consultation manually after task completes
-        # (This will be handled by checking task result later)
         
         return {
             "task_id": task_id,
