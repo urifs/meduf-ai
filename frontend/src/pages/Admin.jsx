@@ -104,6 +104,9 @@ const Admin = () => {
   // Consultation View State
   const [selectedConsultation, setSelectedConsultation] = useState(null);
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
+  
+  // Deleted Users State
+  const [deletedUsers, setDeletedUsers] = useState([]);
 
   // --- Authentication Check & Polling ---
   useEffect(() => {
