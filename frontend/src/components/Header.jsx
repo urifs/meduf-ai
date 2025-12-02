@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Activity, Stethoscope, User, FileText, ClipboardList, Pill, AlertCircle, CheckCircle2, BrainCircuit, LogOut, Shield, Menu, Clock, Settings, Database, Bell, HelpCircle } from 'lucide-react';
+import { Activity, Stethoscope, User, FileText, ClipboardList, Pill, AlertCircle, CheckCircle2, BrainCircuit, LogOut, Shield, Menu, Clock, Settings, Database, Bell, HelpCircle, Moon, Sun } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { differenceInDays, intervalToDuration } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export const Header = () => {
   const navigate = useNavigate();
