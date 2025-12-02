@@ -297,6 +297,14 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             detail="User not found",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    
+    # Check if account is deleted
+    if user.get("deleted") == True:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account deleted",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     if not verify_password(form_data.password, user["password_hash"]):
         raise HTTPException(
