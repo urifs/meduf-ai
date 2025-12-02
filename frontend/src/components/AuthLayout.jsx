@@ -11,9 +11,9 @@ export const AuthLayout = ({ children, title, subtitle, isZooming = false }) => 
         <div className="absolute bottom-20 left-20 w-80 h-80 bg-purple-400/10 rounded-full blur-3xl animate-float" style={{animationDelay: '1.5s'}}></div>
       </div>
 
-      <div className={`w-full max-w-[450px] space-y-6 relative z-10 ${isZooming ? 'zoom-out-animation' : ''}`}>
-        {/* Logo Section */}
-        <div className="flex flex-col items-center gap-3 text-center animate-fade-in-up">
+      <div className="w-full max-w-[450px] space-y-6 relative z-10">
+        {/* Logo Section - Zoom happens here */}
+        <div className={`flex flex-col items-center gap-3 text-center animate-fade-in-up ${isZooming ? 'zoom-out-animation' : ''}`}>
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-2xl animate-pulse-glow">
             <BrainCircuit className="h-9 w-9" />
           </div>
