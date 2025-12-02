@@ -171,6 +171,9 @@ const Admin = () => {
         total: feedbackData.length
       });
       
+      // Set deleted users
+      setDeletedUsers(deletedRes.data || []);
+      
       setLastUpdated(new Date());
       
     } catch (error) {
