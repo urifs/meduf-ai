@@ -34,7 +34,7 @@ export const AuthLayout = ({ children, title, subtitle, isZooming = false }) => 
         </div>
 
         {/* Footer */}
-        <p className="px-8 text-center text-sm text-slate-600 animate-fade-in" style={{animationDelay: '0.3s'}}>
+        <p className={`px-8 text-center text-sm text-slate-600 animate-fade-in ${isZooming ? 'opacity-0' : ''}`} style={{animationDelay: '0.3s'}}>
           © 2025 Meduf Ai. Todos os direitos reservados.
         </p>
       </div>
