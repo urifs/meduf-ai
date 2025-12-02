@@ -1117,6 +1117,11 @@ async def get_feedbacks_for_admin(
         # Get feedback with pagination, sorted by most recent
         feedbacks = await db.feedback.find({}, {"_id": 0}).sort("timestamp", -1).skip(skip).limit(limit).to_list(limit)
         
+        # Map result_data to analysis_data for frontend compatibility
+        for feedback in feedbacks:
+            if "result_data" in feedback and "analysis_data" not in feedback:
+                feedback["analysis_data"] = feedback["result_data"]
+        
         return feedbacks
     except Exception as e:
         print(f"Error getting feedback: {e}")
