@@ -463,8 +463,14 @@ async def update_user_admin(id: str, update: AdminUserUpdate, admin: UserInDB = 
     update_data = {}
     
     if update.days_valid is not None:
-        # Reset expiration to X days from NOW
-        update_data["expiration_date"] = datetime.utcnow() + timedelta(days=update.days_valid)
+        # Add days to current expiration (or from now if expired/not set)
+        current_expiration = user.get("expiration_date")
+        if current_expiration and current_expiration > datetime.utcnow():
+            # Add to existing expiration
+            update_data["expiration_date"] = current_expiration + timedelta(days=update.days_valid)
+        else:
+            # Start from now if expired or not set
+            update_data["expiration_date"] = datetime.utcnow() + timedelta(days=update.days_valid)
         
     if update.role is not None:
         update_data["role"] = update.role
@@ -492,8 +498,14 @@ async def update_user_admin(id: str, update: AdminUserUpdate, admin: UserInDB = 
     update_data = {}
     
     if update.days_valid is not None:
-        # Reset expiration to X days from NOW
-        update_data["expiration_date"] = datetime.utcnow() + timedelta(days=update.days_valid)
+        # Add days to current expiration (or from now if expired/not set)
+        current_expiration = user.get("expiration_date")
+        if current_expiration and current_expiration > datetime.utcnow():
+            # Add to existing expiration
+            update_data["expiration_date"] = current_expiration + timedelta(days=update.days_valid)
+        else:
+            # Start from now if expired or not set
+            update_data["expiration_date"] = datetime.utcnow() + timedelta(days=update.days_valid)
         
     if update.role is not None:
         update_data["role"] = update.role
