@@ -259,15 +259,15 @@ async def analyze_toxicology(agent: str, exposure_route: Optional[str] = None, s
 1. **Agente** tóxico
 2. **Antídoto** específico
 3. **Mecanismo** de toxicidade
-4. **Conduta** clínica
+4. **Conduta** clínica (passos sequenciais)
 
 Responda APENAS com JSON:
 ```json
 {
-  "agent": "string",
-  "antidote": "string",
-  "mechanism": "string",
-  "conduct": "string"
+  "agent": "Nome do agente tóxico",
+  "antidote": "Antídoto específico",
+  "mechanism": "Mecanismo de toxicidade",
+  "conduct": ["Passo 1", "Passo 2", "Passo 3"]
 }
 ```"""
         
