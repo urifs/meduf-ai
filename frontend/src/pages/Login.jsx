@@ -21,7 +21,19 @@ const Login = () => {
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    const { id, value } = e.target;
+    let processedValue = value;
+    
+    // Para o campo identifier (email/usuário)
+    if (id === 'identifier') {
+      // Remove espaços e converte para minúsculas
+      processedValue = value.replace(/\s/g, '').toLowerCase();
+    }
+    
+    setFormData({
+      ...formData,
+      [id]: processedValue
+    });
   };
 
   const handleSubmit = async (e) => {
