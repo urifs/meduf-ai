@@ -147,7 +147,7 @@ class TaskManager:
         """Remove tasks older than cleanup_interval (background job)"""
         while True:
             try:
-                now = datetime.utcnow()
+                now = now_sao_paulo()
                 expired_tasks = [
                     task_id for task_id, task in self.tasks.items()
                     if (now - task["created_at"]).total_seconds() > self.cleanup_interval
