@@ -112,38 +112,8 @@ class TaskManager:
                     except Exception as track_error:
                         print(f"⚠️ Error tracking usage: {track_error}")
                 
-                # Check if we need to save consultation
-                task = self.tasks.get(task_id)
-                save_consultation = kwargs.get('save_consultation', False)
-                user_id = kwargs.get('user_id')
-                user_name = kwargs.get('user_name')
-                patient_data = kwargs.get('patient_data')
-                
                 # Mark as completed
-                self.complete_task(task_id, result, save_consultation, user_id, user_name, patient_data)
-                
-                # Save to database if needed
-                if save_consultation and user_id and result:
-                    try:
-                        from motor.motor_asyncio import AsyncIOMotorClient
-                        import os
-                        mongo_url = os.getenv("MONGO_URL", "mongodb://localhost:27017")
-                        client = AsyncIOMotorClient(mongo_url)
-                        db = client.meduf_ai
-                        
-                        consultation_doc = {
-                            "user_id": user_id,
-                            "patient": patient_data or {"name": "Exame"},
-                            "report": result,
-                            "type": task.get("type", "exam-analysis"),
-                            "created_at": datetime.utcnow()
-                        }
-                        
-                        loop.run_until_complete(db.consultations.insert_one(consultation_doc))
-                        print(f"💾 Consulta salva para user {user_id}")
-                    except Exception as save_error:
-                        print(f"⚠️ Erro ao salvar consulta: {save_error}")
-                
+                self.complete_task(task_id, result)
                 print(f"✅ Task {task_id} completed successfully")
                 
             finally:
