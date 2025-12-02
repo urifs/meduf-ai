@@ -235,17 +235,18 @@
   background: conic-gradient(
     from 0deg,
     transparent 0deg,
-    rgba(30, 58, 138, 0.9) 30deg,
-    rgba(30, 58, 138, 1) 45deg,
-    rgba(30, 58, 138, 0.9) 60deg,
-    transparent 90deg,
+    transparent 60deg,
+    rgba(30, 58, 138, 0.6) 80deg,
+    rgba(30, 58, 138, 1) 90deg,
+    rgba(30, 58, 138, 0.6) 100deg,
+    transparent 120deg,
     transparent 360deg
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: neon-border-travel 4s linear infinite;
-  box-shadow: 0 0 30px rgba(30, 58, 138, 0.6);
+  animation: neon-border-rotate 4s linear infinite;
+  filter: blur(2px);
   pointer-events: none;
   z-index: -1;
 }
