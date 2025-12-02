@@ -141,7 +141,7 @@ const ExamReader = () => {
           }
           
           // Update message based on progress
-          const currentProgress = task.progress || setProgress;
+          const currentProgress = task.progress || 20;
           if (currentProgress < 30) {
             setProgressMessage('Lendo valores da imagem...');
           } else if (currentProgress < 60) {
