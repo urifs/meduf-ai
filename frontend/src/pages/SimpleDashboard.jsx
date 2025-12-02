@@ -173,7 +173,7 @@ const SimpleDashboard = () => {
                 </CardContent>
               </Card>
             )}
-            <ClinicalReport data={reportData} />
+            <ClinicalReport data={reportData} analysisType="simple-diagnosis" />
           </div>
         </div>
       </main>
