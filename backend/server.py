@@ -968,61 +968,6 @@ async def analyze_medical_exam(
         raise HTTPException(status_code=500, detail=f"Erro ao processar arquivo: {str(e)}")
 
 
-@app.post("/api/ai/analyze-xray", response_model=dict)
-async def analyze_xray(
-    file: UploadFile = File(...),
-    body_region: str = "",
-    additional_info: str = "",
-    user: UserInDB = Depends(get_current_user)
-):
-    """
-    Analyze X-ray images
-    Supports: JPG, PNG, PDF
-    """
-    try:
-        # Read file content
-        content = await file.read()
-        
-        # Get file type
-        content_type = file.content_type or "application/octet-stream"
-        
-        # Convert to base64
-        if not content_type.startswith('image/'):
-            raise HTTPException(
-                status_code=400, 
-                detail="Para análise de raio-X, é necessário enviar uma imagem (JPG, PNG)"
-            )
-        
-        image_data = base64.b64encode(content).decode('utf-8')
-        
-        # Create task for background processing
-        task_id = task_manager.create_task("xray-analysis")
-        
-        # Start background analysis
-        asyncio.create_task(
-            task_manager.execute_task(
-                task_id,
-                analyze_xray_image,
-                image_data,
-                content_type,
-                body_region,
-                additional_info
-            )
-        )
-        
-        return {
-            "task_id": task_id,
-            "status": "pending",
-            "message": "Análise do raio-X iniciada. Use /api/ai/tasks/{task_id} para verificar o progresso."
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"Error uploading X-ray: {e}")
-        raise HTTPException(status_code=500, detail=f"Erro ao processar arquivo: {str(e)}")
-
-
 
 # --- Epidemiological Alerts Endpoint ---
 @app.get("/api/epidemiological-alerts", response_model=dict)
