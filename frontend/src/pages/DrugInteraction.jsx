@@ -283,64 +283,6 @@ const DrugInteraction = () => {
     }
   };
 
-  const copyToClipboard = () => {
-    if (!result) return;
-    
-    let text = `## Análise de Interação Medicamentosa\n\n`;
-    text += `Medicamentos: ${result.medications.join(" + ")}\n\n`;
-    text += `### Gravidade: ${result.severity}\n\n`;
-    text += `**Resumo**: ${result.summary}\n\n`;
-    text += `**Detalhes**: ${result.details}\n\n`;
-    text += `**Recomendações**: ${result.recommendations}\n\n`;
-    
-    if (result.renal_impact) {
-      text += `### 🫘 Impacto Renal\n${result.renal_impact}\n\n`;
-    }
-    
-    if (result.hepatic_impact) {
-      text += `### 🫁 Impacto Hepático\n${result.hepatic_impact}\n\n`;
-    }
-    
-    if (result.monitoring) {
-      text += `### 📊 Monitoramento\n`;
-      if (result.monitoring.renal?.length > 0) {
-        text += `**Função Renal**: ${result.monitoring.renal.join(", ")}\n`;
-      }
-      if (result.monitoring.hepatic?.length > 0) {
-        text += `**Função Hepática**: ${result.monitoring.hepatic.join(", ")}\n`;
-      }
-      if (result.monitoring.outros?.length > 0) {
-        text += `**Outros**: ${result.monitoring.outros.join(", ")}\n`;
-      }
-    }
-    
-    navigator.clipboard.writeText(text);
-    toast.success("Copiado para a área de transferência!");
-  };
-
-  const handleSaveImage = async () => {
-    if (!reportRef.current) return;
-    
-    try {
-      const canvas = await html2canvas(reportRef.current, {
-        scale: 2,
-        backgroundColor: "#ffffff",
-        useCORS: true
-      });
-      
-      const image = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = image;
-      link.download = `interacao-medicamentosa-${new Date().toISOString().slice(0,10)}.png`;
-      link.click();
-      
-      toast.success("Imagem salva com sucesso!");
-    } catch (error) {
-      console.error("Error saving image:", error);
-      toast.error("Erro ao salvar imagem.");
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-red-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 relative">
       {/* Animated Background */}
