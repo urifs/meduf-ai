@@ -70,7 +70,7 @@ class TaskManager:
         if task_id in self.tasks:
             self.tasks[task_id]["status"] = TaskStatus.FAILED
             self.tasks[task_id]["error"] = error
-            self.tasks[task_id]["completed_at"] = datetime.utcnow()
+            self.tasks[task_id]["completed_at"] = now_sao_paulo()
     
     def execute_task_sync(
         self, 
