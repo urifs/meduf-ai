@@ -231,7 +231,7 @@ const ExamReader = () => {
               <CardHeader>
                 <CardTitle>Upload do Exame</CardTitle>
                 <CardDescription>
-                  Selecione uma foto, PDF ou documento do exame laboratorial
+                  Adicione uma ou mais fotos/páginas do exame laboratorial
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
