@@ -946,6 +946,96 @@ const Admin = () => {
           </DialogContent>
         </Dialog>
 
+        {/* User Profile Dialog */}
+        <Dialog open={isProfileOpen} onOpenChange={setIsProfileOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Perfil do Usuário</DialogTitle>
+              <DialogDescription>
+                Informações detalhadas da conta
+              </DialogDescription>
+            </DialogHeader>
+            
+            {selectedUserProfile && (
+              <div className="space-y-6 mt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">Nome Completo</Label>
+                    <p className="text-sm font-medium">{selectedUserProfile.name}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">Email</Label>
+                    <p className="text-sm">{selectedUserProfile.email}</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">Função</Label>
+                    <Badge variant="outline" className={selectedUserProfile.role === 'ADMIN' ? 'border-purple-200 bg-purple-50 text-purple-700' : 'border-slate-200 bg-slate-50 text-slate-700'}>
+                      {selectedUserProfile.role}
+                    </Badge>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">Status</Label>
+                    <Badge className={selectedUserProfile.status === 'Ativo' ? 'bg-green-500' : 'bg-red-500'}>
+                      {selectedUserProfile.status}
+                    </Badge>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">Data de Criação</Label>
+                    <p className="text-sm">{formatDate(selectedUserProfile.created_at)}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">Validade da Conta</Label>
+                    <p className={`text-sm ${getDaysColor(selectedUserProfile.expiration_date)}`}>
+                      {getDaysRemaining(selectedUserProfile.expiration_date)}
+                    </p>
+                  </div>
+                </div>
+                
+                {selectedUserProfile.expiration_date && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">Data de Expiração</Label>
+                    <p className="text-sm">{formatDate(selectedUserProfile.expiration_date)}</p>
+                  </div>
+                )}
+                
+                <div className="pt-4 border-t">
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        setSelectedUserForExpiration(selectedUserProfile);
+                        setIsProfileOpen(false);
+                        setIsExpirationOpen(true);
+                      }}
+                    >
+                      <CalendarClock className="h-4 w-4 mr-2" />
+                      Alterar Validade
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleToggleStatus(selectedUserProfile.id, selectedUserProfile.status)}
+                    >
+                      {selectedUserProfile.status === 'Ativo' ? (
+                        <><Ban className="h-4 w-4 mr-2" /> Bloquear</>
+                      ) : (
+                        <><Unlock className="h-4 w-4 mr-2" /> Desbloquear</>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
       </main>
     </div>
   );
