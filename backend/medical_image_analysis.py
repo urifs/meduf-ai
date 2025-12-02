@@ -110,7 +110,7 @@ async def analyze_exam(
             "findings": "Erro ao processar resposta",
             "interpretation": "Não foi possível analisar o exame. Por favor, tente novamente.",
             "diagnosis": "Análise incompleta",
-            "recommendations": "Consulte um médico para interpretação manual do exame."
+            "recommendations": ["Consulte um médico para interpretação manual do exame."]
         }
     except Exception as e:
         print(f"Error in analyze_exam: {e}")
