@@ -132,12 +132,12 @@ async def analyze_drug_interaction(drug1: str, drug2: str, patient_info: Optiona
     Analisa interação medicamentosa usando Gemini 2.0 Flash
     """
     try:
-        system_prompt = """Você é um farmacêutico clínico especializado. Analise a interação medicamentosa e forneça:
+        system_prompt = """Você é um farmacêutico clínico especializado auxiliando MÉDICOS PROFISSIONAIS. Analise a interação medicamentosa com detalhes técnicos:
 
-1. **Severidade** (Leve/Moderada/Grave)
-2. **Impacto Renal** e **Impacto Hepático**
-3. **Mecanismo** da interação
-4. **Monitoramento** necessário (exames renais, hepáticos e outros)
+1. **Classificação de Severidade** (Leve/Moderada/Grave/Contraindicada)
+2. **Farmacocinética e Farmacodinâmica** (impacto renal, hepático, interações CYP450)
+3. **Mecanismo Molecular** da interação
+4. **Protocolo de Monitoramento** (parâmetros laboratoriais, timing, valores críticos)
 
 Responda APENAS com JSON:
 ```json
