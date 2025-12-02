@@ -1067,6 +1067,27 @@ async def create_feedback(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/api/feedbacks")
+async def get_feedbacks_for_admin(
+    limit: int = 100,
+    skip: int = 0,
+    user: UserInDB = Depends(get_current_user)
+):
+    """
+    Get all user feedback for admin panel (Admin only)
+    """
+    if user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        # Get feedback with pagination, sorted by most recent
+        feedbacks = await db.feedback.find({}, {"_id": 0}).sort("timestamp", -1).skip(skip).limit(limit).to_list(limit)
+        
+        return feedbacks
+    except Exception as e:
+        print(f"Error getting feedback: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/admin/feedback")
 async def get_all_feedback(
     limit: int = 100,
