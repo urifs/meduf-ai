@@ -244,6 +244,7 @@ const ExamReader = () => {
                     type="file"
                     accept="image/*,.pdf,.doc,.docx,.txt"
                     onChange={handleFileSelect}
+                    multiple
                     className="hidden"
                   />
 
