@@ -334,7 +334,7 @@ const Admin = () => {
                       type="email" 
                       placeholder="medico@hospital.com" 
                       value={newUser.email}
-                      onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                      onChange={(e) => setNewUser({...newUser, email: e.target.value.toLowerCase().trim()})}
                       required
                     />
                   </div>
