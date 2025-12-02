@@ -500,7 +500,7 @@ const DrugInteraction = () => {
                               )}
                               {result.monitoring.outros.length > 0 && (
                                 <div className="bg-white p-3 rounded border border-purple-100">
-                                  <span className="text-xs font-bold text-purple-800 block mb-2">📋 Outros</span>
+                                  <span className="text-xs font-bold text-purple-800 block mb-2">Outros</span>
                                   <ul className="text-xs text-purple-900 space-y-1">
                                     {result.monitoring.outros.map((exam, i) => (
                                       <li key={i}>• {exam}</li>
