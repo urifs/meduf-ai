@@ -364,7 +364,7 @@ async def create_consultation(consultation: ConsultationCreate, current_user: Us
 @app.get("/api/consultations", response_model=List[ConsultationInDB])
 async def get_consultations(current_user: UserInDB = Depends(get_current_active_user)):
     consultations = []
-    cursor = consultations_collection.find({"user_id": current_user.id}).sort("created_at", -1)
+    cursor = consultations_collection.find({"user_id": current_user.id}).sort("created_at", -1).limit(100)
     async for document in cursor:
         document["_id"] = str(document["_id"])
         consultations.append(ConsultationInDB(**document))
