@@ -85,18 +85,6 @@ const Selection = () => {
       iconColor: "text-blue-600",
       path: "/exam-reader",
       glow: "hover:shadow-[0_0_40px_rgba(59,130,246,0.3)]"
-    },
-    {
-      title: "Leitor de Raio-X",
-      description: "Análise de imagens radiológicas",
-      detail: "Upload de raios-X para análise radiológica automatizada e identificação de alterações.",
-      icon: Activity,
-      gradient: "from-indigo-500 to-purple-600",
-      hoverGradient: "hover:from-indigo-600 hover:to-purple-700",
-      iconBg: "bg-gradient-to-br from-indigo-400/20 to-purple-500/20",
-      iconColor: "text-indigo-600",
-      path: "/xray-reader",
-      glow: "hover:shadow-[0_0_40px_rgba(99,102,241,0.3)]"
     }
   ];
 
