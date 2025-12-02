@@ -1,7 +1,7 @@
 """
 Medical Image Analysis Engine with Vision
 Uses Gemini 2.5 Flash for direct image analysis (supports vision)
-Supports: Lab exams only
+Supports: Lab exams, X-rays, CT scans, MRI, etc.
 """
 import os
 import base64
@@ -190,6 +190,156 @@ Por favor, forneça uma análise completa em formato JSON."""
                 "Verifique se a imagem está legível",
                 "Tire uma foto mais clara e bem iluminada",
                 "Consulte um médico para análise presencial"
+            ],
+            "urgent_attention": False,
+            "additional_notes": f"Erro técnico: {str(e)}"
+        }
+
+
+async def analyze_xray_image(image_data: str, image_type: str, body_region: str = "", additional_info: str = "") -> Dict[str, Any]:
+    """
+    Analyze X-ray images using Gemini 2.5 Flash with vision
+    """
+    try:
+        print("🔍 Iniciando análise de raio-X com Gemini 2.5 Flash (Vision)...")
+        
+        if not image_type.startswith('image/'):
+            return {
+                "body_region": body_region or "Não especificada",
+                "technical_quality": "Formato não suportado",
+                "normal_findings": [],
+                "abnormal_findings": [],
+                "diagnostic_impression": "Por favor, envie uma imagem (JPG ou PNG) do raio-X.",
+                "differential_diagnosis": [],
+                "overall_severity": "Indeterminada",
+                "recommendations": ["Envie uma imagem válida do raio-X"],
+                "urgent_attention": False,
+                "additional_notes": "Apenas imagens são aceitas para análise de raio-X"
+            }
+        
+        print("📸 Usando análise visual direta com Gemini 2.5 Flash")
+        
+        # Create system prompt for X-ray analysis
+        system_prompt = """Você é um médico radiologista especializado em análise de raios-X.
+
+Analise a IMAGEM de raio-X fornecida e identifique:
+
+1. **Região Anatômica** - Identifique a região do corpo radiografada
+2. **Qualidade Técnica** - Avalie a qualidade da imagem (posicionamento, penetração, etc)
+3. **Achados Normais** - Descreva estruturas anatômicas visualizadas normais
+4. **Alterações Identificadas** - Liste TODAS as alterações ou anormalidades detectadas
+5. **Impressão Diagnóstica** - Forneça hipóteses diagnósticas baseadas nos achados
+6. **Gravidade** - Classifique a gravidade dos achados
+7. **Recomendações** - Sugira exames complementares ou condutas
+
+**IMPORTANTE:**
+- Analise CUIDADOSAMENTE a imagem radiográfica
+- Seja preciso na descrição radiológica
+- Use terminologia médica padronizada
+- Destaque achados críticos ou suspeitos
+- Indique se há necessidade de correlação clínica
+- Mencione limitações quando relevante
+
+**FORMATO DA RESPOSTA (APENAS JSON, SEM TEXTO EXTRA):**
+```json
+{
+  "body_region": "Região anatômica identificada",
+  "technical_quality": "Boa/Adequada/Limitada - descrição",
+  "normal_findings": ["Achado normal 1", "Achado normal 2"],
+  "abnormal_findings": [
+    {
+      "finding": "Descrição do achado anormal",
+      "location": "Localização específica",
+      "severity": "Leve/Moderada/Grave",
+      "clinical_significance": "Significado clínico"
+    }
+  ],
+  "diagnostic_impression": "Impressão diagnóstica principal",
+  "differential_diagnosis": ["Hipótese 1", "Hipótese 2"],
+  "overall_severity": "Normal/Leve/Moderada/Grave/Crítica",
+  "recommendations": [
+    "Recomendação 1",
+    "Recomendação 2"
+  ],
+  "urgent_attention": true/false,
+  "additional_notes": "Observações ou limitações do exame"
+}
+```"""
+
+        # Build prompt
+        region_text = f"Região do Corpo Informada: {body_region}\n" if body_region else ""
+        clinical_text = f"Informações Clínicas: {additional_info}\n" if additional_info else ""
+        
+        user_prompt = f"""Analise a IMAGEM de raio-X fornecida.
+
+{region_text}{clinical_text}
+
+Por favor, forneça uma análise radiológica completa em formato JSON identificando todas as alterações visíveis e sua relevância clínica."""
+
+        print("🤖 Enviando para Gemini 2.5 Flash com suporte a visão...")
+        
+        # Create chat with Gemini 2.5 Flash (supports vision)
+        chat = LlmChat(
+            api_key=EMERGENT_KEY,
+            session_id="meduf-xray-vision",
+            system_message=system_prompt
+        ).with_model("gemini", "gemini-2.5-flash")
+
+        # Send message with image
+        message = UserMessage(
+            text=user_prompt,
+            image_url=f"data:{image_type};base64,{image_data}"
+        )
+
+        response = await chat.send_message(message)
+        
+        print("📊 Resposta recebida do Gemini, processando...")
+        
+        # Parse response
+        response_text = response.strip() if isinstance(response, str) else str(response)
+        
+        # Extract JSON
+        if "```json" in response_text:
+            response_text = response_text.split("```json")[1].split("```")[0].strip()
+        elif "```" in response_text:
+            response_text = response_text.split("```")[1].split("```")[0].strip()
+        
+        try:
+            analysis = json.loads(response_text)
+            print("✅ Análise de raio-X concluída com sucesso!")
+            return analysis
+        except json.JSONDecodeError:
+            print("⚠️ Resposta não estruturada")
+            return {
+                "body_region": body_region or "Não especificada",
+                "technical_quality": "Análise visual realizada",
+                "normal_findings": [],
+                "abnormal_findings": [],
+                "diagnostic_impression": response_text,
+                "differential_diagnosis": [],
+                "overall_severity": "Avaliar",
+                "recommendations": ["Correlação clínica recomendada"],
+                "urgent_attention": False,
+                "additional_notes": "Resposta em formato texto - avaliação radiológica presencial recomendada"
+            }
+        
+    except Exception as e:
+        print(f"❌ Erro na análise de raio-X: {e}")
+        import traceback
+        traceback.print_exc()
+        
+        return {
+            "body_region": body_region or "Não especificada",
+            "technical_quality": "Erro no processamento",
+            "normal_findings": [],
+            "abnormal_findings": [],
+            "diagnostic_impression": f"Erro ao processar imagem: {str(e)}",
+            "differential_diagnosis": [],
+            "overall_severity": "Indeterminada",
+            "recommendations": [
+                "Tente novamente com uma imagem mais clara",
+                "Verifique se a imagem está em formato JPG ou PNG",
+                "Consulte um radiologista para análise presencial"
             ],
             "urgent_attention": False,
             "additional_notes": f"Erro técnico: {str(e)}"
