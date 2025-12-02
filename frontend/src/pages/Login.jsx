@@ -13,6 +13,7 @@ import { CustomLoader } from '@/components/ui/custom-loader';
 const Login = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [isZooming, setIsZooming] = useState(false);
   const [formData, setFormData] = useState({
     identifier: '', 
     password: ''
