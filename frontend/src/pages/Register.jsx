@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Loader2, UserPlus } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
+import { CustomLoader } from '@/components/ui/custom-loader';
 import api from '@/lib/api';
 
 const Register = () => {
