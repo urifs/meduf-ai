@@ -316,37 +316,30 @@ class BackendTester:
         print(f"\n🔬 Testing Exam Analysis...")
         
         # Test data from review request - Análise de Exame
-        test_data = {
-            "files": [
-                {
-                    "content": "Hemograma: Leucócitos 15000/mm³ (VR: 4000-11000), Neutrófilos 85% (VR: 50-70%), Hemoglobina 12.5 g/dL (VR: 12-16), Hematócrito 38% (VR: 36-46%), Plaquetas 350000/mm³ (VR: 150000-450000)"
-                }
-            ]
-        }
+        exam_content = "Hemograma: Leucócitos 15000/mm³ (VR: 4000-11000), Neutrófilos 85% (VR: 50-70%), Hemoglobina 12.5 g/dL (VR: 12-16), Hematócrito 38% (VR: 36-46%), Plaquetas 350000/mm³ (VR: 150000-450000)"
         
         start_time = time.time()
         try:
             # Create a simple text file for upload simulation
             import io
-            from requests_toolbelt.multipart.encoder import MultipartEncoder
             
             # Create file-like object
-            file_content = test_data["files"][0]["content"]
-            file_obj = io.BytesIO(file_content.encode('utf-8'))
+            file_obj = io.BytesIO(exam_content.encode('utf-8'))
             
-            # Prepare multipart form data
-            multipart_data = MultipartEncoder(
-                fields={
-                    'files': ('hemograma.txt', file_obj, 'text/plain'),
-                    'additional_info': ''
-                }
-            )
+            # Prepare files for upload
+            files = {
+                'files': ('hemograma.txt', file_obj, 'text/plain')
+            }
+            
+            data = {
+                'additional_info': ''
+            }
             
             # Step 1: Submit exam analysis request
             response = self.session.post(
                 f"{BACKEND_URL}/ai/analyze-exam",
-                data=multipart_data,
-                headers={'Content-Type': multipart_data.content_type}
+                files=files,
+                data=data
             )
             submit_duration = time.time() - start_time
             
@@ -355,8 +348,8 @@ class BackendTester:
                               f"Submit failed: {response.status_code} - {response.text}", submit_duration)
                 return False
             
-            data = response.json()
-            task_id = data.get("task_id")
+            response_data = response.json()
+            task_id = response_data.get("task_id")
             
             if not task_id:
                 self.log_result("Exam Analysis - Submit", False, 
