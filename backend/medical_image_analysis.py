@@ -327,13 +327,12 @@ Por favor, forneça uma análise INTEGRADA em formato JSON considerando TODAS as
                 response_text = response_text.split("```")[1].split("```")[0].strip()
             
             try:
-                analysis = json.loads(response_text)
-                analysis['pages_analyzed'] = len(files_data)
+                result = json.loads(response_text)
+                result['pages_analyzed'] = len(files_data)
                 print(f"✅ Análise de {len(files_data)} páginas concluída!")
-                return analysis
             except json.JSONDecodeError:
                 print("⚠️ Resposta não estruturada")
-                return {
+                result = {
                     "exam_type": f"Exame Laboratorial ({len(files_data)} páginas)",
                     "pages_analyzed": len(files_data),
                     "altered_values": [],
