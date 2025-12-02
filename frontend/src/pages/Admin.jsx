@@ -770,12 +770,12 @@ const Admin = () => {
                           <TableCell className="font-medium">{feedback.user_email}</TableCell>
                           <TableCell>
                             <Badge variant="outline">
-                              {feedback.analysis_type === 'diagnosis' && '🩺 Diagnóstico'}
-                              {feedback.analysis_type === 'simple-diagnosis' && '📋 Diagnóstico Simples'}
-                              {feedback.analysis_type === 'drug-interaction' && '💊 Interação'}
-                              {feedback.analysis_type === 'medication-guide' && '💉 Guia Terapêutico'}
-                              {feedback.analysis_type === 'toxicology' && '☠️ Toxicologia'}
-                              {feedback.analysis_type === 'exam-reader' && '📄 Leitor de Exames'}
+                              {feedback.analysis_type === 'diagnosis' && 'Diagnóstico'}
+                              {feedback.analysis_type === 'simple-diagnosis' && 'Diagnóstico Simples'}
+                              {feedback.analysis_type === 'drug-interaction' && 'Interação'}
+                              {feedback.analysis_type === 'medication-guide' && 'Guia Terapêutico'}
+                              {feedback.analysis_type === 'toxicology' && 'Toxicologia'}
+                              {feedback.analysis_type === 'exam-reader' && 'Leitor de Exames'}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-center">
