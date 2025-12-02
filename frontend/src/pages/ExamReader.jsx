@@ -216,6 +216,12 @@ const ExamReader = () => {
           <p className="text-slate-600">
             Faça upload de exames laboratoriais (foto ou PDF) para análise automática das alterações
           </p>
+          <div className="mt-3 flex items-center gap-2 text-sm text-blue-600 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
+            <Info className="h-4 w-4 flex-shrink-0" />
+            <span>
+              <strong>Múltiplas páginas:</strong> Você pode adicionar várias fotos/arquivos se o exame tiver várias páginas
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
