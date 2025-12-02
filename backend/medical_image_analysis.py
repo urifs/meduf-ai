@@ -27,7 +27,7 @@ EXAM_SYSTEM_PROMPT = """Você é um médico radiologista e patologista especiali
 1. **Achados Principais** (observações clínicas importantes)
 2. **Interpretação** (significado clínico)
 3. **Diagnóstico Sugerido** (hipóteses diagnósticas)
-4. **Recomendações** (próximos passos)
+4. **Recomendações** (próximos passos como lista)
 
 **FORMATO DA RESPOSTA:**
 ```json
@@ -35,7 +35,11 @@ EXAM_SYSTEM_PROMPT = """Você é um médico radiologista e patologista especiali
   "findings": "Descrição detalhada dos achados",
   "interpretation": "Interpretação clínica",
   "diagnosis": "Diagnóstico sugerido",
-  "recommendations": "Recomendações clínicas"
+  "recommendations": [
+    "Recomendação 1",
+    "Recomendação 2",
+    "Recomendação 3"
+  ]
 }
 ```
 
