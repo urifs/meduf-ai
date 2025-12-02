@@ -908,7 +908,28 @@ const Admin = () => {
                   </Card>
                 </div>
                 <div className="md:col-span-2">
-                  <ClinicalReport data={selectedConsultation.report} />
+                  {selectedConsultation.report ? (
+                    typeof selectedConsultation.report === 'object' && selectedConsultation.report.diagnoses ? (
+                      <ClinicalReport data={selectedConsultation.report} />
+                    ) : (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Resultado da Análise</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <pre className="whitespace-pre-wrap text-sm bg-muted p-4 rounded-md">
+                            {JSON.stringify(selectedConsultation.report, null, 2)}
+                          </pre>
+                        </CardContent>
+                      </Card>
+                    )
+                  ) : (
+                    <Card>
+                      <CardContent className="py-8 text-center text-muted-foreground">
+                        Dados da análise não disponíveis
+                      </CardContent>
+                    </Card>
+                  )}
                 </div>
               </div>
             )}
