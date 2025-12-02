@@ -230,10 +230,29 @@
 .animate-neon-border::before {
   content: '';
   position: absolute;
-  inset: -2px;
+  inset: 0;
   border-radius: 1rem;
-  background: rgba(30, 58, 138, 1);
-  animation: neon-border-travel 4s linear infinite;
+  padding: 3px;
+  background: 
+    linear-gradient(90deg,
+      transparent 0%,
+      transparent 35%,
+      rgba(30, 58, 138, 0.4) 40%,
+      rgba(30, 58, 138, 1) 45%,
+      rgba(30, 58, 138, 1) 55%,
+      rgba(30, 58, 138, 0.4) 60%,
+      transparent 65%,
+      transparent 100%
+    );
+  background-size: 400% 100%;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: neon-border-travel 6s linear infinite;
+  filter: drop-shadow(0 0 10px rgba(30, 58, 138, 0.8)) 
+          drop-shadow(0 0 20px rgba(30, 58, 138, 0.6));
   pointer-events: none;
   z-index: -1;
 }
