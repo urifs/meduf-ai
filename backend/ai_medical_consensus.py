@@ -10,6 +10,10 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 import aiohttp
 import xml.etree.ElementTree as ET
 import json
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 
 # Get Emergent Universal Key from environment
