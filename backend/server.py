@@ -1046,7 +1046,8 @@ async def create_feedback(
     try:
         feedback_doc = {
             "user_id": user.id,
-            "username": user.username,
+            "user_email": user.email,
+            "user_name": user.name,
             "analysis_type": feedback.analysis_type,
             "is_helpful": feedback.is_helpful,
             "result_data": feedback.result_data,
