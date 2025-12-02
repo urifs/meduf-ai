@@ -14,6 +14,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from bson import ObjectId
+from timezone_utils import now_sao_paulo, utc_to_sao_paulo
 
 # --- Configuration ---
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
