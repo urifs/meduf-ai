@@ -14,6 +14,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import api from '@/lib/api';
 import html2canvas from 'html2canvas';
 import { startAITask } from '@/lib/aiPolling';
+import { CustomLoader } from '@/components/ui/custom-loader';
 import '../styles/animations.css';
 
 const DrugInteraction = () => {
