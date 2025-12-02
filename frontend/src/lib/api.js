@@ -3,7 +3,14 @@ import axios from 'axios';
 // Use empty string if REACT_APP_BACKEND_URL is not set or is empty
 // This allows the app to use relative URLs in production (Kubernetes ingress handles routing)
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-const API_URL = (backendUrl && backendUrl.trim() !== '') ? backendUrl + '/api' : '/api';
+
+// For deploy/preview environments, use current origin + /api
+// For localhost development, use relative URLs
+const API_URL = (backendUrl && backendUrl.trim() !== '') 
+  ? backendUrl + '/api'  // Explicit URL provided
+  : (window.location.origin.includes('localhost') 
+      ? '/api'  // Localhost: use relative
+      : window.location.origin + '/api');  // Deploy: use full URL with current origin
 
 const api = axios.create({
   baseURL: API_URL,
