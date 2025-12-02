@@ -183,7 +183,7 @@ const Toxicology = () => {
                   >
                     {isLoading ? (
                       <span className="flex items-center gap-2">
-                        <span className="animate-spin">⏳</span> Buscando Protocolo...
+                        <CustomLoader size="sm" /> Buscando Protocolo...
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
