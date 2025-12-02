@@ -490,7 +490,7 @@ const DrugInteraction = () => {
                               )}
                               {result.monitoring.hepatic.length > 0 && (
                                 <div className="bg-white p-3 rounded border border-orange-100">
-                                  <span className="text-xs font-bold text-orange-800 block mb-2">🫁 Função Hepática</span>
+                                  <span className="text-xs font-bold text-orange-800 block mb-2">Função Hepática</span>
                                   <ul className="text-xs text-orange-900 space-y-1">
                                     {result.monitoring.hepatic.map((exam, i) => (
                                       <li key={i}>• {exam}</li>
