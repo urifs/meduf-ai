@@ -192,15 +192,16 @@ export const Header = () => {
                </Button>
             </SheetTrigger>
 
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-              <SheetHeader>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0 flex flex-col">
+              <SheetHeader className="px-6 pt-6 pb-4">
                 <SheetTitle className="flex items-center gap-2">
                   <BrainCircuit className="h-5 w-5 text-primary" />
                   Menu de Navegação
                 </SheetTitle>
               </SheetHeader>
               
-              <div className="flex flex-col gap-6 mt-8">
+              <ScrollArea className="flex-1 px-6">
+                <div className="flex flex-col gap-6 pb-6">
                 {/* User Profile Section in Menu */}
                 <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
                   <Avatar className="h-10 w-10 border border-muted">
