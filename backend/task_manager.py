@@ -4,10 +4,11 @@ Handles long-running AI consensus tasks asynchronously
 """
 import uuid
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Any, Optional, Callable
 from enum import Enum
 from concurrent.futures import ThreadPoolExecutor
+from timezone_utils import now_sao_paulo
 from cost_tracker import track_usage
 import json
 
