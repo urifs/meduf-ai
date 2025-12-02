@@ -912,7 +912,7 @@ async def get_task_status(task_id: str, user: UserInDB = Depends(get_current_use
 
 
 # --- Medical Image Analysis Endpoints ---
-from medical_image_analysis import analyze_exam_image
+from medical_image_analysis import analyze_exam_image, analyze_multiple_exam_images
 import base64
 
 
