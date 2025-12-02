@@ -126,7 +126,6 @@ Por favor, forneça uma análise completa em formato JSON."""
         # Send message with image if available
         if image_base64:
             # Send with image using FileContent
-            from emergentintegrations.llm.chat import FileContent
             file_content = FileContent(
                 content_type=image_type,
                 file_content_base64=image_base64
