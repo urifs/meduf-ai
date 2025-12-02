@@ -92,7 +92,7 @@ const Login = () => {
 
   return (
     <AuthLayout 
-      title="Bem-vindo de volta" 
+      title="Bem-vindo" 
       subtitle="Acesse sua conta para continuar suas análises clínicas."
       isZooming={isZooming}
     >
