@@ -353,7 +353,9 @@ Por favor, forneça uma análise INTEGRADA em formato JSON considerando TODAS as
             try:
                 from motor.motor_asyncio import AsyncIOMotorClient
                 import os
-                from datetime import datetime
+                import sys
+                sys.path.append('/app/backend')
+                from timezone_utils import now_sao_paulo
                 
                 mongo_url = os.getenv("MONGO_URL", "mongodb://localhost:27017")
                 client = AsyncIOMotorClient(mongo_url)
@@ -364,7 +366,7 @@ Por favor, forneça uma análise INTEGRADA em formato JSON considerando TODAS as
                     "patient": {"name": "Análise de Exame"},
                     "report": result,
                     "type": "exam-analysis",
-                    "created_at": datetime.utcnow()
+                    "created_at": now_sao_paulo()
                 }
                 
                 await db.consultations.insert_one(consultation_doc)
