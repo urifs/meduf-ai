@@ -918,41 +918,56 @@ import base64
 
 @app.post("/api/ai/analyze-exam", response_model=dict)
 async def analyze_medical_exam(
-    file: UploadFile = File(...),
+    files: list[UploadFile] = File(...),
     additional_info: str = "",
     user: UserInDB = Depends(get_current_user)
 ):
     """
-    Analyze medical exam images (lab results)
+    Analyze medical exam images (lab results) - supports multiple files
     Supports: JPG, PNG, PDF, DOC, DOCX, TXT
     """
     try:
-        # Read file content
-        content = await file.read()
+        if not files:
+            raise HTTPException(status_code=400, detail="Nenhum arquivo enviado")
         
-        # Get file type
-        content_type = file.content_type or "application/octet-stream"
+        print(f"📄 Recebidos {len(files)} arquivo(s) para análise")
         
-        # Convert to base64 for image types
-        if content_type.startswith('image/'):
-            image_data = base64.b64encode(content).decode('utf-8')
-        else:
-            # For documents, try to extract text (simplified - in production use proper libraries)
-            try:
-                image_data = content.decode('utf-8')
-            except:
+        # Process all files
+        processed_files = []
+        for idx, file in enumerate(files):
+            print(f"  Processando arquivo {idx + 1}/{len(files)}: {file.filename}")
+            
+            # Read file content
+            content = await file.read()
+            
+            # Get file type
+            content_type = file.content_type or "application/octet-stream"
+            
+            # Convert to base64 for image types
+            if content_type.startswith('image/'):
                 image_data = base64.b64encode(content).decode('utf-8')
+            else:
+                # For documents, try to extract text
+                try:
+                    image_data = content.decode('utf-8')
+                except:
+                    image_data = base64.b64encode(content).decode('utf-8')
+            
+            processed_files.append({
+                'data': image_data,
+                'type': content_type,
+                'filename': file.filename
+            })
         
         # Create task for background processing
         task_id = task_manager.create_task("exam-analysis")
         
-        # Start background analysis
+        # Start background analysis with multiple files
         asyncio.create_task(
             task_manager.execute_task(
                 task_id,
-                analyze_exam_image,
-                image_data,
-                content_type,
+                analyze_multiple_exam_images,
+                processed_files,
                 additional_info
             )
         )
@@ -960,11 +975,15 @@ async def analyze_medical_exam(
         return {
             "task_id": task_id,
             "status": "pending",
-            "message": "Análise do exame iniciada. Use /api/ai/tasks/{task_id} para verificar o progresso."
+            "message": f"Análise de {len(files)} arquivo(s) iniciada. Use /api/ai/tasks/{{task_id}} para verificar o progresso."
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"Error uploading exam: {e}")
+        print(f"❌ Error uploading exam: {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Erro ao processar arquivo: {str(e)}")
 
 
