@@ -53,7 +53,7 @@ const Login = () => {
         }
       });
 
-      const { access_token, user_name, user_role, expiration_date } = response.data;
+      const { access_token, user_name, user_role, expiration_date, avatar_url } = response.data;
 
       localStorage.setItem('isAuthenticated', 'true');
       localStorage.setItem('token', access_token);
@@ -61,6 +61,9 @@ const Login = () => {
       localStorage.setItem('userRole', user_role);
       if (expiration_date) {
         localStorage.setItem('userExpiration', expiration_date);
+      }
+      if (avatar_url) {
+        localStorage.setItem('userAvatar', avatar_url);
       }
       
       toast.success(`Bem-vindo, ${user_name}!`);
