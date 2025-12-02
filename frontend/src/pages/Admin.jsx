@@ -23,7 +23,10 @@ import {
   UserPlus,
   CalendarClock,
   DollarSign,
-  TrendingUp
+  TrendingUp,
+  MessageSquare,
+  ThumbsUp,
+  ThumbsDown
 } from 'lucide-react';
 import { CustomLoader } from '@/components/ui/custom-loader';
 import {
