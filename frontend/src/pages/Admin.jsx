@@ -536,7 +536,15 @@ const Admin = () => {
                           <TableRow key={user.id}>
                             <TableCell>
                               <div className="flex flex-col">
-                                <span className="font-medium">{user.name}</span>
+                                <button 
+                                  onClick={() => {
+                                    setSelectedUserProfile(user);
+                                    setIsProfileOpen(true);
+                                  }}
+                                  className="font-medium text-primary hover:underline cursor-pointer text-left"
+                                >
+                                  {user.name}
+                                </button>
                                 <span className="text-xs text-muted-foreground">{user.email}</span>
                               </div>
                             </TableCell>
