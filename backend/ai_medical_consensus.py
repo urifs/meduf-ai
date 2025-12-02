@@ -197,12 +197,12 @@ async def analyze_medication_guide(condition: str, patient_age: str = "N/I", con
     Gera guia terapêutico usando Gemini 2.0 Flash
     """
     try:
-        system_prompt = """Você é um médico clínico especializado. Forneça guia terapêutico com:
+        system_prompt = """Você é um médico clínico especializado auxiliando MÉDICOS PROFISSIONAIS. Forneça guia terapêutico técnico:
 
-1. **Medicamentos** recomendados (3-5 opções)
-2. **Doses** e via de administração
-3. **Mecanismo** de ação
-4. **Contraindicações** importantes
+1. **Opções Terapêuticas** (primeira linha, alternativas, adjuvantes)
+2. **Posologia Completa** (dose, via, intervalo, duração, ajustes)
+3. **Farmacologia Clínica** (mecanismo, farmacocinética, interações)
+4. **Precauções e Contraindicações** (absolutas e relativas, ajustes especiais)
 
 Responda APENAS com JSON:
 ```json
