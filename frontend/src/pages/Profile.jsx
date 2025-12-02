@@ -122,6 +122,19 @@ const Profile = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background font-sans">
+        <Header />
+        <main className="container mx-auto px-4 py-8 md:px-8 max-w-2xl">
+          <div className="flex justify-center items-center h-64">
+            <CustomLoader size="lg" />
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background font-sans">
       <Header />
