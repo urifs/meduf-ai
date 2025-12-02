@@ -238,22 +238,28 @@
 }
 
 .animate-neon-border {
-  animation: neon-border-rotate 4s ease-in-out infinite;
-  border-radius: 1rem;
   position: relative;
+  border-radius: 1rem;
 }
 
 .animate-neon-border::before {
   content: '';
   position: absolute;
-  inset: -2px;
+  inset: -3px;
   border-radius: 1rem;
-  padding: 2px;
-  background: linear-gradient(45deg, #4F46E5, #8B5CF6, #4F46E5);
+  padding: 3px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    transparent 40%,
+    rgba(30, 58, 138, 1) 50%,
+    transparent 60%,
+    transparent 100%);
+  background-size: 200% 200%;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: neon-border-rotate 4s ease-in-out infinite;
+  animation: neon-border-travel 6s linear infinite;
+  box-shadow: 0 0 30px rgba(30, 58, 138, 0.6);
 }
 
 .zoom-out-animation {
