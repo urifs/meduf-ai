@@ -21,11 +21,11 @@ import {
   AlertCircle,
   Database,
   UserPlus,
-  Loader2,
   CalendarClock,
   DollarSign,
   TrendingUp
 } from 'lucide-react';
+import { CustomLoader } from '@/components/ui/custom-loader';
 import {
   DropdownMenu,
   DropdownMenuContent,
