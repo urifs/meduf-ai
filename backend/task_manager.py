@@ -57,23 +57,13 @@ class TaskManager:
             if progress is not None:
                 self.tasks[task_id]["progress"] = progress
     
-    def complete_task(self, task_id: str, result: Any, save_consultation: bool = False, user_id: str = None, user_name: str = None, patient_data: dict = None):
+    def complete_task(self, task_id: str, result: Any):
         """Mark task as completed with result"""
         if task_id in self.tasks:
             self.tasks[task_id]["status"] = TaskStatus.COMPLETED
             self.tasks[task_id]["result"] = result
             self.tasks[task_id]["completed_at"] = datetime.utcnow()
             self.tasks[task_id]["progress"] = 100
-            
-            # Save consultation if requested
-            if save_consultation and user_id:
-                self.tasks[task_id]["save_consultation"] = True
-                self.tasks[task_id]["consultation_data"] = {
-                    "user_id": user_id,
-                    "user_name": user_name,
-                    "patient": patient_data or {},
-                    "report": result
-                }
     
     def fail_task(self, task_id: str, error: str):
         """Mark task as failed with error message"""
