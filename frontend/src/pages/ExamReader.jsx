@@ -10,7 +10,6 @@ import {
   Upload, 
   Camera, 
   FileText, 
-  Loader2, 
   AlertTriangle,
   CheckCircle2,
   XCircle,
@@ -18,6 +17,7 @@ import {
 } from 'lucide-react';
 import { toast } from "sonner";
 import api from '@/lib/api';
+import { CustomLoader } from '@/components/ui/custom-loader';
 
 const ExamReader = () => {
   const navigate = useNavigate();
