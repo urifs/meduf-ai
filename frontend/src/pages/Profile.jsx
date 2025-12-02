@@ -79,7 +79,11 @@ const Profile = () => {
     formData.append('file', file);
 
     try {
-      const response = await api.post('/users/me/avatar', formData);
+      const response = await api.post('/users/me/avatar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
 
       const newAvatarUrl = response.data.avatar_url;
       setUser(prev => ({ ...prev, avatar_url: newAvatarUrl }));
