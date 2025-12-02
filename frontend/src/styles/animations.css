@@ -224,6 +224,7 @@
 .animate-neon-border {
   position: relative;
   border-radius: 1rem;
+  box-shadow: 0 0 20px rgba(30, 58, 138, 0.3);
 }
 
 .animate-neon-border::before {
