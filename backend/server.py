@@ -914,7 +914,26 @@ async def get_task_status(task_id: str, user: UserInDB = Depends(get_current_use
     }
     
     if task["status"] == TaskStatus.COMPLETED:
-        response["result"] = task["result"]
+        result = task["result"]
+        
+        # Save consultation if this is an exam-analysis and hasn't been saved yet
+        if task["type"] == "exam-analysis" and result and "_user_id" in result and not task.get("_consultation_saved"):
+            try:
+                consultation_doc = {
+                    "user_id": result["_user_id"],
+                    "patient": {"name": "Análise de Exame"},
+                    "report": {k: v for k, v in result.items() if not k.startswith("_")},  # Remove internal fields
+                    "type": "exam-analysis",
+                    "created_at": now_sao_paulo()
+                }
+                
+                await db.consultations.insert_one(consultation_doc)
+                task["_consultation_saved"] = True
+                print(f"💾 Consulta de exame salva para user {result['_user_id']}")
+            except Exception as save_error:
+                print(f"⚠️ Erro ao salvar consulta de exame: {save_error}")
+        
+        response["result"] = result
         response["completed_at"] = task["completed_at"].isoformat()
     elif task["status"] == TaskStatus.FAILED:
         response["error"] = task["error"]
