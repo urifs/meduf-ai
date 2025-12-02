@@ -423,7 +423,7 @@ const ExamReader = () => {
                       <Alert variant="destructive">
                         <AlertTriangle className="h-4 w-4" />
                         <AlertDescription>
-                          <strong>Atenção:</strong> Este exame pode requerer avaliação médica urgente.
+                          <strong>Atenção:</strong> Achados críticos identificados. Considerar conduta imediata.
                         </AlertDescription>
                       </Alert>
                     )}
