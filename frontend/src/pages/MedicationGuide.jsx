@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import api from '@/lib/api';
 import html2canvas from 'html2canvas';
 import { startAITask } from '@/lib/aiPolling';
+import { CustomLoader } from '@/components/ui/custom-loader';
 import '../styles/animations.css';
 
 const MedicationGuide = () => {
