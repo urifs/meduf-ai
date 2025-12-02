@@ -514,6 +514,14 @@ const DrugInteraction = () => {
                     </div>
                   ) : null}
                 </div>
+
+                {/* ResultActions Component */}
+                <ResultActions 
+                  resultRef={reportRef}
+                  resultData={result}
+                  analysisType="drug-interaction"
+                  fileName={`interacao-medicamentosa-${new Date().toISOString().slice(0,10)}.png`}
+                />
               </div>
             ) : (
               <Card className="h-full border-dashed border-2 flex items-center justify-center bg-gradient-to-br from-orange-50/30 to-red-50/30 min-h-[400px] rounded-xl">
