@@ -81,6 +81,9 @@ export const ResultActions = ({
 
   const handleFeedback = async (isHelpful) => {
     try {
+      setIsSubmittingFeedback(true);
+      setFeedbackType(isHelpful ? 'helpful' : 'not-helpful');
+      
       await api.post('/feedback', {
         analysis_type: analysisType,
         is_helpful: isHelpful,
@@ -96,6 +99,9 @@ export const ResultActions = ({
     } catch (error) {
       console.error("Error sending feedback:", error);
       toast.error("Erro ao enviar feedback");
+      setFeedbackType(null);
+    } finally {
+      setIsSubmittingFeedback(false);
     }
   };
 
