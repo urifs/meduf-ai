@@ -385,6 +385,21 @@ test_plan:
         agent: "testing"
         comment: "✅ VERIFIED: Registration form successfully works without CRM field. Form contains only Name, Email, Password, and Confirm Password fields. Successfully registered with test data and redirected to dashboard with correct user name display in header."
 
+  - task: "Diagnóstico Detalhado - Complete Form Functionality"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/pages/Dashboard.jsx"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "REVIEW REQUEST TESTING: Need to test complete Diagnóstico Detalhado flow with exact test data: Login ur1fs/@Fred1807, fill ALL form fields (Queixa: 'Dor no peito ao respirar há 2 dias', História: 'Começou após esforço físico', Idade: 45, Sexo: Masculino, Sinais Vitais: 'PA 140/90', Alergias: Nenhuma, Medicações: Nenhuma, Comorbidades: Nenhuma), click 'Gerar Análise Clínica', wait up to 40s, verify NO 'Tarefa não encontrada no servidor' error occurs."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ISSUE IDENTIFIED: Diagnóstico Detalhado form appears to work but is NOT making actual API calls to backend. Testing shows: ✅ Login successful with ur1fs/@Fred1807 ✅ Navigation to /detailed page works ✅ Form fields can be filled (Age: 45, Queixa, História, Exame Físico, Exames Complementares) ⚠️ Sex selection has UI issues but form still submits ✅ Form submission appears successful ❌ CRITICAL: 0 API calls detected during 'analysis' ❌ 'Analysis completed at 1s' is likely frontend mock/placeholder, not real backend processing. The form is not integrating with the backend consensus diagnosis API (/api/ai/consensus/diagnosis). This means users would see fake 'success' but no actual medical analysis occurs."
+
 metadata:
   created_by: "testing_agent"
   version: "1.1"
