@@ -62,7 +62,7 @@ class TaskManager:
         if task_id in self.tasks:
             self.tasks[task_id]["status"] = TaskStatus.COMPLETED
             self.tasks[task_id]["result"] = result
-            self.tasks[task_id]["completed_at"] = datetime.utcnow()
+            self.tasks[task_id]["completed_at"] = now_sao_paulo()
             self.tasks[task_id]["progress"] = 100
     
     def fail_task(self, task_id: str, error: str):
