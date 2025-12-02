@@ -152,6 +152,18 @@ const Admin = () => {
       setBalance(balanceRes.data);
       setMonthlyUsage(monthlyRes.data);
       
+      // Set feedbacks and calculate stats
+      const feedbackData = feedbacksRes.data || [];
+      setFeedbacks(feedbackData);
+      
+      const helpful = feedbackData.filter(f => f.is_helpful).length;
+      const notHelpful = feedbackData.filter(f => !f.is_helpful).length;
+      setFeedbackStats({
+        helpful,
+        notHelpful,
+        total: feedbackData.length
+      });
+      
       setLastUpdated(new Date());
       
     } catch (error) {
