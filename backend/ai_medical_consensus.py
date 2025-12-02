@@ -137,16 +137,20 @@ async def analyze_drug_interaction(drug1: str, drug2: str, patient_info: Optiona
 1. **Severidade** (Leve/Moderada/Grave)
 2. **Impacto Renal** e **Impacto Hepático**
 3. **Mecanismo** da interação
-4. **Monitoramento** necessário
+4. **Monitoramento** necessário (exames renais, hepáticos e outros)
 
 Responda APENAS com JSON:
 ```json
 {
-  "severity": "string",
-  "renal_impact": "string",
-  "hepatic_impact": "string",
-  "mechanism": "string",
-  "monitoring": "string"
+  "severity": "Leve|Moderada|Grave",
+  "renal_impact": "Descrição do impacto renal",
+  "hepatic_impact": "Descrição do impacto hepático",
+  "mechanism": "Mecanismo da interação",
+  "monitoring": {
+    "renal": ["Exame 1", "Exame 2"],
+    "hepatic": ["Exame 1", "Exame 2"],
+    "outros": ["Exame 1", "Exame 2"]
+  }
 }
 ```"""
         
