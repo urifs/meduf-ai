@@ -201,7 +201,7 @@ Por favor, forneça uma análise completa em formato JSON."""
 
 
 
-async def analyze_multiple_exam_images(files_data: list, additional_info: str = "") -> Dict[str, Any]:
+async def analyze_multiple_exam_images(files_data: list, additional_info: str = "", user_id: str = None, user_name: str = None) -> Dict[str, Any]:
     """
     Analyze multiple exam images (for multi-page exams)
     Combines all pages into a single comprehensive analysis
