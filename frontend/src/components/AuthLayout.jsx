@@ -23,7 +23,7 @@ export const AuthLayout = ({ children, title, subtitle, isZooming = false }) => 
         </div>
 
         {/* Card Container with Neon Border */}
-        <div className="glass-card rounded-2xl shadow-2xl p-8 border-2 border-white/50 animate-scale-in backdrop-blur-xl animate-neon-border">
+        <div className={`glass-card rounded-2xl shadow-2xl p-8 border-2 border-white/50 animate-scale-in backdrop-blur-xl animate-neon-border ${isZooming ? 'opacity-0' : ''}`}>
           <div className="flex flex-col space-y-2 text-center mb-6">
             <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">{title}</h1>
             <p className="text-sm text-muted-foreground">
