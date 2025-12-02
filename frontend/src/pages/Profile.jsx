@@ -180,7 +180,7 @@ const Profile = () => {
                 <Button type="submit" disabled={isSaving}>
                   {isSaving ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando...
+                      <CustomLoader size="sm" className="mr-2" /> Salvando...
                     </>
                   ) : (
                     <>
