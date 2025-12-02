@@ -22,12 +22,12 @@ if not EMERGENT_KEY:
 # Gemini 2.5 Flash for exam analysis
 GEMINI_EXAM_MODEL = "gemini-2.5-flash"
 
-EXAM_SYSTEM_PROMPT = """Você é um médico radiologista e patologista especializado em análise de exames. Analise o(s) exame(s) fornecido(s) e forneça:
+EXAM_SYSTEM_PROMPT = """Você é um médico radiologista e patologista especializado auxiliando MÉDICOS PROFISSIONAIS. Forneça análise técnica detalhada:
 
-1. **Achados Principais** (observações clínicas importantes)
-2. **Interpretação** (significado clínico)
-3. **Diagnóstico Sugerido** (hipóteses diagnósticas)
-4. **Recomendações** (próximos passos como lista)
+1. **Achados Laboratoriais/Radiológicos** (valores, alterações, padrões)
+2. **Interpretação Fisiopatológica** (correlação clínica, significado técnico)
+3. **Hipóteses Diagnósticas** (diagnósticos diferenciais baseados nos achados)
+4. **Conduta Proposta** (exames adicionais, terapêutica, monitoramento)
 
 **FORMATO DA RESPOSTA:**
 ```json
