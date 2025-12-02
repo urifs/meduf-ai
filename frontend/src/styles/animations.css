@@ -248,17 +248,19 @@
   inset: -3px;
   border-radius: 1rem;
   padding: 3px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    transparent 40%,
-    rgba(30, 58, 138, 1) 50%,
-    transparent 60%,
-    transparent 100%);
-  background-size: 200% 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(30, 58, 138, 0.9) 30deg,
+    rgba(30, 58, 138, 1) 45deg,
+    rgba(30, 58, 138, 0.9) 60deg,
+    transparent 90deg,
+    transparent 360deg
+  );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: neon-border-travel 6s linear infinite;
+  animation: neon-border-travel 4s linear infinite;
   box-shadow: 0 0 30px rgba(30, 58, 138, 0.6);
   pointer-events: none;
   z-index: -1;
