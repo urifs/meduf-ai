@@ -20,7 +20,7 @@ if not EMERGENT_KEY:
     raise ValueError("EMERGENT_LLM_KEY environment variable is required but not set")
 
 # Gemini 2.5 Flash for exam analysis
-GEMINI_EXAM_MODEL = "gemini-2.5-flash-preview-04-17"
+GEMINI_EXAM_MODEL = "gemini-2.5-flash"
 
 EXAM_SYSTEM_PROMPT = """Você é um médico radiologista e patologista especializado em análise de exames. Analise o(s) exame(s) fornecido(s) e forneça:
 
