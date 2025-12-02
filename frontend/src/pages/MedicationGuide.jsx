@@ -68,7 +68,7 @@ const MedicationGuide = () => {
             })) || []
           }
         });
-        toast.success("✅ Guia completo! Análise concluída");
+        toast.success("Guia completo! Análise concluída");
       } catch (error) {
         console.error("Error saving:", error);
         toast.success("Guia gerado (não salvo no histórico).");
