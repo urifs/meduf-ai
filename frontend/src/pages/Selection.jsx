@@ -168,7 +168,7 @@ const Selection = () => {
           {/* Bottom Info */}
           <div className={`mt-16 text-center ${mounted ? 'animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '600ms' }}>
             <p className="text-sm text-muted-foreground">
-              💡 Todas as análises utilizam consenso de múltiplas IAs e base de dados PubMed
+              Todas as análises utilizam consenso de múltiplas IAs e base de dados PubMed
             </p>
           </div>
         </main>
