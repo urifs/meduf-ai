@@ -96,7 +96,11 @@ const Login = () => {
         } else if (status === 401) {
           toast.error("Senha incorreta. Tente novamente.");
         } else if (status === 403) {
-          toast.error(detail || "Acesso negado.");
+          if (detail === "Account deleted") {
+            toast.error("Sua conta foi excluída devido à expiração. Entre em contato com o administrador para renovar o acesso.");
+          } else {
+            toast.error(detail || "Acesso negado.");
+          }
         } else if (status === 400 && detail === "User account is blocked") {
           toast.error("Esta conta foi bloqueada pelo administrador.");
         } else {
