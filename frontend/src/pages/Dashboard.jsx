@@ -47,7 +47,7 @@ const Dashboard = () => {
       clearInterval(progressInterval);
       setProgress(100);
       
-      console.log("✅ AI task completed successfully!");
+      console.log("AI task completed successfully!");
       console.log("Result structure:", {
         hasDiagnoses: !!aiReport?.diagnoses,
         count: aiReport?.diagnoses?.length
