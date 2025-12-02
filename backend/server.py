@@ -145,6 +145,14 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     user = await users_collection.find_one({"email": email})
     if user is None:
         raise credentials_exception
+    
+    # Check if account is deleted
+    if user.get("deleted") == True:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Conta excluída. Acesso negado.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
         
     # Single Session Enforcement
     # If the user has a session_id in DB, it MUST match the token's session_id
