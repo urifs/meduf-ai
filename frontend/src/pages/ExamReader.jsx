@@ -127,30 +127,24 @@ const ExamReader = () => {
       const pollInterval = setInterval(async () => {
         attempts++;
         
+        // Simulated progress (same as other analysis pages)
+        const progressPercent = Math.min(20 + (attempts * 70 / maxAttempts), 90);
+        setProgress(progressPercent);
+        
+        // Update message based on simulated progress
+        if (attempts < 15) {
+          setProgressMessage('Lendo valores da imagem...');
+        } else if (attempts < 30) {
+          setProgressMessage('Identificando alterações...');
+        } else if (attempts < 60) {
+          setProgressMessage('Analisando significado clínico...');
+        } else {
+          setProgressMessage('Finalizando análise...');
+        }
+        
         try {
           const taskResponse = await api.get(`/ai/tasks/${taskId}`);
           const task = taskResponse.data;
-          
-          // Use actual backend progress if available
-          if (task.progress !== undefined && task.progress > 0) {
-            setProgress(task.progress);
-          } else {
-            // Fallback: time-based progress (more conservative)
-            const progressPercent = Math.min(20 + (attempts * 60 / maxAttempts), 85);
-            setProgress(progressPercent);
-          }
-          
-          // Update message based on progress
-          const currentProgress = task.progress || 20;
-          if (currentProgress < 30) {
-            setProgressMessage('Lendo valores da imagem...');
-          } else if (currentProgress < 60) {
-            setProgressMessage('Identificando alterações...');
-          } else if (currentProgress < 90) {
-            setProgressMessage('Analisando significado clínico...');
-          } else {
-            setProgressMessage('Finalizando análise...');
-          }
 
           if (task.status === 'completed') {
             clearInterval(pollInterval);
