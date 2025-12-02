@@ -128,11 +128,10 @@ const Admin = () => {
     try {
       // Add timestamp to prevent caching
       const timestamp = new Date().getTime();
-      const [usersRes, consultsRes, onlineRes, balanceRes, monthlyRes, feedbacksRes, deletedRes] = await Promise.all([
+      const [usersRes, consultsRes, onlineRes, monthlyRes, feedbacksRes, deletedRes] = await Promise.all([
         api.get(`/admin/users?t=${timestamp}`),
         api.get(`/admin/consultations?t=${timestamp}`),
         api.get(`/admin/stats/online?t=${timestamp}`),
-        api.get(`/admin/balance?t=${timestamp}`),
         api.get(`/admin/usage-stats/monthly?t=${timestamp}`),
         api.get(`/feedbacks?t=${timestamp}`),
         api.get(`/admin/deleted-users?t=${timestamp}`)
