@@ -73,6 +73,17 @@ const ExamReader = () => {
     handleFileSelect(event);
   };
 
+  const handleRemoveFile = (index) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    toast.info("Arquivo removido");
+  };
+
+  const handleClearAll = () => {
+    setSelectedFiles([]);
+    setAnalysis(null);
+    toast.info("Todos os arquivos removidos");
+  };
+
   const handleAnalyze = async () => {
     if (!selectedFile) {
       toast.error("Por favor, selecione um arquivo ou tire uma foto");
