@@ -15,6 +15,10 @@ from passlib.context import CryptContext
 from jose import JWTError, jwt
 from bson import ObjectId
 from timezone_utils import now_sao_paulo, utc_to_sao_paulo
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # --- Configuration ---
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
