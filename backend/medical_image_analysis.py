@@ -131,18 +131,46 @@ async def analyze_exam_simple(exam_content: str) -> Dict[str, Any]:
 async def analyze_exam_image(files, additional_info="", user_id=None, user_name=None):
     """Analyze single exam image"""
     if not files:
-        return {"error": "No files provided"}
+        return {
+            "findings": "Nenhum arquivo fornecido",
+            "interpretation": "Não foi possível realizar análise sem dados de exame",
+            "diagnosis": "Análise não realizada",
+            "recommendations": ["Fornecer arquivos de exame para análise"]
+        }
     
     # Convert files to text format
     exam_texts = []
     for file in files:
         if isinstance(file, dict):
-            if file.get('type', '').startswith('image/'):
-                exam_texts.append(f"Image file: {file.get('filename', 'unknown')}")
+            file_data = file.get('data', '')
+            file_type = file.get('type', '')
+            filename = file.get('filename', 'unknown')
+            
+            # For images, note that it's an image but we can't OCR it directly
+            # The AI model (Gemini 2.5 Flash) can handle text descriptions
+            if file_type.startswith('image/'):
+                exam_texts.append(f"IMAGEM MÉDICA ANEXADA: {filename}\nObs: Análise visual de imagens requer integração OCR adicional. Por favor, forneça descrição textual dos achados da imagem.")
             else:
-                exam_texts.append(file.get('data', ''))
+                # For text files, use the content directly
+                if file_data:
+                    exam_texts.append(f"Exame: {filename}\n\nConteúdo:\n{file_data}")
+                else:
+                    exam_texts.append(f"Arquivo {filename} sem conteúdo legível")
         else:
             exam_texts.append(str(file))
+    
+    # If no valid text content, return helpful message
+    if not exam_texts or all(not text.strip() for text in exam_texts):
+        return {
+            "findings": "Arquivos carregados mas sem conteúdo de texto",
+            "interpretation": "Os arquivos fornecidos não contêm texto legível para análise",
+            "diagnosis": "Análise incompleta",
+            "recommendations": [
+                "Fornecer arquivo de texto (.txt) com resultados de exames",
+                "Para imagens, descrever textualmente os achados radiológicos",
+                "Incluir valores laboratoriais em formato texto"
+            ]
+        }
     
     result = await analyze_exam(
         exam_texts=exam_texts,
