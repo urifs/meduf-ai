@@ -101,6 +101,7 @@ const Login = () => {
     <AuthLayout 
       title="Bem-vindo" 
       subtitle="Acesse sua conta para continuar suas análises clínicas."
+      isCardFading={isCardFading}
       isZooming={isZooming}
     >
       <form onSubmit={handleSubmit} className="space-y-6">
