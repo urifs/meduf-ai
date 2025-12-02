@@ -157,7 +157,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     user["_id"] = str(user["_id"])
     
     # Track active user (update timestamp)
-    active_user_sessions[user["_id"]] = datetime.utcnow()
+    active_user_sessions[user["_id"]] = now_sao_paulo()
     
     return UserInDB(**user)
 
