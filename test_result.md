@@ -545,7 +545,7 @@ test_plan:
     - "Diagnóstico Detalhado - Complete Form Functionality"
   test_all: false
   test_priority: "critical_frontend_backend_integration_fix_needed"
-  test_summary: "❌ CRITICAL PRODUCTION ISSUE DISCOVERED: Diagnóstico Detalhado frontend form is NOT integrated with backend API. While backend consensus diagnosis system works perfectly (verified in previous tests), the frontend Dashboard.jsx component shows fake 'analysis completed' messages without making actual API calls to /api/ai/consensus/diagnosis. This is a critical production bug - users see success but receive no real medical analysis. IMMEDIATE ACTION REQUIRED: Fix frontend-backend integration for Diagnóstico Detalhado feature. All other functionalities (Simple Diagnosis, Drug Interaction, Toxicology, Medication Guide, Exam Analysis) working correctly with proper backend integration."
+  test_summary: "❌ CRITICAL PRODUCTION ISSUE CONFIRMED: Diagnóstico Detalhado frontend form is completely NON-FUNCTIONAL for actual medical analysis. Comprehensive testing with exact review request data (ur1fs/@Fred1807, 'Dor no peito ao respirar', Age 45, 'Após esforço') confirms zero backend integration. Frontend Dashboard.jsx accepts form data and shows fake processing but makes NO API calls to /api/ai/consensus/diagnosis. Users experience: working form → fake loading → no results → no medical analysis. This is a critical production failure - the core detailed diagnosis feature is broken. IMMEDIATE ACTION REQUIRED: Implement proper frontend-backend integration in Dashboard.jsx to call /api/ai/consensus/diagnosis endpoint with form data and handle real AI analysis results."
 
 frontend:
   - task: "Toxicology Feature - Backend AI Engine Integration - Paracetamol"
