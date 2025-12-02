@@ -176,14 +176,6 @@ const MedicationGuide = () => {
                     <Pill className="h-6 w-6 text-emerald-600" /> 
                     <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Sugestão Terapêutica</span>
                   </h2>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={copyToClipboard} className="gap-2 hover:bg-emerald-50">
-                      <Copy className="h-4 w-4" /> Copiar
-                    </Button>
-                    <Button variant="default" size="sm" onClick={handleSaveImage} className="gap-2 bg-gradient-to-r from-emerald-600 to-teal-600">
-                      <Download className="h-4 w-4" /> Salvar Imagem
-                    </Button>
-                  </div>
                 </div>
                 
                 <div ref={reportRef} className="space-y-4 p-6 bg-white rounded-xl shadow-lg">
