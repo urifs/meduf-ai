@@ -21,6 +21,7 @@ const Dashboard = () => {
   const [progress, setProgress] = useState(0);
 
   const handleAnalyze = async (formData) => {
+    console.log("[Dashboard] Starting analysis with formData:", formData);
     setIsLoading(true);
     setReportData(null);
     setProgress(10);
@@ -33,16 +34,19 @@ const Dashboard = () => {
         });
       }, 1500);
 
+      console.log("[Dashboard] Calling startAITask with endpoint: /ai/consensus/diagnosis");
       const aiReport = await startAITask(
         '/ai/consensus/diagnosis',
         formData,
         (task) => {
-          console.log(`Task status: ${task.status}, progress: ${task.progress}%`);
+          console.log(`[Dashboard] Task status: ${task.status}, progress: ${task.progress}%`);
           if (task.status === 'processing' && task.progress > 0) {
             setProgress(prev => Math.max(prev, task.progress));
           }
         }
       );
+      
+      console.log("[Dashboard] AI task completed, result:", aiReport);
       
       clearInterval(progressInterval);
       setProgress(100);
