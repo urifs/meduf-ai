@@ -457,7 +457,7 @@ const DrugInteraction = () => {
                       <Card className="border-l-4 border-l-orange-500 shadow-sm">
                         <CardHeader className="pb-2">
                           <CardTitle className="text-lg text-orange-700 flex items-center gap-2">
-                            🫁 Impacto Hepático
+                            Impacto Hepático
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
