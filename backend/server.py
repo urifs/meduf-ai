@@ -310,7 +310,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if user.get("deleted") == True:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Account deleted",
+            detail="Sua conta foi excluída ou expirou. Por favor, renove seu acesso.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
