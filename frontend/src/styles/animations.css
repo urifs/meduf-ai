@@ -123,28 +123,12 @@
   }
 }
 
-@keyframes neon-border-travel {
+@keyframes neon-border-rotate {
   0% {
-    background: conic-gradient(
-      from 0deg,
-      transparent 0deg,
-      rgba(30, 58, 138, 0.9) 30deg,
-      rgba(30, 58, 138, 1) 45deg,
-      rgba(30, 58, 138, 0.9) 60deg,
-      transparent 90deg,
-      transparent 360deg
-    );
+    transform: rotate(0deg);
   }
   100% {
-    background: conic-gradient(
-      from 360deg,
-      transparent 0deg,
-      rgba(30, 58, 138, 0.9) 30deg,
-      rgba(30, 58, 138, 1) 45deg,
-      rgba(30, 58, 138, 0.9) 60deg,
-      transparent 90deg,
-      transparent 360deg
-    );
+    transform: rotate(360deg);
   }
 }
 
