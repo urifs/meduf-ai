@@ -1055,10 +1055,12 @@ async def analyze_medical_exam(
         if not files:
             raise HTTPException(status_code=400, detail="Nenhum arquivo enviado")
         
-        print(f"📄 Recebidos {len(files)} arquivo(s) para análise")
+        print(f"📄 Recebidos {len(files)} arquivo(s) para análise de exame")
         
-        # Process all files
+        # Save files temporarily for vision analysis
+        import tempfile
         processed_files = []
+        
         for idx, file in enumerate(files):
             print(f"  Processando arquivo {idx + 1}/{len(files)}: {file.filename}")
             
@@ -1068,21 +1070,23 @@ async def analyze_medical_exam(
             # Get file type
             content_type = file.content_type or "application/octet-stream"
             
-            # Convert to base64 for image types
-            if content_type.startswith('image/'):
-                image_data = base64.b64encode(content).decode('utf-8')
-            else:
-                # For documents, try to extract text
-                try:
-                    image_data = content.decode('utf-8')
-                except:
-                    image_data = base64.b64encode(content).decode('utf-8')
+            # Determine file extension
+            file_extension = Path(file.filename).suffix if file.filename else '.bin'
+            
+            # Save to temporary file for vision analysis
+            with tempfile.NamedTemporaryFile(mode='wb', delete=False, suffix=file_extension) as tmp_file:
+                tmp_file.write(content)
+                tmp_path = tmp_file.name
+                print(f"    ✅ Arquivo salvo temporariamente: {tmp_path}")
             
             processed_files.append({
-                'data': image_data,
-                'type': content_type,
-                'filename': file.filename
+                'file_path': tmp_path,
+                'mime_type': content_type,
+                'filename': file.filename,
+                'size': len(content)
             })
+            
+            print(f"    📊 Tipo: {content_type}, Tamanho: {len(content)} bytes")
         
         # Create task for background processing
         task_id = task_manager.create_task("exam-analysis")
