@@ -972,7 +972,7 @@ async def analyze_medical_exam(
             })
         
         # Create task for background processing
-        task_id = task_manager.create_task("exam-analysis", user_id=str(user.id))
+        task_id = task_manager.create_task("exam-analysis")
         
         # Start background analysis with multiple files
         # Note: analyze_multiple_exam_images only accepts files_data and additional_info
