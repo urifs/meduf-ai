@@ -499,7 +499,15 @@ const ExamReader = () => {
                     </AlertDescription>
                   </Alert>
                 )}
-              </>
+
+                {/* Result Actions */}
+                <ResultActions
+                  resultRef={resultRef}
+                  resultData={analysis}
+                  analysisType="exam-reader"
+                  fileName="resultado-exame-meduf-ai.png"
+                />
+              </div>
             ) : (
               <Card className="shadow-lg">
                 <CardContent className="pt-6">
