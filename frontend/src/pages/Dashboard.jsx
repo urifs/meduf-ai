@@ -37,7 +37,7 @@ const Dashboard = () => {
         '/ai/consensus/diagnosis',
         formData,
         (task) => {
-          console.log(`📊 Task status: ${task.status}, progress: ${task.progress}%`);
+          console.log(`Task status: ${task.status}, progress: ${task.progress}%`);
           if (task.status === 'processing' && task.progress > 0) {
             setProgress(prev => Math.max(prev, task.progress));
           }
