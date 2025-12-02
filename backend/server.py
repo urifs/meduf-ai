@@ -969,8 +969,10 @@ async def analyze_medical_exam(
                 analyze_multiple_exam_images,
                 processed_files,
                 additional_info,
+                save_consultation=True,
                 user_id=str(user.id),
-                user_name=user.name
+                user_name=user.name,
+                patient_data={"name": "Análise de Exame", "info": additional_info}
             )
         )
         
