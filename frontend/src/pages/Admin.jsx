@@ -744,6 +744,39 @@ const Admin = () => {
               </div>
             </CardHeader>
             <CardContent>
+              {/* Gráfico de Pizza */}
+              {feedbackStats && feedbackStats.total > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold mb-4">Distribuição de Avaliações</h3>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={[
+                          { name: 'Útil', value: feedbackStats.helpful, color: '#22c55e' },
+                          { name: 'Não útil', value: feedbackStats.notHelpful, color: '#ef4444' }
+                        ]}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {[
+                          { name: 'Útil', value: feedbackStats.helpful, color: '#22c55e' },
+                          { name: 'Não útil', value: feedbackStats.notHelpful, color: '#ef4444' }
+                        ].map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+              
               <div className="rounded-md border">
                 <Table>
                   <TableHeader>
