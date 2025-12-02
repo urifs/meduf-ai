@@ -54,7 +54,7 @@ const Dashboard = () => {
       });
       
       if (!aiReport || !aiReport.diagnoses) {
-        console.error("❌ Invalid response");
+        console.error("Invalid response");
         throw new Error("Resposta inválida. Tente novamente.");
       }
       
