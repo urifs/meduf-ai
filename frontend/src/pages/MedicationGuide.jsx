@@ -177,7 +177,7 @@ const MedicationGuide = () => {
                   >
                     {isLoading ? (
                       <span className="flex items-center gap-2">
-                        <span className="animate-spin">⏳</span> Buscando Protocolos...
+                        <CustomLoader size="sm" /> Buscando Protocolos...
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
