@@ -484,7 +484,7 @@ const Admin = () => {
                 ✓ Gemini 2.0 Flash ($0.075/$0.30 por 1M tokens)
               </p>
               <p className="text-xs text-blue-600 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                💡 Valores exatos, atualizados a cada 3 segundos
+                Valores exatos, atualizados a cada 3 segundos
               </p>
             </CardContent>
           </Card>
