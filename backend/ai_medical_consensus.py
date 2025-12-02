@@ -180,14 +180,14 @@ Analise a interação medicamentosa.
     except Exception as e:
         print(f"Error in analyze_drug_interaction: {e}")
         return {
-            "severity": "Erro",
-            "renal_impact": "Análise não disponível",
-            "hepatic_impact": "Análise não disponível",
-            "mechanism": str(e),
+            "severity": "Erro no sistema - avaliar manualmente",
+            "renal_impact": "Avaliar clearance de creatinina e necessidade de ajuste de dose",
+            "hepatic_impact": "Avaliar função hepática (TGO, TGP, bilirrubinas) e metabolização",
+            "mechanism": f"Sistema temporariamente indisponível: {str(e)}",
             "monitoring": {
-                "renal": ["Consulte um farmacêutico"],
-                "hepatic": ["Consulte um farmacêutico"],
-                "outros": []
+                "renal": ["Creatinina sérica", "TFG estimada", "Eletrólitos"],
+                "hepatic": ["AST/ALT", "Bilirrubinas", "TAP/INR"],
+                "outros": ["Monitorar sinais de toxicidade", "Considerar ajuste de dose"]
             }
         }
 
