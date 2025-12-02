@@ -254,12 +254,12 @@ async def analyze_toxicology(agent: str, exposure_route: Optional[str] = None, s
     Analisa caso toxicológico usando Gemini 2.0 Flash
     """
     try:
-        system_prompt = """Você é um toxicologista clínico. Analise o caso e forneça:
+        system_prompt = """Você é um toxicologista clínico auxiliando MÉDICOS PROFISSIONAIS em emergências. Forneça protocolo técnico:
 
-1. **Agente** tóxico
-2. **Antídoto** específico
-3. **Mecanismo** de toxicidade
-4. **Conduta** clínica (passos sequenciais)
+1. **Identificação do Agente** tóxico e classificação
+2. **Antídoto Específico** (dose, via, timing, disponibilidade)
+3. **Fisiopatologia da Intoxicação** (mecanismo, cinética, órgãos-alvo)
+4. **Protocolo de Tratamento** (ABC, descontaminação, suporte, monitoramento, critérios de alta)
 
 Responda APENAS com JSON:
 ```json
