@@ -124,29 +124,11 @@
 }
 
 @keyframes neon-border-travel {
-  0%, 100% {
-    box-shadow: 
-      0 -4px 15px rgba(30, 58, 138, 1),
-      0 -4px 30px rgba(30, 58, 138, 0.5);
-    clip-path: inset(0 95% 95% 0 round 1rem);
+  0% {
+    background-position: 0% 0%;
   }
-  25% {
-    box-shadow: 
-      4px 0 15px rgba(30, 58, 138, 1),
-      4px 0 30px rgba(30, 58, 138, 0.5);
-    clip-path: inset(0 0 95% 95% round 1rem);
-  }
-  50% {
-    box-shadow: 
-      0 4px 15px rgba(30, 58, 138, 1),
-      0 4px 30px rgba(30, 58, 138, 0.5);
-    clip-path: inset(95% 0 0 95% round 1rem);
-  }
-  75% {
-    box-shadow: 
-      -4px 0 15px rgba(30, 58, 138, 1),
-      -4px 0 30px rgba(30, 58, 138, 0.5);
-    clip-path: inset(95% 95% 0 0 round 1rem);
+  100% {
+    background-position: 400% 0%;
   }
 }
 
