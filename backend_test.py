@@ -311,6 +311,75 @@ class BackendTester:
             self.log_result("Consensus Medication Guide", False, f"Error: {str(e)}", duration)
             return False
     
+    def test_exam_analysis(self):
+        """Test exam analysis endpoint - Gemini 2.5 Flash"""
+        print(f"\n🔬 Testing Exam Analysis...")
+        
+        # Test data from review request - Análise de Exame
+        test_data = {
+            "files": [
+                {
+                    "content": "Hemograma: Leucócitos 15000/mm³ (VR: 4000-11000), Neutrófilos 85% (VR: 50-70%), Hemoglobina 12.5 g/dL (VR: 12-16), Hematócrito 38% (VR: 36-46%), Plaquetas 350000/mm³ (VR: 150000-450000)"
+                }
+            ]
+        }
+        
+        start_time = time.time()
+        try:
+            # Create a simple text file for upload simulation
+            import io
+            from requests_toolbelt.multipart.encoder import MultipartEncoder
+            
+            # Create file-like object
+            file_content = test_data["files"][0]["content"]
+            file_obj = io.BytesIO(file_content.encode('utf-8'))
+            
+            # Prepare multipart form data
+            multipart_data = MultipartEncoder(
+                fields={
+                    'files': ('hemograma.txt', file_obj, 'text/plain'),
+                    'additional_info': ''
+                }
+            )
+            
+            # Step 1: Submit exam analysis request
+            response = self.session.post(
+                f"{BACKEND_URL}/ai/analyze-exam",
+                data=multipart_data,
+                headers={'Content-Type': multipart_data.content_type}
+            )
+            submit_duration = time.time() - start_time
+            
+            if response.status_code != 200:
+                self.log_result("Exam Analysis - Submit", False, 
+                              f"Submit failed: {response.status_code} - {response.text}", submit_duration)
+                return False
+            
+            data = response.json()
+            task_id = data.get("task_id")
+            
+            if not task_id:
+                self.log_result("Exam Analysis - Submit", False, 
+                              "No task_id returned", submit_duration)
+                return False
+            
+            # Check if response was immediate (< 1 second as required)
+            if submit_duration > 1.0:
+                self.log_result("Exam Analysis - Submit Speed", False, 
+                              f"Response too slow: {submit_duration:.2f}s (should be < 1s)", submit_duration)
+            else:
+                self.log_result("Exam Analysis - Submit Speed", True, 
+                              f"Immediate response with task_id: {task_id}", submit_duration)
+            
+            # Step 2: Poll for results
+            return self.poll_task_result(task_id, "Exam Analysis", 
+                                       expected_fields=["tipo_exame", "interpretacao_clinica"])
+            
+        except Exception as e:
+            duration = time.time() - start_time
+            self.log_result("Exam Analysis", False, f"Error: {str(e)}", duration)
+            return False
+    
     def poll_task_result(self, task_id, test_name, expected_fields=None, max_wait=120):
         """Poll task status until completion or timeout"""
         print(f"📊 Polling task {task_id} for {test_name}...")
