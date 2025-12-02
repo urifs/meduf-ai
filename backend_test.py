@@ -503,6 +503,11 @@ class BackendTester:
         if self.test_consensus_toxicology():
             tests_passed += 1
         
+        # Test 6: Exam Analysis (Gemini 2.5 Flash)
+        total_tests += 1
+        if self.test_exam_analysis():
+            tests_passed += 1
+        
         # Summary
         print("\n" + "=" * 60)
         print(f"📊 TEST SUMMARY: {tests_passed}/{total_tests} tests passed")
