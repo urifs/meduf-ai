@@ -260,6 +260,8 @@
   mask-composite: exclude;
   animation: neon-border-travel 6s linear infinite;
   box-shadow: 0 0 30px rgba(30, 58, 138, 0.6);
+  pointer-events: none;
+  z-index: -1;
 }
 
 .zoom-out-animation {
