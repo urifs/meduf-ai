@@ -248,15 +248,10 @@
 .animate-neon-border::before {
   content: '';
   position: absolute;
-  inset: -4px;
+  inset: -2px;
   border-radius: 1rem;
-  background: linear-gradient(90deg, 
-    rgba(30, 58, 138, 1) 0%, 
-    rgba(30, 58, 138, 0) 100%
-  );
-  animation: neon-border-travel 6s linear infinite;
-  box-shadow: 0 0 20px rgba(30, 58, 138, 0.8),
-              0 0 40px rgba(30, 58, 138, 0.5);
+  background: rgba(30, 58, 138, 1);
+  animation: neon-border-travel 4s linear infinite;
   pointer-events: none;
   z-index: -1;
 }
