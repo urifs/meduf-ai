@@ -33,8 +33,8 @@ export const AuthLayout = ({ children, title, subtitle, isCardFading = false, is
           {children}
         </div>
 
-        {/* Footer */}
-        <p className={`px-8 text-center text-sm text-slate-600 animate-fade-in ${isZooming ? 'opacity-0' : ''}`} style={{animationDelay: '0.3s'}}>
+        {/* Footer - Fades with card */}
+        <p className={`px-8 text-center text-sm text-slate-600 animate-fade-in transition-opacity duration-400 ${isCardFading ? 'opacity-0' : 'opacity-100'}`} style={{animationDelay: '0.3s'}}>
           © 2025 Meduf Ai. Todos os direitos reservados.
         </p>
       </div>
