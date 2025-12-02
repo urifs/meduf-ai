@@ -51,11 +51,17 @@ const Login = () => {
       
       toast.success(`Bem-vindo, ${user_name}!`);
       
-      if (user_role === 'ADMIN') {
-        navigate('/admin');
-      } else {
-        navigate('/');
-      }
+      // Trigger zoom animation
+      setIsZooming(true);
+      
+      // Wait for animation to complete, then navigate
+      setTimeout(() => {
+        if (user_role === 'ADMIN') {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
+      }, 800); // Match animation duration
 
     } catch (error) {
       console.error(error);
