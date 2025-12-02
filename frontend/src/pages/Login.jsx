@@ -52,17 +52,23 @@ const Login = () => {
       
       toast.success(`Bem-vindo, ${user_name}!`);
       
-      // Trigger zoom animation
-      setIsZooming(true);
+      // Sequência de animações:
+      // 1. Fade out da caixa de login (400ms)
+      setIsCardFading(true);
       
-      // Wait for animation to complete, then navigate
       setTimeout(() => {
-        if (user_role === 'ADMIN') {
-          navigate('/admin');
-        } else {
-          navigate('/');
-        }
-      }, 800); // Match animation duration
+        // 2. Zoom da logo (800ms)
+        setIsZooming(true);
+        
+        setTimeout(() => {
+          // 3. Navegar para plataforma
+          if (user_role === 'ADMIN') {
+            navigate('/admin');
+          } else {
+            navigate('/');
+          }
+        }, 800); // Duração do zoom
+      }, 400); // Duração do fade da caixa
 
     } catch (error) {
       console.error(error);
