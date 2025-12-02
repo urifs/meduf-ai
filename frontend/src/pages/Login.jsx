@@ -203,6 +203,7 @@ const Login = () => {
           Novas contas são criadas apenas por administradores.
         </div>
       </form>
+      <Toaster />
     </AuthLayout>
   );
 };
