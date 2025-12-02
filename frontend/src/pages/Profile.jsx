@@ -132,7 +132,7 @@ const Profile = () => {
                     onClick={() => fileInputRef.current?.click()}
                   >
                     {isUploading ? (
-                      <Loader2 className="h-8 w-8 text-white animate-spin" />
+                      <CustomLoader size="lg" className="text-white" />
                     ) : (
                       <Camera className="h-8 w-8 text-white" />
                     )}
