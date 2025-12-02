@@ -399,7 +399,7 @@ const ExamReader = () => {
           {/* Analysis Results */}
           <div className="space-y-6">
             {analysis ? (
-              <>
+              <div ref={resultRef}>
                 {/* Overview Card */}
                 <Card className={`shadow-lg border-l-4 ${analysis.urgent_attention ? 'border-l-red-500' : 'border-l-blue-500'}`}>
                   <CardHeader>
