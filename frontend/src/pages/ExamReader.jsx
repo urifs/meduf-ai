@@ -18,11 +18,13 @@ import {
 import { toast } from "sonner";
 import api from '@/lib/api';
 import { CustomLoader } from '@/components/ui/custom-loader';
+import { ResultActions } from '@/components/ResultActions';
 
 const ExamReader = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
+  const resultRef = useRef(null);
   
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [additionalInfo, setAdditionalInfo] = useState('');
