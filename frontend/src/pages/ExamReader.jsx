@@ -29,6 +29,8 @@ const ExamReader = () => {
   const [additionalInfo, setAdditionalInfo] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState(null);
+  const [progress, setProgress] = useState(0);
+  const [progressMessage, setProgressMessage] = useState('');
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
