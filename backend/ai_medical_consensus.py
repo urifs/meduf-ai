@@ -294,3 +294,28 @@ Analise o caso toxicológico.
             "mechanism": str(e),
             "conduct": "Procure atendimento médico imediatamente"
         }
+
+
+# Consensus functions for background task system
+async def get_ai_consensus_diagnosis(patient_data):
+    """Consensus diagnosis using Gemini 2.0 Flash"""
+    return await analyze_diagnosis(
+        patient_data.get("queixa", ""),
+        patient_data.get("idade", "N/I"),
+        patient_data.get("sexo", "N/I")
+    )
+
+async def get_ai_consensus_medication_guide(symptoms):
+    """Consensus medication guide using Gemini 2.0 Flash"""
+    medications = await analyze_medication_guide(symptoms)
+    return {"medications": medications}
+
+async def get_ai_consensus_drug_interaction(medications):
+    """Consensus drug interaction using Gemini 2.0 Flash"""
+    if len(medications) >= 2:
+        return await analyze_drug_interaction(medications[0], medications[1])
+    return {"error": "Need at least 2 medications"}
+
+async def get_ai_consensus_toxicology(substance):
+    """Consensus toxicology using Gemini 2.0 Flash"""
+    return await analyze_toxicology(substance)
