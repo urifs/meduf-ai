@@ -728,7 +728,10 @@ const Admin = () => {
                     </div>
                     <div className="text-center">
                       <div className="text-3xl font-bold text-red-600">{feedbackStats.notHelpful}</div>
-                      <div className="text-xs text-muted-foreground">👎 Não útil</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <ThumbsDown className="h-3 w-3" />
+                        Não útil
+                      </div>
                     </div>
                     <div className="text-center">
                       <div className="text-3xl font-bold text-blue-600">
