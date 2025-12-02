@@ -145,7 +145,7 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
             )}
-            <ClinicalReport data={reportData} />
+            <ClinicalReport data={reportData} analysisType="diagnosis" />
           </div>
         </div>
       </main>
