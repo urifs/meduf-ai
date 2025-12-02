@@ -472,7 +472,8 @@ const DrugInteraction = () => {
                         <Card className="border-l-4 border-l-purple-500 shadow-sm bg-purple-50/30">
                           <CardHeader className="pb-2">
                             <CardTitle className="text-lg text-purple-700 flex items-center gap-2">
-                              📊 Exames de Monitoramento Recomendados
+                              <Activity className="h-5 w-5" />
+                              Exames de Monitoramento Recomendados
                             </CardTitle>
                           </CardHeader>
                           <CardContent>
