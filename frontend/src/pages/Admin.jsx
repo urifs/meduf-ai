@@ -706,7 +706,7 @@ const Admin = () => {
             </div>
             <DialogFooter>
               <Button onClick={handleUpdateExpiration} disabled={isUpdatingExpiration}>
-                {isUpdatingExpiration ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar Alteração"}
+                {isUpdatingExpiration ? <CustomLoader size="sm" /> : "Salvar Alteração"}
               </Button>
             </DialogFooter>
           </DialogContent>
