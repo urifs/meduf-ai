@@ -369,11 +369,13 @@ const Admin = () => {
                       <Label htmlFor="days_valid">Dias de Acesso</Label>
                       <Input 
                         id="days_valid" 
-                        type="number" 
-                        min="1"
+                        type="text" 
                         placeholder="30" 
                         value={newUser.days_valid}
-                        onChange={(e) => setNewUser({...newUser, days_valid: parseInt(e.target.value) || 30})}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '');
+                          setNewUser({...newUser, days_valid: value ? parseInt(value) : ''});
+                        }}
                         required
                       />
                     </div>
