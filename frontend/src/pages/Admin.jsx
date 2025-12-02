@@ -98,6 +98,8 @@ const Admin = () => {
   const [isUpdatingExpiration, setIsUpdatingExpiration] = useState(false);
   const [selectedUserForExpiration, setSelectedUserForExpiration] = useState(null);
   const [newDaysValid, setNewDaysValid] = useState(30);
+  const [selectedUserProfile, setSelectedUserProfile] = useState(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   // Consultation View State
   const [selectedConsultation, setSelectedConsultation] = useState(null);
