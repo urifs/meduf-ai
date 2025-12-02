@@ -122,12 +122,13 @@ const Admin = () => {
     try {
       // Add timestamp to prevent caching
       const timestamp = new Date().getTime();
-      const [usersRes, consultsRes, onlineRes, balanceRes, monthlyRes] = await Promise.all([
+      const [usersRes, consultsRes, onlineRes, balanceRes, monthlyRes, feedbacksRes] = await Promise.all([
         api.get(`/admin/users?t=${timestamp}`),
         api.get(`/admin/consultations?t=${timestamp}`),
         api.get(`/admin/stats/online?t=${timestamp}`),
         api.get(`/admin/balance?t=${timestamp}`),
-        api.get(`/admin/usage-stats/monthly?t=${timestamp}`)
+        api.get(`/admin/usage-stats/monthly?t=${timestamp}`),
+        api.get(`/feedbacks?t=${timestamp}`)
       ]);
 
       // DIRECT MAPPING: No mock data merging. What you see is what is in the DB.
