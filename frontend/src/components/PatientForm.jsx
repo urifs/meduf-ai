@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Stethoscope, FileText, History, Activity, Sparkles } from 'lucide-react';
+import { CustomLoader } from '@/components/ui/custom-loader';
 
 export const PatientForm = ({ onSubmit, isLoading }) => {
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
