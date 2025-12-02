@@ -218,7 +218,7 @@ active_user_sessions = {}
 @app.get("/api/admin/stats/online")
 async def get_online_users_count(admin: UserInDB = Depends(get_admin_user)):
     # Count users active in last 5 minutes
-    now = datetime.utcnow()
+    now = now_sao_paulo()
     threshold = now - timedelta(minutes=5)
     
     # Clean up old sessions
