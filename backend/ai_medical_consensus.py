@@ -13,7 +13,9 @@ import json
 
 
 # Get Emergent Universal Key from environment
-EMERGENT_KEY = os.environ.get("EMERGENT_LLM_KEY", "sk-emergent-b51Fb1fC8C81f9e13D")
+EMERGENT_KEY = os.environ.get("EMERGENT_LLM_KEY")
+if not EMERGENT_KEY:
+    raise ValueError("EMERGENT_LLM_KEY environment variable is required but not set")
 
 
 MEDICAL_SYSTEM_PROMPT = """Você é um assistente clínico especializado. Analise os sintomas fornecidos e forneça:
