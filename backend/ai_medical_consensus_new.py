@@ -1,0 +1,296 @@
+"""
+AI Medical Consensus Engine
+Uses Gemini 2.0 Flash for medical diagnosis
+Production-ready implementation with Emergent Universal Key
+"""
+import os
+import asyncio
+from typing import Dict, List, Any, Optional
+from emergentintegrations.llm.chat import LlmChat, UserMessage
+import json
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Get Emergent Universal Key from environment
+EMERGENT_KEY = os.environ.get("EMERGENT_LLM_KEY")
+if not EMERGENT_KEY:
+    raise ValueError("EMERGENT_LLM_KEY environment variable is required but not set")
+
+# Gemini 2.0 Flash model
+GEMINI_MODEL = "gemini-2.0-flash"
+
+MEDICAL_SYSTEM_PROMPT = """Você é um assistente clínico especializado brasileiro. Analise os sintomas fornecidos e forneça:
+
+1. **Diagnósticos Diferenciais** (3-5 hipóteses mais prováveis)
+2. **Justificativas Clínicas** para cada diagnóstico
+3. **Conduta Inicial** (exames e procedimentos)
+4. **Medicações Sugeridas** (com doses e mecanismos)
+
+**IMPORTANTE:**
+- Seja preciso e técnico
+- Use terminologia médica brasileira
+- Baseie-se em evidências científicas
+- Considere diagnósticos diferenciais importantes
+- Sugira exames complementares relevantes
+- NÃO substitui consulta médica presencial
+
+**ESTRUTURA DA RESPOSTA:**
+```json
+{
+  "diagnoses": [
+    {
+      "name": "Nome do Diagnóstico",
+      "justification": "Justificativa clínica detalhada"
+    }
+  ],
+  "conduct": {
+    "advice": "Conduta geral e recomendações",
+    "procedures": ["Procedimento 1", "Procedimento 2"]
+  },
+  "medications": [
+    {
+      "name": "Nome do medicamento",
+      "dosage": "Dose e via de administração",
+      "mechanism": "Mecanismo de ação"
+    }
+  ]
+}
+```
+
+Responda APENAS com o JSON, sem texto adicional."""
+
+
+async def analyze_diagnosis(queixa: str, idade: str = "N/I", sexo: str = "N/I") -> Dict[str, Any]:
+    """
+    Gera diagnóstico usando Gemini 2.0 Flash
+    
+    Args:
+        queixa: Descrição do caso clínico
+        idade: Idade do paciente
+        sexo: Sexo do paciente
+        
+    Returns:
+        Dict com diagnoses, conduct e medications
+    """
+    try:
+        # Create chat instance with Gemini 2.0 Flash
+        chat = LlmChat(
+            api_key=EMERGENT_KEY,
+            session_id=f"diagnosis_{os.urandom(8).hex()}",
+            system_message=MEDICAL_SYSTEM_PROMPT
+        ).with_model("gemini", GEMINI_MODEL)
+        
+        # Prepare prompt
+        user_prompt = f"""
+Paciente: {idade} anos, sexo {sexo}
+Queixa Principal: {queixa}
+
+Forneça análise clínica completa no formato JSON especificado.
+"""
+        
+        # Send message
+        user_message = UserMessage(text=user_prompt)
+        response = await chat.send_message(user_message)
+        
+        # Parse JSON response
+        response_text = response.strip()
+        if response_text.startswith("```json"):
+            response_text = response_text.split("```json")[1].split("```")[0].strip()
+        elif response_text.startswith("```"):
+            response_text = response_text.split("```")[1].split("```")[0].strip()
+        
+        result = json.loads(response_text)
+        
+        return result
+        
+    except json.JSONDecodeError as e:
+        print(f"JSON Decode Error: {e}")
+        print(f"Response was: {response}")
+        # Fallback response
+        return {
+            "diagnoses": [
+                {
+                    "name": "Análise Incompleta",
+                    "justification": "Não foi possível processar a resposta completa. Por favor, tente novamente."
+                }
+            ],
+            "conduct": {
+                "advice": "Consulte um médico para avaliação completa.",
+                "procedures": []
+            },
+            "medications": []
+        }
+    except Exception as e:
+        print(f"Error in analyze_diagnosis: {e}")
+        raise
+
+
+async def analyze_drug_interaction(drug1: str, drug2: str, patient_info: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Analisa interação medicamentosa usando Gemini 2.0 Flash
+    """
+    try:
+        system_prompt = """Você é um farmacêutico clínico especializado. Analise a interação medicamentosa e forneça:
+
+1. **Severidade** (Leve/Moderada/Grave)
+2. **Impacto Renal** e **Impacto Hepático**
+3. **Mecanismo** da interação
+4. **Monitoramento** necessário
+
+Responda APENAS com JSON:
+```json
+{
+  "severity": "string",
+  "renal_impact": "string",
+  "hepatic_impact": "string",
+  "mechanism": "string",
+  "monitoring": "string"
+}
+```"""
+        
+        chat = LlmChat(
+            api_key=EMERGENT_KEY,
+            session_id=f"interaction_{os.urandom(8).hex()}",
+            system_message=system_prompt
+        ).with_model("gemini", GEMINI_MODEL)
+        
+        prompt = f"""
+Medicamento 1: {drug1}
+Medicamento 2: {drug2}
+{f"Informações do Paciente: {patient_info}" if patient_info else ""}
+
+Analise a interação medicamentosa.
+"""
+        
+        response = await chat.send_message(UserMessage(text=prompt))
+        response_text = response.strip()
+        if response_text.startswith("```json"):
+            response_text = response_text.split("```json")[1].split("```")[0].strip()
+        elif response_text.startswith("```"):
+            response_text = response_text.split("```")[1].split("```")[0].strip()
+        
+        return json.loads(response_text)
+        
+    except Exception as e:
+        print(f"Error in analyze_drug_interaction: {e}")
+        return {
+            "severity": "Erro",
+            "renal_impact": "Análise não disponível",
+            "hepatic_impact": "Análise não disponível",
+            "mechanism": str(e),
+            "monitoring": "Consulte um farmacêutico"
+        }
+
+
+async def analyze_medication_guide(condition: str, patient_age: str = "N/I", contraindications: Optional[str] = None) -> List[Dict[str, Any]]:
+    """
+    Gera guia terapêutico usando Gemini 2.0 Flash
+    """
+    try:
+        system_prompt = """Você é um médico clínico especializado. Forneça guia terapêutico com:
+
+1. **Medicamentos** recomendados (3-5 opções)
+2. **Doses** e via de administração
+3. **Mecanismo** de ação
+4. **Contraindicações** importantes
+
+Responda APENAS com JSON:
+```json
+[
+  {
+    "name": "Nome do medicamento",
+    "dosage": "Dose e via",
+    "mechanism": "Mecanismo",
+    "contraindications": "Contraindicações"
+  }
+]
+```"""
+        
+        chat = LlmChat(
+            api_key=EMERGENT_KEY,
+            session_id=f"medguide_{os.urandom(8).hex()}",
+            system_message=system_prompt
+        ).with_model("gemini", GEMINI_MODEL)
+        
+        prompt = f"""
+Condição: {condition}
+Idade do Paciente: {patient_age}
+{f"Contraindicações Conhecidas: {contraindications}" if contraindications else ""}
+
+Forneça guia terapêutico.
+"""
+        
+        response = await chat.send_message(UserMessage(text=prompt))
+        response_text = response.strip()
+        if response_text.startswith("```json"):
+            response_text = response_text.split("```json")[1].split("```")[0].strip()
+        elif response_text.startswith("```"):
+            response_text = response_text.split("```")[1].split("```")[0].strip()
+        
+        return json.loads(response_text)
+        
+    except Exception as e:
+        print(f"Error in analyze_medication_guide: {e}")
+        return [{
+            "name": "Erro",
+            "dosage": "Análise não disponível",
+            "mechanism": str(e),
+            "contraindications": "Consulte um médico"
+        }]
+
+
+async def analyze_toxicology(agent: str, exposure_route: Optional[str] = None, symptoms: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Analisa caso toxicológico usando Gemini 2.0 Flash
+    """
+    try:
+        system_prompt = """Você é um toxicologista clínico. Analise o caso e forneça:
+
+1. **Agente** tóxico
+2. **Antídoto** específico
+3. **Mecanismo** de toxicidade
+4. **Conduta** clínica
+
+Responda APENAS com JSON:
+```json
+{
+  "agent": "string",
+  "antidote": "string",
+  "mechanism": "string",
+  "conduct": "string"
+}
+```"""
+        
+        chat = LlmChat(
+            api_key=EMERGENT_KEY,
+            session_id=f"tox_{os.urandom(8).hex()}",
+            system_message=system_prompt
+        ).with_model("gemini", GEMINI_MODEL)
+        
+        prompt = f"""
+Agente: {agent}
+{f"Via de Exposição: {exposure_route}" if exposure_route else ""}
+{f"Sintomas: {symptoms}" if symptoms else ""}
+
+Analise o caso toxicológico.
+"""
+        
+        response = await chat.send_message(UserMessage(text=prompt))
+        response_text = response.strip()
+        if response_text.startswith("```json"):
+            response_text = response_text.split("```json")[1].split("```")[0].strip()
+        elif response_text.startswith("```"):
+            response_text = response_text.split("```")[1].split("```")[0].strip()
+        
+        return json.loads(response_text)
+        
+    except Exception as e:
+        print(f"Error in analyze_toxicology: {e}")
+        return {
+            "agent": agent,
+            "antidote": "Análise não disponível",
+            "mechanism": str(e),
+            "conduct": "Procure atendimento médico imediatamente"
+        }
