@@ -125,10 +125,15 @@ Por favor, forneça uma análise completa em formato JSON."""
 
         # Send message with image if available
         if image_base64:
-            # Send with image
+            # Send with image using FileContent
+            from emergentintegrations.llm.chat import FileContent
+            file_content = FileContent(
+                content_type=image_type,
+                file_content_base64=image_base64
+            )
             message = UserMessage(
                 text=user_prompt,
-                image_url=f"data:{image_type};base64,{image_base64}"
+                file_contents=[file_content]
             )
         else:
             # Send text only
