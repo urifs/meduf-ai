@@ -29,6 +29,7 @@ import {
   ThumbsDown
 } from 'lucide-react';
 import { CustomLoader } from '@/components/ui/custom-loader';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import {
   DropdownMenu,
   DropdownMenuContent,
