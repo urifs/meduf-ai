@@ -20,8 +20,9 @@ EMERGENT_KEY = os.environ.get("EMERGENT_LLM_KEY")
 if not EMERGENT_KEY:
     raise ValueError("EMERGENT_LLM_KEY environment variable is required but not set")
 
-# Gemini 2.5 Flash for exam analysis WITH VISION
-GEMINI_VISION_MODEL = "gemini-2.5-flash-preview-04-17"
+# Gemini 2.0 Flash for exam analysis WITH VISION
+# Note: gemini-2.0-flash has vision capabilities and is stable
+GEMINI_VISION_MODEL = "gemini-2.0-flash"
 
 EXAM_VISION_SYSTEM_PROMPT = """Você é um médico radiologista e patologista especializado auxiliando MÉDICOS PROFISSIONAIS. Analise VISUALMENTE a(s) imagem(ns) médica(s) fornecida(s) e forneça análise técnica detalhada:
 
