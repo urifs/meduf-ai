@@ -213,7 +213,8 @@ const ExamReader = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold tracking-tight text-slate-900 mb-2">
-            📋 Leitor de Exames
+            <FileText className="h-5 w-5 inline mr-2" />
+            Leitor de Exames
           </h1>
           <p className="text-slate-600">
             Faça upload de exames laboratoriais (foto ou PDF) para análise automática das alterações
