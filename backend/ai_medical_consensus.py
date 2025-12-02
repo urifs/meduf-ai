@@ -300,7 +300,7 @@ Analise o caso toxicológico.
             "agent": agent,
             "antidote": "Análise não disponível",
             "mechanism": str(e),
-            "conduct": "Procure atendimento médico imediatamente"
+            "conduct": ["Procure atendimento médico imediatamente", "Ligue para o Centro de Intoxicações: 0800 722 6001"]
         }
 
 
