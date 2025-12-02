@@ -74,8 +74,11 @@ export const Header = () => {
       const end = new Date(userExpiration);
       
       if (end > now) {
-        const duration = intervalToDuration({ start: now, end: end });
-        setTimeLeft(duration);
+        // Calculate days and remaining hours
+        const totalHours = Math.floor((end - now) / (1000 * 60 * 60));
+        const days = Math.floor(totalHours / 24);
+        const hours = totalHours % 24;
+        setTimeLeft({ days, hours });
       } else {
         setTimeLeft({ days: 0, hours: 0 });
       }
