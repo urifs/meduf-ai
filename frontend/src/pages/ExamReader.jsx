@@ -128,7 +128,7 @@ const ExamReader = () => {
         attempts++;
         
         try {
-          const taskResponse = await api.get(`/ai/tasks/${taskId}`);
+          const taskResponse = await api.get(`tasks/${taskId}`);
           const task = taskResponse.data;
           
           // Use actual backend progress if available
