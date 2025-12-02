@@ -99,9 +99,10 @@ const Login = () => {
         } else if (status === 401) {
           toast.error("Senha incorreta. Tente novamente.");
         } else if (status === 403) {
-          if (detail === "Account deleted") {
-            toast.error("Sua conta foi excluída devido à expiração. Por favor, clique em 'Adquirir Acesso' abaixo para renovar.", {
-              duration: 8000,
+          // Tratamento para contas excluídas ou expiradas
+          if (detail === "Account deleted" || detail?.includes("excluída") || detail?.includes("expirou")) {
+            toast.error("Sua conta está inativa ou expirou. Para renovar seu acesso, clique no botão 'Adquirir Acesso' abaixo.", {
+              duration: 10000,
               action: {
                 label: 'Adquirir Acesso',
                 onClick: () => window.open('https://api.whatsapp.com/send/?phone=551152868823&text=Gostaria%20de%20renovar%20meu%20acesso%20ao%20Meduf%20AI', '_blank')
@@ -112,14 +113,6 @@ const Login = () => {
           }
         } else if (status === 400 && detail === "User account is blocked") {
           toast.error("Esta conta foi bloqueada pelo administrador.");
-        } else if (status === 400 && detail?.includes("expired")) {
-          toast.error("Sua conta expirou. Por favor, clique em 'Adquirir Acesso' abaixo para renovar o acesso.", {
-            duration: 8000,
-            action: {
-              label: 'Adquirir Acesso',
-              onClick: () => window.open('https://api.whatsapp.com/send/?phone=551152868823&text=Gostaria%20de%20renovar%20meu%20acesso%20ao%20Meduf%20AI', '_blank')
-            }
-          });
         } else {
           toast.error("Erro ao realizar login. Tente novamente mais tarde.");
         }
