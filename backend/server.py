@@ -960,7 +960,7 @@ async def analyze_medical_exam(
             })
         
         # Create task for background processing
-        task_id = task_manager.create_task("exam-analysis")
+        task_id = task_manager.create_task("exam-analysis", user_id=str(user.id))
         
         # Start background analysis with multiple files
         asyncio.create_task(
@@ -968,7 +968,9 @@ async def analyze_medical_exam(
                 task_id,
                 analyze_multiple_exam_images,
                 processed_files,
-                additional_info
+                additional_info,
+                user_id=str(user.id),
+                user_name=user.name
             )
         )
         
