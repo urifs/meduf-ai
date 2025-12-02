@@ -267,7 +267,7 @@ const DrugInteraction = () => {
             }))
           }
         });
-        toast.success("✅ Análise completa com perfil renal e hepático!");
+        toast.success("Análise completa com perfil renal e hepático!");
       } catch (error) {
         console.error("Error saving:", error);
       }
