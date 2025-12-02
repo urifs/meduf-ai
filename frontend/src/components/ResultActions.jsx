@@ -12,7 +12,9 @@ export const ResultActions = ({
   fileName = "resultado-meduf-ai.png" 
 }) => {
   const [feedbackSent, setFeedbackSent] = useState(false);
+  const [feedbackType, setFeedbackType] = useState(null); // 'helpful' or 'not-helpful'
   const [isSaving, setIsSaving] = useState(false);
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
 
   const handleCopy = async () => {
     try {
