@@ -197,8 +197,10 @@ const DrugInteraction = () => {
 
   const handleAnalyze = async (e) => {
     e.preventDefault();
+    console.log("[DrugInteraction] handleAnalyze called");
     
     const activeMeds = medications.filter(m => m.trim() !== "");
+    console.log("[DrugInteraction] Active medications:", activeMeds);
     
     if (activeMeds.length < 2) {
       toast.error("Insira pelo menos 2 medicamentos.");
@@ -218,6 +220,7 @@ const DrugInteraction = () => {
         });
       }, 1500);
 
+      console.log("[DrugInteraction] Calling startAITask...");
       // Call AI Consensus Engine with polling - send ALL medications
       const interactionData = await startAITask(
         '/ai/consensus/drug-interaction',
@@ -225,11 +228,14 @@ const DrugInteraction = () => {
           medications: activeMeds  // Send all medications as an array
         },
         (task) => {
+          console.log("[DrugInteraction] Task progress:", task.status, task.progress);
           if (task.status === 'processing' && task.progress > 0) {
             setProgress(prev => Math.max(prev, task.progress));
           }
         }
       );
+      
+      console.log("[DrugInteraction] Task completed, data:", interactionData);
       
       // Clear interval and set to 100%
       clearInterval(progressInterval);
