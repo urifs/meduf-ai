@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { User, Save, Loader2, Camera, Upload } from 'lucide-react';
+import { User, Save, Camera, Upload } from 'lucide-react';
+import { CustomLoader } from '@/components/ui/custom-loader';
 import api from '@/lib/api';
 
 const Profile = () => {
