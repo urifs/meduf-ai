@@ -30,7 +30,7 @@ class TaskManager:
         self.cleanup_interval = 3600  # 1 hour
         self.executor = ThreadPoolExecutor(max_workers=4)
         
-    def create_task(self, task_type: str, user_id: str = None) -> str:
+    def create_task(self, task_type: str) -> str:
         """Create a new task and return its ID"""
         task_id = str(uuid.uuid4())
         self.tasks[task_id] = {
@@ -41,8 +41,7 @@ class TaskManager:
             "error": None,
             "created_at": datetime.utcnow(),
             "completed_at": None,
-            "progress": 0,
-            "user_id": user_id
+            "progress": 0
         }
         return task_id
     
