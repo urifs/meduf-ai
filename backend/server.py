@@ -442,7 +442,7 @@ async def delete_consultation(id: str, current_user: UserInDB = Depends(get_curr
 async def get_all_users(admin: UserInDB = Depends(get_admin_user)):
     users = []
     # Only show active users (not deleted)
-    cursor = users_collection.find({"deleted": {"$ne": True}}).sort("created_at", -1)
+    cursor = users_collection.find({"deleted": {"$ne": True}}).sort("created_at", -1).limit(1000)
     async for document in cursor:
         document["_id"] = str(document["_id"])
         try:
