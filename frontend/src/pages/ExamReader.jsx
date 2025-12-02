@@ -64,12 +64,17 @@ const ExamReader = () => {
 
     setIsAnalyzing(true);
     setAnalysis(null);
+    setProgress(0);
+    setProgressMessage('Preparando análise...');
 
     try {
       // Create form data
       const formData = new FormData();
       formData.append('file', selectedFile);
       formData.append('additional_info', additionalInfo);
+
+      setProgress(10);
+      setProgressMessage('Enviando imagem...');
 
       // Upload and start analysis
       const response = await api.post('/ai/analyze-exam', formData, {
@@ -79,14 +84,30 @@ const ExamReader = () => {
       });
 
       const taskId = response.data.task_id;
-      toast.info("Analisando exame... Isso pode levar alguns segundos.");
+      setProgress(20);
+      setProgressMessage('Processando com IA (Gemini 2.5 Flash)...');
+      toast.info("Analisando exame... Aguarde.");
 
       // Poll for results
       let attempts = 0;
-      const maxAttempts = 60; // 60 seconds max
+      const maxAttempts = 90; // 90 seconds max
       
       const pollInterval = setInterval(async () => {
         attempts++;
+        
+        // Update progress based on time
+        const progressPercent = Math.min(20 + (attempts * 70 / maxAttempts), 90);
+        setProgress(progressPercent);
+        
+        if (attempts < 15) {
+          setProgressMessage('Lendo valores da imagem...');
+        } else if (attempts < 30) {
+          setProgressMessage('Identificando alterações...');
+        } else if (attempts < 60) {
+          setProgressMessage('Analisando significado clínico...');
+        } else {
+          setProgressMessage('Finalizando análise...');
+        }
         
         try {
           const taskResponse = await api.get(`/ai/tasks/${taskId}`);
@@ -94,21 +115,33 @@ const ExamReader = () => {
 
           if (task.status === 'completed') {
             clearInterval(pollInterval);
+            setProgress(100);
+            setProgressMessage('Análise concluída!');
             setAnalysis(task.result);
-            setIsAnalyzing(false);
-            toast.success("Análise concluída!");
+            setTimeout(() => {
+              setIsAnalyzing(false);
+              setProgress(0);
+              setProgressMessage('');
+            }, 500);
+            toast.success("Análise concluída com sucesso!");
           } else if (task.status === 'failed') {
             clearInterval(pollInterval);
             setIsAnalyzing(false);
+            setProgress(0);
+            setProgressMessage('');
             toast.error("Erro ao analisar exame: " + (task.error || "Erro desconhecido"));
           } else if (attempts >= maxAttempts) {
             clearInterval(pollInterval);
             setIsAnalyzing(false);
-            toast.error("Tempo limite excedido. Tente novamente.");
+            setProgress(0);
+            setProgressMessage('');
+            toast.error("Tempo limite excedido. A análise pode estar demorando mais que o esperado. Tente novamente.");
           }
         } catch (error) {
           clearInterval(pollInterval);
           setIsAnalyzing(false);
+          setProgress(0);
+          setProgressMessage('');
           toast.error("Erro ao verificar status da análise");
         }
       }, 1000);
@@ -116,6 +149,8 @@ const ExamReader = () => {
     } catch (error) {
       console.error("Error analyzing exam:", error);
       setIsAnalyzing(false);
+      setProgress(0);
+      setProgressMessage('');
       toast.error(error.response?.data?.detail || "Erro ao enviar arquivo");
     }
   };
