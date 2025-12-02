@@ -12,7 +12,7 @@ from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 
 # Configuration
-BACKEND_URL = "https://clinical-ai-assist.preview.emergentagent.com/api"
+BACKEND_URL = "https://medufai.preview.emergentagent.com/api"
 TEST_USERNAME = "ur1fs"
 TEST_PASSWORD = "@Fred1807"
 
