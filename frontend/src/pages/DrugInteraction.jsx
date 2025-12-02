@@ -442,7 +442,7 @@ const DrugInteraction = () => {
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm font-medium">
                       <span className="flex items-center gap-2 text-orange-700">
-                        <span className="animate-spin">🔬</span>
+                        <CustomLoader size="sm" className="text-orange-600" />
                         Analisando com IA e banco de dados PubMed...
                       </span>
                       <span className="font-bold text-orange-600">{progress}%</span>
