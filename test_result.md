@@ -794,6 +794,37 @@ frontend:
         agent: "testing"
         comment: "✅ FIXED: Backend feedback system fully operational. Fixed 'username' attribute error by updating feedback creation to use user.email and user.name instead of non-existent user.username. Added missing /api/feedbacks endpoint for admin panel compatibility. Feedback creation now working with proper user identification, timestamp recording, and admin visualization. All feedback API endpoints functional."
 
+backend:
+  - task: "Exam Reader - Medical Image Analysis Functionality"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test exam reader functionality that user reports is failing at ~25% progress. Test upload, task creation, polling, and completion of medical image analysis."
+      - working: true
+        agent: "testing"
+        comment: "✅ BACKEND FUNCTIONALITY VERIFIED: Exam Reader backend working perfectly. Multiple tests completed successfully: 1) Simple exam analysis: Task created in 0.02s, completed in 14s with 5 altered values detected ✅ 2) Large complex exam (121KB): Task created in 0.02s, completed in 24s with 20 alterations detected ✅ 3) Concurrent uploads: All 3 tasks completed successfully (8s, 4s, 0.01s) ✅ 4) Backend logs: No errors detected ✅. Medical image analysis using Gemini 2.5 Flash working correctly with proper JSON response parsing."
+
+  - task: "Exam Reader - Frontend Progress Bar Issue Investigation"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/pages/ExamReader.jsx"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Investigate reported issue where exam upload progress stops at ~25%. Need to test frontend polling behavior and progress calculation."
+      - working: false
+        agent: "testing"
+        comment: "❌ FRONTEND PROGRESS MISMATCH IDENTIFIED: Root cause found for '25% stuck' issue. Problem is NOT backend failure but frontend/backend progress reporting mismatch. Frontend calculates artificial progress: 20% + (time_elapsed * 70 / 90s) while backend stays at 10% during processing, then jumps to 100% when complete. Test showed: Frontend displayed 46.4% progress while backend was at 10% for 33 seconds, then completed. Users perceive this as 'stuck at 25%' because frontend shows increasing progress while backend appears frozen. Lines 131-132 in ExamReader.jsx contain the problematic time-based progress calculation."
+
 agent_communication:
   - agent: "testing"
     message: "Updated test plan for Meduf Ai Authentication Flow testing. All 7 authentication-related tasks need comprehensive verification through Playwright automation following the specific 12-step review request requirements."
