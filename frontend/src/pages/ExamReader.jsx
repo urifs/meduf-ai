@@ -24,8 +24,7 @@ const ExamReader = () => {
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
   
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [preview, setPreview] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [additionalInfo, setAdditionalInfo] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState(null);
@@ -33,23 +32,41 @@ const ExamReader = () => {
   const [progressMessage, setProgressMessage] = useState('');
 
   const handleFileSelect = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setSelectedFile(file);
+    const files = Array.from(event.target.files);
+    
+    if (files.length === 0) return;
+
+    // Validate files
+    const validFiles = [];
+    for (const file of files) {
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit per file
+        toast.error(`${file.name} é muito grande (máx 10MB)`);
+        continue;
+      }
+      validFiles.push(file);
+    }
+
+    if (validFiles.length === 0) return;
+
+    // Create previews for image files
+    const newFiles = validFiles.map(file => {
+      const fileObj = { file, preview: null };
       
-      // Create preview for images
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onloadend = () => {
-          setPreview(reader.result);
+          fileObj.preview = reader.result;
+          setSelectedFiles(prev => [...prev]); // Force re-render
         };
         reader.readAsDataURL(file);
-      } else {
-        setPreview(null);
       }
       
-      setAnalysis(null);
-    }
+      return fileObj;
+    });
+
+    setSelectedFiles(prev => [...prev, ...newFiles]);
+    setAnalysis(null);
+    toast.success(`${validFiles.length} arquivo(s) adicionado(s)`);
   };
 
   const handleCameraCapture = (event) => {
