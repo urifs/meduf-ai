@@ -243,7 +243,10 @@ const ExamReader = () => {
                     className="w-full h-20 border-2 border-dashed hover:border-blue-500 transition-colors"
                   >
                     <Upload className="h-6 w-6 mr-2" />
-                    Selecionar Arquivo (JPG, PNG, PDF, DOC)
+                    <div className="text-left">
+                      <div>Adicionar Arquivo(s)</div>
+                      <div className="text-xs text-slate-500 font-normal">JPG, PNG, PDF, DOC - Múltiplos arquivos permitidos</div>
+                    </div>
                   </Button>
                   <input
                     ref={fileInputRef}
