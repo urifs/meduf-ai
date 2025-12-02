@@ -501,13 +501,13 @@ frontend:
 
 metadata:
   created_by: "testing_agent"
-  version: "2.0"
-  test_sequence: 12
-  run_ui: true
+  version: "2.1"
+  test_sequence: 13
+  run_ui: false
   test_completed: true
-  all_tests_passed: true
+  all_tests_passed: false
   last_test_date: "2025-12-02"
-  critical_bug_fixed: true
+  critical_bug_fixed: false
   consensus_endpoints_verified: 5
   review_request_testing_completed: true
   exact_test_data_verified: true
@@ -515,6 +515,8 @@ metadata:
   analysis_functionality_confirmed: true
   feedback_system_tested: true
   feedback_backend_fixed: true
+  exam_reader_backend_verified: true
+  exam_reader_frontend_issue_identified: true
 
 test_plan:
   current_focus:
