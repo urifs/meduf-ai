@@ -710,7 +710,8 @@ const Admin = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-2xl flex items-center gap-2">
-                    💬 Feedbacks dos Usuários
+                    <MessageSquare className="h-6 w-6" />
+                    Feedbacks dos Usuários
                   </CardTitle>
                   <CardDescription className="mt-2">
                     Avaliações sobre as análises realizadas pela IA
