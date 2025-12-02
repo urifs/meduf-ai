@@ -421,7 +421,7 @@ const DrugInteraction = () => {
                   >
                     {isLoading ? (
                       <span className="flex items-center gap-2">
-                        <span className="animate-spin">⏳</span> Verificando...
+                        <CustomLoader size="sm" /> Verificando...
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
