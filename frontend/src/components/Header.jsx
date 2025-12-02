@@ -41,7 +41,7 @@ export const Header = () => {
         if (response.ok) {
           const data = await response.json();
           setOutbreaks(data.alerts);
-          console.log('✅ Alertas epidemiológicos atualizados:', data.cache_info);
+          console.log('Alertas epidemiológicos atualizados:', data.cache_info);
         }
       } catch (error) {
         console.error('Erro ao buscar alertas:', error);
