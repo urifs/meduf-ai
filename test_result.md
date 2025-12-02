@@ -830,6 +830,22 @@ backend:
         agent: "testing"
         comment: "✅ PROGRESS BAR FIX VERIFIED: Comprehensive testing confirms the progress bar issue has been resolved. Code analysis shows proper implementation in lines 135-141: now uses actual backend progress (task.progress) when available, with more conservative fallback calculation. Progress messages update based on actual progress values (lines 144-153). Backend functionality confirmed working with successful task completion. UI elements all present and functional. The reported '25% stuck' issue should no longer occur as frontend now properly uses backend progress data instead of time-based estimation."
 
+frontend:
+  - task: "ExamReader Double Prefix Fix - /api/api/ URL Issue"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/ExamReader.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "REVIEW REQUEST TESTING: Need to verify that the double /api/api/ prefix fix is working correctly. Test complete upload flow with real file, monitor network requests to ensure polling uses /ai/tasks/{id} (without double /api/) and returns 200, verify analysis completes without timeout."
+      - working: true
+        agent: "testing"
+        comment: "✅ DOUBLE PREFIX FIX VERIFIED SUCCESSFULLY: Comprehensive testing confirms the fix is working perfectly. 🔍 NETWORK ANALYSIS: 5 requests monitored - 1 analyze-exam (200 OK), 4 task polling requests (all 200 OK). ✅ CRITICAL FIX CONFIRMED: No /api/api/ URLs detected, task polling using correct /api/ai/tasks/ format, no 404 errors, successful polling responses. ✅ COMPLETE WORKFLOW: Login successful with ur1fs/@Fred1807, ExamReader page loaded, file uploaded successfully, analysis started and completed with results displayed (Tipo de Exame, Interpretação Clínica sections present). The reported double prefix issue has been completely resolved."
+
 agent_communication:
   - agent: "testing"
     message: "Updated test plan for Meduf Ai Authentication Flow testing. All 7 authentication-related tasks need comprehensive verification through Playwright automation following the specific 12-step review request requirements."
