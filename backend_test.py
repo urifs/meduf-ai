@@ -366,7 +366,7 @@ class BackendTester:
             
             # Step 2: Poll for results
             return self.poll_task_result(task_id, "Exam Analysis", 
-                                       expected_fields=["tipo_exame", "interpretacao_clinica"])
+                                       expected_fields=["findings", "interpretation", "diagnosis", "recommendations"])
             
         except Exception as e:
             duration = time.time() - start_time
