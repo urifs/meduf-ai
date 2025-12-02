@@ -17,7 +17,32 @@ const Profile = () => {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const fileInputRef = useRef(null);
+
+  // Fetch user data on component mount
+  React.useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await api.get('/users/me');
+        setUser({
+          name: response.data.name,
+          avatar_url: response.data.avatar_url || ''
+        });
+        // Update localStorage
+        localStorage.setItem('userName', response.data.name);
+        if (response.data.avatar_url) {
+          localStorage.setItem('userAvatar', response.data.avatar_url);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchUserData();
+  }, []);
 
   // Helper to resolve avatar URL
   const getAvatarUrl = (url) => {
