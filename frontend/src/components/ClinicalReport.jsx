@@ -3,12 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { AlertTriangle, CheckCircle2, Pill, ClipboardList, BrainCircuit, Copy, Activity, Download } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import html2canvas from 'html2canvas';
+import { AlertTriangle, CheckCircle2, Pill, ClipboardList, BrainCircuit, Activity } from 'lucide-react';
+import { ResultActions } from '@/components/ResultActions';
 
-export const ClinicalReport = ({ data }) => {
+export const ClinicalReport = ({ data, analysisType = 'diagnosis' }) => {
   const reportRef = React.useRef(null);
 
   if (!data) {
@@ -25,67 +23,12 @@ export const ClinicalReport = ({ data }) => {
     );
   }
 
-  const copyToClipboard = () => {
-    // Format text for clipboard
-    let text = "";
-    
-    if (data.diagnoses && data.diagnoses.length > 0) {
-      text += `## 1. Hipóteses Diagnósticas\n${data.diagnoses.map(d => `* **${d.name}:** ${d.justification}`).join('\n')}\n\n`;
-    }
-    
-    if (data.conduct) {
-      text += `## 2. Conduta e Investigação\n`;
-      if (data.conduct.exams) text += `* **Exames:** ${data.conduct.exams.join(', ')}\n`;
-      if (data.conduct.procedures) text += `* **Procedimentos:** ${data.conduct.procedures.join(', ')}\n`;
-      if (data.conduct.advice) text += `* **Orientações:** ${data.conduct.advice}\n`;
-      text += `\n`;
-    }
-    
-    if (data.medications && data.medications.length > 0) {
-      text += `## 3. Sugestão Farmacológica\n${data.medications.map(m => `* **${m.name}** - ${m.dosage}\n    * ${m.mechanism}`).join('\n')}`;
-    }
-
-    navigator.clipboard.writeText(text);
-    toast.success("Relatório copiado para a área de transferência");
-  };
-
-  const handleSaveImage = async () => {
-    if (!reportRef.current) return;
-    
-    try {
-      const canvas = await html2canvas(reportRef.current, {
-        scale: 2, // Higher quality
-        backgroundColor: "#ffffff",
-        useCORS: true
-      });
-      
-      const image = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = image;
-      link.download = `analise-clinica-${new Date().toISOString().slice(0,10)}.png`;
-      link.click();
-      
-      toast.success("Imagem salva com sucesso!");
-    } catch (error) {
-      console.error("Error saving image:", error);
-      toast.error("Erro ao salvar imagem.");
-    }
-  };
-
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold tracking-tight text-primary flex items-center gap-2">
           <BrainCircuit className="h-6 w-6" /> Análise Clínica
         </h2>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={copyToClipboard} className="gap-2">
-            <Copy className="h-4 w-4" /> Copiar
-          </Button>
-          <Button variant="default" size="sm" onClick={handleSaveImage} className="gap-2">
-            <Download className="h-4 w-4" /> Salvar Imagem
-          </Button>
-        </div>
       </div>
 
       {/* Report Container to Capture */}
@@ -208,6 +151,14 @@ export const ClinicalReport = ({ data }) => {
           </AlertDescription>
         </Alert>
       </div>
+
+      {/* ResultActions Component */}
+      <ResultActions 
+        resultRef={reportRef}
+        resultData={data}
+        analysisType={analysisType}
+        fileName={`analise-clinica-${new Date().toISOString().slice(0,10)}.png`}
+      />
     </div>
   );
 };
