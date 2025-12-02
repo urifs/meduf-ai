@@ -181,7 +181,7 @@ const Login = () => {
           <Button 
             type="button"
             variant="outline"
-            className="w-full h-11 text-base border-green-600 text-green-700 hover:bg-green-50 hover:text-green-800"
+            className="w-full h-11 text-base border-blue-400 text-blue-500 hover:bg-blue-50 hover:text-blue-600"
             onClick={() => window.open('https://api.whatsapp.com/send/?phone=551152868823&text&type=phone_number&app_absent=0', '_blank')}
           >
             <ExternalLink className="mr-2 h-4 w-4" /> Adquirir Acesso
