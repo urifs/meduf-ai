@@ -389,7 +389,7 @@ test_plan:
     implemented: true
     working: false
     file: "/app/frontend/src/pages/Dashboard.jsx"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
@@ -399,6 +399,9 @@ test_plan:
       - working: false
         agent: "testing"
         comment: "❌ CRITICAL ISSUE IDENTIFIED: Diagnóstico Detalhado form appears to work but is NOT making actual API calls to backend. Testing shows: ✅ Login successful with ur1fs/@Fred1807 ✅ Navigation to /detailed page works ✅ Form fields can be filled (Age: 45, Queixa, História, Exame Físico, Exames Complementares) ⚠️ Sex selection has UI issues but form still submits ✅ Form submission appears successful ❌ CRITICAL: 0 API calls detected during 'analysis' ❌ 'Analysis completed at 1s' is likely frontend mock/placeholder, not real backend processing. The form is not integrating with the backend consensus diagnosis API (/api/ai/consensus/diagnosis). This means users would see fake 'success' but no actual medical analysis occurs."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ISSUE CONFIRMED WITH EXACT REVIEW REQUEST DATA: Comprehensive testing with exact credentials ur1fs/@Fred1807 and test data (Queixa: 'Dor no peito ao respirar', Idade: 45, Sexo: Masculino, História: 'Após esforço') confirms the critical frontend-backend integration failure. ✅ LOGIN: Successful authentication with ur1fs/@Fred1807 ✅ NAVIGATION: Successfully reached /detailed page ✅ FORM FILLING: All required fields filled correctly (Age: 45, Complaint: 'Dor no peito ao respirar', History: 'Após esforço') ✅ FORM SUBMISSION: Button click successful ❌ CRITICAL FAILURE: 0 API calls detected during 40-second monitoring period ❌ NO BACKEND INTEGRATION: Frontend Dashboard.jsx is NOT calling /api/ai/consensus/diagnosis endpoint ❌ NO RESULTS: No clinical analysis appears after 40 seconds ✅ NO ERROR MESSAGE: Correctly, no 'Tarefa não encontrada no servidor' appears because no backend call is made. CONCLUSION: The Diagnóstico Detalhado feature is completely non-functional for actual medical analysis. Users see a working form but receive no real AI-powered diagnosis. This is a critical production issue requiring immediate frontend-backend integration repair."
 
 metadata:
   created_by: "testing_agent"
