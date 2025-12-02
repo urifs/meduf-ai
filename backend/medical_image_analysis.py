@@ -107,10 +107,10 @@ async def analyze_exam(
         print(f"JSON Decode Error in exam analysis: {e}")
         print(f"Response was: {response}")
         return {
-            "findings": "Erro ao processar resposta",
-            "interpretation": "Não foi possível analisar o exame. Por favor, tente novamente.",
-            "diagnosis": "Análise incompleta",
-            "recommendations": ["Consulte um médico para interpretação manual do exame."]
+            "findings": "Erro ao processar resposta da IA",
+            "interpretation": "Sistema temporariamente indisponível. Análise manual recomendada.",
+            "diagnosis": "Análise incompleta - avaliar clinicamente",
+            "recommendations": ["Interpretar resultados manualmente considerando quadro clínico", "Repetir análise ou utilizar outra ferramenta diagnóstica"]
         }
     except Exception as e:
         print(f"Error in analyze_exam: {e}")
