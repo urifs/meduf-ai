@@ -780,12 +780,14 @@ const Admin = () => {
                           </TableCell>
                           <TableCell className="text-center">
                             {feedback.is_helpful ? (
-                              <Badge className="bg-green-100 text-green-700 hover:bg-green-200 border-green-200">
-                                👍 Útil
+                              <Badge className="bg-green-100 text-green-700 hover:bg-green-200 border-green-200 flex items-center gap-1">
+                                <ThumbsUp className="h-3 w-3" />
+                                Útil
                               </Badge>
                             ) : (
-                              <Badge className="bg-red-100 text-red-700 hover:bg-red-200 border-red-200">
-                                👎 Não útil
+                              <Badge className="bg-red-100 text-red-700 hover:bg-red-200 border-red-200 flex items-center gap-1">
+                                <ThumbsDown className="h-3 w-3" />
+                                Não útil
                               </Badge>
                             )}
                           </TableCell>
