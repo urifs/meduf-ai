@@ -93,43 +93,6 @@ const Toxicology = () => {
     }
   };
 
-  const copyToClipboard = () => {
-    if (!result) return;
-    
-    let text = `## Protocolo de Intoxicação: ${result.agent}\n\n`;
-    text += `**Antídoto:** ${result.antidote}\n`;
-    text += `**Mecanismo:** ${result.mechanism}\n\n`;
-    text += `### Conduta Inicial\n`;
-    result.conduct.forEach(step => text += `* ${step}\n`);
-    text += `\n### Protocolo Específico\n${result.protocol}`;
-    
-    navigator.clipboard.writeText(text);
-    toast.success("Copiado para a área de transferência!");
-  };
-
-  const handleSaveImage = async () => {
-    if (!reportRef.current) return;
-    
-    try {
-      const canvas = await html2canvas(reportRef.current, {
-        scale: 2,
-        backgroundColor: "#ffffff",
-        useCORS: true
-      });
-      
-      const image = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = image;
-      link.download = `toxicologia-${new Date().toISOString().slice(0,10)}.png`;
-      link.click();
-      
-      toast.success("Imagem salva com sucesso!");
-    } catch (error) {
-      console.error("Error saving image:", error);
-      toast.error("Erro ao salvar imagem.");
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-rose-50 to-pink-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 relative">
       {/* Animated Background */}
