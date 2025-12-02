@@ -177,13 +177,10 @@ class TaskManager:
         """
         # Submit to thread pool for true background execution
         loop = asyncio.get_event_loop()
+        # run_in_executor doesn't accept **kwargs, so we wrap it
         loop.run_in_executor(
             self.executor,
-            self.execute_task_sync,
-            task_id,
-            func,
-            *args,
-            **kwargs
+            lambda: self.execute_task_sync(task_id, func, *args, **kwargs)
         )
     
     async def cleanup_old_tasks(self):
