@@ -121,3 +121,39 @@ async def analyze_exam_simple(exam_content: str) -> Dict[str, Any]:
         exam_texts=[exam_content],
         patient_context=None
     )
+
+
+# Aliases for backward compatibility
+async def analyze_exam_image(files, additional_info="", user_id=None, user_name=None):
+    """Analyze single exam image"""
+    if not files:
+        return {"error": "No files provided"}
+    
+    # Convert files to text format
+    exam_texts = []
+    for file in files:
+        if isinstance(file, dict):
+            if file.get('type', '').startswith('image/'):
+                exam_texts.append(f"Image file: {file.get('filename', 'unknown')}")
+            else:
+                exam_texts.append(file.get('data', ''))
+        else:
+            exam_texts.append(str(file))
+    
+    result = await analyze_exam(
+        exam_texts=exam_texts,
+        patient_context=additional_info
+    )
+    
+    # Add user info if provided
+    if user_id:
+        result["_user_id"] = user_id
+    if user_name:
+        result["_user_name"] = user_name
+    
+    return result
+
+
+async def analyze_multiple_exam_images(files, additional_info="", user_id=None, user_name=None):
+    """Analyze multiple exam images"""
+    return await analyze_exam_image(files, additional_info, user_id, user_name)
