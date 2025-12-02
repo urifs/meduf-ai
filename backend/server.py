@@ -26,7 +26,7 @@ ADMIN_PASS = os.environ.get("ADMIN_PASS", "@Fred1807")
 
 # --- Database Setup ---
 client = AsyncIOMotorClient(MONGO_URL)
-db_name = os.environ.get("DB_NAME", "meduf_ai")
+db_name = os.environ.get("DB_NAME", "test_database")
 db = client[db_name]
 users_collection = db.users
 consultations_collection = db.consultations
