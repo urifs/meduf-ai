@@ -323,11 +323,14 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     
     # Check Expiration
     if user.get("expiration_date") and user["expiration_date"] < datetime.utcnow():
-        # Delete expired user immediately if they try to login
-        await users_collection.delete_one({"_id": user["_id"]})
+        # Mark user as deleted when expired
+        await users_collection.update_one(
+            {"_id": user["_id"]},
+            {"$set": {"deleted": True, "deleted_at": datetime.utcnow()}}
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Sua conta expirou após 30 dias. Por favor, crie uma nova conta."
+            detail="Sua conta expirou. Para renovar seu acesso, clique em 'Adquirir Acesso'."
         )
 
     if user.get("status") == "Bloqueado":
