@@ -242,10 +242,10 @@ Forneça guia terapêutico.
     except Exception as e:
         print(f"Error in analyze_medication_guide: {e}")
         return [{
-            "name": "Erro",
-            "dosage": "Análise não disponível",
-            "mechanism": str(e),
-            "contraindications": "Consulte um médico"
+            "name": "Sistema temporariamente indisponível",
+            "dosage": "Consultar protocolos clínicos e guidelines atualizados",
+            "mechanism": f"Erro: {str(e)}",
+            "contraindications": "Avaliar contraindicações específicas do paciente e condição clínica"
         }]
 
 
