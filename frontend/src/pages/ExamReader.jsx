@@ -85,7 +85,7 @@ const ExamReader = () => {
 
       const taskId = response.data.task_id;
       setProgress(20);
-      setProgressMessage('Processando com IA (Gemini 2.5 Flash)...');
+      setProgressMessage('Processando com IA...');
       toast.info("Analisando exame... Aguarde.");
 
       // Poll for results
