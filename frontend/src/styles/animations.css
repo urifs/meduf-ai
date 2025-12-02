@@ -184,6 +184,10 @@
   animation: pulse-slow 3s ease-in-out infinite;
 }
 
+.animate-pulse-gradient {
+  animation: pulse-gradient 4s ease-in-out infinite;
+}
+
 .animate-bounce-gentle {
   animation: bounce-gentle 2s ease-in-out infinite;
 }
