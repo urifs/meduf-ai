@@ -4,17 +4,11 @@ import '../styles/animations.css';
 
 export const AuthLayout = ({ children, title, subtitle }) => {
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 relative overflow-hidden">
-      {/* Pulsating Gradient Background behind login card */}
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-4 relative overflow-hidden">
+      {/* Animated Background - Same as analysis pages */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Main pulsating gradient circle */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-40">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-purple-800 to-blue-900 rounded-full animate-pulse-gradient"></div>
-        </div>
-        
-        {/* Secondary floating elements */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl animate-float" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-20 right-20 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-20 left-20 w-80 h-80 bg-purple-400/10 rounded-full blur-3xl animate-float" style={{animationDelay: '1.5s'}}></div>
       </div>
 
       <div className="w-full max-w-[450px] space-y-6 relative z-10">
