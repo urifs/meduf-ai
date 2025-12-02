@@ -85,8 +85,8 @@ const ExamReader = () => {
   };
 
   const handleAnalyze = async () => {
-    if (!selectedFile) {
-      toast.error("Por favor, selecione um arquivo ou tire uma foto");
+    if (selectedFiles.length === 0) {
+      toast.error("Por favor, adicione pelo menos um arquivo");
       return;
     }
 
@@ -96,13 +96,15 @@ const ExamReader = () => {
     setProgressMessage('Preparando análise...');
 
     try {
-      // Create form data
+      // Create form data with multiple files
       const formData = new FormData();
-      formData.append('file', selectedFile);
+      selectedFiles.forEach((fileObj, index) => {
+        formData.append('files', fileObj.file);
+      });
       formData.append('additional_info', additionalInfo);
 
       setProgress(10);
-      setProgressMessage('Enviando imagem...');
+      setProgressMessage(`Enviando ${selectedFiles.length} arquivo(s)...`);
 
       // Upload and start analysis
       const response = await api.post('/ai/analyze-exam', formData, {
