@@ -178,17 +178,26 @@ async def get_admin_user(current_user: UserInDB = Depends(get_current_active_use
 
 # --- Background Tasks ---
 async def remove_expired_users():
-    """Background task to remove users whose expiration date has passed."""
+    """Background task to mark expired users as deleted."""
     while True:
         try:
-            now = datetime.utcnow()
-            # Find users where expiration_date exists and is less than now
-            result = await users_collection.delete_many({
-                "expiration_date": {"$lt": now},
-                "role": {"$ne": "ADMIN"} # Never delete admins automatically
-            })
-            if result.deleted_count > 0:
-                print(f"Cleaned up {result.deleted_count} expired user accounts.")
+            now = now_sao_paulo()
+            # Mark users as deleted instead of removing
+            result = await users_collection.update_many(
+                {
+                    "expiration_date": {"$lt": now},
+                    "role": {"$ne": "ADMIN"},  # Never delete admins automatically
+                    "deleted": {"$ne": True}  # Don't update already deleted
+                },
+                {
+                    "$set": {
+                        "deleted": True,
+                        "deleted_at": now
+                    }
+                }
+            )
+            if result.modified_count > 0:
+                print(f"Marked {result.modified_count} expired user accounts as deleted.")
         except Exception as e:
             print(f"Error in cleanup task: {e}")
         
