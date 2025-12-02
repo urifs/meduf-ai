@@ -267,22 +267,59 @@ const ExamReader = () => {
                   />
                 </div>
 
-                {/* Preview */}
-                {selectedFile && (
-                  <div className="mt-4 p-4 bg-slate-50 rounded-lg border">
-                    <p className="text-sm font-medium text-slate-700 mb-2">
-                      <FileText className="h-4 w-4 inline mr-1" />
-                      Arquivo selecionado:
-                    </p>
-                    <p className="text-sm text-slate-600">{selectedFile.name}</p>
-                    
-                    {preview && (
-                      <img 
-                        src={preview} 
-                        alt="Preview" 
-                        className="mt-3 max-h-64 w-full object-contain rounded border"
-                      />
-                    )}
+                {/* Files Preview */}
+                {selectedFiles.length > 0 && (
+                  <div className="mt-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium text-slate-700">
+                        <FileText className="h-4 w-4 inline mr-1" />
+                        {selectedFiles.length} arquivo(s) selecionado(s)
+                      </p>
+                      <Button
+                        onClick={handleClearAll}
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        Limpar Todos
+                      </Button>
+                    </div>
+
+                    <div className="space-y-2 max-h-96 overflow-y-auto">
+                      {selectedFiles.map((fileObj, index) => (
+                        <div 
+                          key={index} 
+                          className="p-3 bg-slate-50 rounded-lg border relative group"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-slate-700">
+                                Página {index + 1}: {fileObj.file.name}
+                              </p>
+                              <p className="text-xs text-slate-500 mt-1">
+                                {(fileObj.file.size / 1024).toFixed(1)} KB
+                              </p>
+                            </div>
+                            <Button
+                              onClick={() => handleRemoveFile(index)}
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-500 hover:text-red-700 hover:bg-red-50 -mt-1 -mr-1"
+                            >
+                              <XCircle className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          
+                          {fileObj.preview && (
+                            <img 
+                              src={fileObj.preview} 
+                              alt={`Preview ${index + 1}`} 
+                              className="mt-3 max-h-40 w-full object-contain rounded border bg-white"
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 
