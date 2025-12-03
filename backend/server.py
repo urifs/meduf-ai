@@ -393,6 +393,69 @@ async def get_users(current_user: UserInDB = Depends(get_current_active_user)):
     return users
 
 
+# ===== CONSULTATIONS =====
+
+@app.post("/api/consultations")
+async def create_consultation(
+    data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Save consultation to database"""
+    try:
+        consultation = {
+            "user_id": current_user.username,
+            "user_email": current_user.email,
+            "timestamp": datetime.now(timezone.utc),
+            "patient": data.get("patient", {}),
+            "report": data.get("report", {})
+        }
+        
+        result = await consultations_collection.insert_one(consultation)
+        return {"id": str(result.inserted_id), "message": "Consultation saved"}
+    except Exception as e:
+        print(f"Error saving consultation: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/consultations")
+async def get_consultations(
+    limit: int = 100,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Get user consultations"""
+    try:
+        # Admin sees all, users see only their own
+        query = {} if current_user.role == "ADMIN" else {"user_id": current_user.username}
+        
+        consultations = []
+        cursor = consultations_collection.find(query, {"_id": 0}).sort("timestamp", -1).limit(limit)
+        async for doc in cursor:
+            consultations.append(doc)
+        
+        return {"consultations": consultations}
+    except Exception as e:
+        print(f"Error fetching consultations: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ===== EPIDEMIOLOGICAL ALERTS =====
+
+@app.get("/api/epidemiological-alerts")
+async def get_epidemiological_alerts():
+    """Get epidemiological alerts (mock for now)"""
+    return {
+        "alerts": [
+            {
+                "id": "1",
+                "disease": "Dengue",
+                "severity": "Alto",
+                "region": "Nacional",
+                "updated": datetime.now(timezone.utc).isoformat()
+            }
+        ]
+    }
+
+
 # ===== STARTUP =====
 
 @app.on_event("startup")
