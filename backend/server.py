@@ -288,11 +288,14 @@ async def create_medication_guide_task(
     try:
         task_id = task_manager.create_task("medication_guide")
         
+        # Accept both 'symptoms' and 'condition' for flexibility
+        condition = data.get("symptoms") or data.get("condition", "")
+        
         asyncio.create_task(
             task_manager.execute_task(
                 task_id,
                 analyze_medication_guide,
-                condition=data.get("condition", ""),
+                condition=condition,
                 patient_age=data.get("age", "N/I"),
                 contraindications=data.get("contraindications")
             )
