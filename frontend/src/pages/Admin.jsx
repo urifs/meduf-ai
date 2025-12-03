@@ -822,7 +822,6 @@ const Admin = () => {
                               {feedback.analysis_type === 'drug-interaction' && 'Interação'}
                               {feedback.analysis_type === 'medication-guide' && 'Guia Terapêutico'}
                               {feedback.analysis_type === 'toxicology' && 'Toxicologia'}
-                              {feedback.analysis_type === 'exam-reader' && 'Leitor de Exames'}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-center">
