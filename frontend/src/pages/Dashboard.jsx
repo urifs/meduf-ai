@@ -51,7 +51,7 @@ const Dashboard = () => {
           report: aiReport
         });
       } catch (error) {
-        console.error("Error saving:", error);
+        // Silent fail - don't show error to user
       }
       
       setReportData(aiReport);
@@ -68,8 +68,7 @@ const Dashboard = () => {
       localStorage.setItem('meduf_history', JSON.stringify(existingHistory.slice(0, 50)));
       
     } catch (error) {
-      const errorMsg = error.message || "Erro ao processar análise. Por favor, tente novamente.";
-      toast.error(errorMsg);
+      toast.error("Não foi possível completar a análise. Por favor, tente novamente.");
     } finally {
       setIsLoading(false);
       setProgress(0);
