@@ -388,7 +388,7 @@ async def get_users(current_user: UserInDB = Depends(get_current_active_user)):
         doc["_id"] = str(doc["_id"])
         try:
             users.append(UserInDB(**doc))
-        except:
+        except Exception:
             pass
     return users
 
