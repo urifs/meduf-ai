@@ -13,7 +13,7 @@ import History from "@/pages/History";
 import Admin from "@/pages/Admin";
 import Profile from "@/pages/Profile";
 import DatabaseManager from "@/pages/DatabaseManager";
-import ExamReader from "@/pages/ExamReader";
+// ExamReader removed
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
