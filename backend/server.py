@@ -374,10 +374,10 @@ async def get_task_status(
     return task
 
 
-# ===== ADMIN ENDPOINTS (Simplified) =====
+# ===== ADMIN =====
 
 @app.get("/api/admin/users")
-async def get_users(current_user: UserInDB = Depends(get_current_active_user)):
+async def get_admin_users(current_user: UserInDB = Depends(get_current_active_user)):
     """Get all users (admin only)"""
     if current_user.role != "ADMIN":
         raise HTTPException(status_code=403, detail="Admin only")
@@ -386,11 +386,83 @@ async def get_users(current_user: UserInDB = Depends(get_current_active_user)):
     cursor = users_collection.find({"deleted": {"$ne": True}}).sort("created_at", -1).limit(1000)
     async for doc in cursor:
         doc["_id"] = str(doc["_id"])
-        try:
-            users.append(UserInDB(**doc))
-        except Exception:
-            pass
+        # Add id field from username or email
+        doc["id"] = doc.get("username", doc.get("email", ""))
+        doc["status"] = "Ativo" if not doc.get("deleted") else "Inativo"
+        users.append(doc)
     return users
+
+
+@app.get("/api/admin/consultations")
+async def get_admin_consultations(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get all consultations (admin only)"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    consultations = []
+    cursor = consultations_collection.find({}, {"_id": 0}).sort("timestamp", -1).limit(1000)
+    async for doc in cursor:
+        consultations.append(doc)
+    return consultations
+
+
+@app.get("/api/admin/stats/online")
+async def get_online_stats(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get online users stats (admin only)"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    # Simple mock - return count of active users
+    count = await users_collection.count_documents({"deleted": {"$ne": True}})
+    return {"online": count}
+
+
+@app.get("/api/admin/usage-stats/monthly")
+async def get_monthly_usage(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get monthly usage statistics (admin only)"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    # Get count of consultations this month
+    from datetime import datetime, timezone
+    start_of_month = datetime.now(timezone.utc).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    count = await consultations_collection.count_documents({
+        "timestamp": {"$gte": start_of_month}
+    })
+    
+    return {
+        "total_consultations": count,
+        "total_tokens": count * 2500,  # Estimate
+        "total_cost_usd": count * 0.01  # Estimate
+    }
+
+
+@app.get("/api/admin/deleted-users")
+async def get_deleted_users(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get deleted users (admin only)"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    users = []
+    cursor = users_collection.find({"deleted": True}).sort("deleted_at", -1).limit(100)
+    async for doc in cursor:
+        doc["_id"] = str(doc["_id"])
+        doc["id"] = doc.get("username", doc.get("email", ""))
+        users.append(doc)
+    return users
+
+
+@app.get("/api/feedbacks")
+async def get_feedbacks(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get all feedbacks"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    feedbacks = []
+    cursor = db.feedbacks.find({}, {"_id": 0}).sort("timestamp", -1).limit(500)
+    async for doc in cursor:
+        feedbacks.append(doc)
+    return feedbacks
 
 
 # ===== CONSULTATIONS =====
