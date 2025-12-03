@@ -85,7 +85,6 @@ class TaskManager:
         """
         max_retries = 3
         retry_count = 0
-        last_error = None
         
         while retry_count < max_retries:
             try:
@@ -112,7 +111,7 @@ class TaskManager:
                             
                             # Track usage asynchronously
                             loop.run_until_complete(track_usage(
-                                user_id="system",  # Can be updated to actual user_id
+                                user_id="system",
                                 consultation_type=task.get("type", "unknown"),
                                 input_text=input_text,
                                 output_text=output_text
@@ -120,19 +119,15 @@ class TaskManager:
                         except Exception as track_error:
                             print(f"⚠️ Error tracking usage: {track_error}")
                     
-                        # Mark as completed
-                        self.complete_task(task_id, result)
-                        print(f"✅ Task {task_id} completed successfully on attempt {retry_count + 1}")
-                        return  # Success! Exit function
+                    # Mark as completed
+                    self.complete_task(task_id, result)
+                    print(f"✅ Task {task_id} completed successfully on attempt {retry_count + 1}")
+                    return  # Success! Exit function
                         
-                except Exception as exec_error:
-                    raise exec_error  # Re-raise to be caught by outer try-except
-                    
                 finally:
                     loop.close()
                 
             except Exception as e:
-                last_error = e
                 retry_count += 1
                 error_msg = str(e)
                 print(f"⚠️ Task {task_id} attempt {retry_count} failed: {error_msg}")
@@ -147,14 +142,6 @@ class TaskManager:
                     self.fail_task(task_id, f"Failed after {max_retries} attempts. Last error: {error_msg}")
                     import traceback
                     print(f"Full traceback:\n{traceback.format_exc()}")
-                    
-        except Exception as fatal_error:
-            # This should NEVER happen
-            error_msg = f"FATAL ERROR in task execution: {str(fatal_error)}"
-            print(f"💀 {error_msg}")
-            self.fail_task(task_id, error_msg)
-            import traceback
-            print(f"Fatal traceback:\n{traceback.format_exc()}")
 
     async def execute_task(
         self, 
