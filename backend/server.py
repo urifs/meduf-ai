@@ -28,6 +28,21 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 # 24 hours
 ADMIN_USER = os.environ.get("ADMIN_USER", "ur1fs")
 ADMIN_PASS = os.environ.get("ADMIN_PASS", "@Fred1807")
 
+# CRITICAL: Validate EMERGENT_LLM_KEY at startup
+EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY")
+if not EMERGENT_LLM_KEY:
+    print("=" * 80)
+    print("❌ CRITICAL ERROR: EMERGENT_LLM_KEY not found in environment!")
+    print("=" * 80)
+    print("The application requires EMERGENT_LLM_KEY to function.")
+    print("Please configure it in your deployment environment.")
+    print("=" * 80)
+    raise ValueError("EMERGENT_LLM_KEY is required but not set in environment")
+else:
+    print("=" * 80)
+    print(f"✅ EMERGENT_LLM_KEY loaded successfully (starts with: {EMERGENT_LLM_KEY[:15]}...)")
+    print("=" * 80)
+
 # --- Database Setup ---
 client = AsyncIOMotorClient(MONGO_URL)
 db_name = os.environ.get("DB_NAME", "test_database")
