@@ -120,17 +120,38 @@ class TaskManager:
                     except Exception as track_error:
                         print(f"⚠️ Error tracking usage: {track_error}")
                 
-                # Mark as completed
-                self.complete_task(task_id, result)
-                print(f"✅ Task {task_id} completed successfully")
+                    # Mark as completed
+                    self.complete_task(task_id, result)
+                    print(f"✅ Task {task_id} completed successfully on attempt {retry_count + 1}")
+                    return  # Success! Exit function
+                    
+                finally:
+                    loop.close()
                 
-            finally:
-                loop.close()
-            
-        except Exception as e:
-            error_msg = str(e)
+            except Exception as e:
+                last_error = e
+                retry_count += 1
+                error_msg = str(e)
+                print(f"⚠️ Task {task_id} attempt {retry_count} failed: {error_msg}")
+                
+                if retry_count < max_retries:
+                    print(f"🔄 Retrying task {task_id} in 5 seconds...")
+                    import time
+                    time.sleep(5)
+                else:
+                    # All retries exhausted
+                    print(f"❌ Task {task_id} failed after {max_retries} attempts")
+                    self.fail_task(task_id, f"Failed after {max_retries} attempts. Last error: {error_msg}")
+                    import traceback
+                    print(f"Full traceback:\n{traceback.format_exc()}")
+                    
+        except Exception as fatal_error:
+            # This should NEVER happen
+            error_msg = f"FATAL ERROR in task execution: {str(fatal_error)}"
+            print(f"💀 {error_msg}")
             self.fail_task(task_id, error_msg)
-            print(f"❌ Task {task_id} failed: {error_msg}")
+            import traceback
+            print(f"Fatal traceback:\n{traceback.format_exc()}")
 
     async def execute_task(
         self, 
