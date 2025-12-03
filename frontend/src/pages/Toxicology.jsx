@@ -1,20 +1,18 @@
 import React, { useState, useRef } from 'react';
 import { Header } from '@/components/Header';
+import { AnalysisProgress } from '@/components/AnalysisProgress';
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import { Skull, Sparkles, ArrowLeft, AlertTriangle, Activity, HeartPulse, Brain, CheckCircle2 } from 'lucide-react';
+import { Skull, ArrowLeft, Activity, HeartPulse, Brain, CheckCircle2 } from 'lucide-react';
 import { ResultActions } from '@/components/ResultActions';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { useNavigate } from 'react-router-dom';
 import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import api from '@/lib/api';
 import { startAITask } from '@/lib/aiPolling';
-import { CustomLoader } from '@/components/ui/custom-loader';
 import '../styles/animations.css';
 
 const Toxicology = () => {
@@ -34,18 +32,13 @@ const Toxicology = () => {
 
     setIsLoading(true);
     setResult(null);
-    setProgress(10); // Start with 10% immediately
+    setProgress(10);
 
     try {
-      // Simulate smooth progress animation
       const progressInterval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 85) return prev; // Cap at 85% until real completion
-          return prev + 5; // Increment by 5% every 1.5 seconds
-        });
+        setProgress(prev => prev >= 85 ? prev : prev + 5);
       }, 1500);
 
-      // Call AI Consensus Engine with polling
       const aiResponse = await startAITask(
         '/ai/consensus/toxicology',
         { substance: substance },
@@ -56,11 +49,9 @@ const Toxicology = () => {
         }
       );
       
-      // Clear interval and set to 100%
       clearInterval(progressInterval);
       setProgress(100);
       
-      // Save to consultation history
       try {
         await api.post('/consultations', {
           patient: { 
@@ -146,7 +137,7 @@ const Toxicology = () => {
                   >
                     {isLoading ? (
                       <span className="flex items-center gap-2">
-                        <CustomLoader size="sm" /> Buscando Protocolo...
+                        <span className="animate-spin">⏳</span> Buscando Protocolo...
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
@@ -161,22 +152,7 @@ const Toxicology = () => {
 
           {/* Output Section */}
           <div className="lg:col-span-7 xl:col-span-8 animate-slide-in-right">
-            {isLoading && progress > 0 && (
-              <Card className="mb-4 glass-card border-2 border-rose-200 shadow-xl animate-pulse-glow">
-                <CardContent className="pt-6">
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm font-medium">
-                      <span className="flex items-center gap-2 text-rose-700">
-                        <CustomLoader size="sm" className="text-rose-600" />
-                        Analisando com IA e banco de dados PubMed...
-                      </span>
-                      <span className="font-bold text-rose-600">{progress}%</span>
-                    </div>
-                    <Progress value={progress} className="h-3 bg-rose-100 [&>div]:bg-gradient-to-r [&>div]:from-rose-500 [&>div]:to-pink-600 shadow-lg" />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            {isLoading && progress > 0 && <AnalysisProgress progress={progress} colorScheme="rose" />}
             {result ? (
               <div className="space-y-6 animate-scale-in">
                 <div className="flex items-center justify-between">

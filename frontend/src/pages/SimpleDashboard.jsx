@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Header } from '@/components/Header';
 import { ClinicalReport } from '@/components/ClinicalReport';
+import { AnalysisProgress } from '@/components/AnalysisProgress';
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { Sparkles, ArrowLeft } from 'lucide-react';
@@ -8,11 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { useNavigate } from 'react-router-dom';
 import api from '@/lib/api';
 import { startAITask } from '@/lib/aiPolling';
-import { CustomLoader } from '@/components/ui/custom-loader';
 import '../styles/animations.css';
 
 const SimpleDashboard = () => {
@@ -35,10 +34,7 @@ const SimpleDashboard = () => {
 
     try {
       const progressInterval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 85) return prev;
-          return prev + 5;
-        });
+        setProgress(prev => prev >= 85 ? prev : prev + 5);
       }, 1500);
 
       const aiReport = await startAITask(
@@ -142,7 +138,7 @@ const SimpleDashboard = () => {
                   >
                     {isLoading ? (
                       <span className="flex items-center gap-2">
-                        <CustomLoader size="sm" /> Analisando...
+                        <span className="animate-spin">⏳</span> Analisando...
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
@@ -157,22 +153,7 @@ const SimpleDashboard = () => {
 
           {/* Right Column: Output */}
           <div className="lg:col-span-7 xl:col-span-8 animate-slide-in-right">
-            {isLoading && progress > 0 && (
-              <Card className="mb-4 glass-card border-2 border-purple-200 shadow-xl animate-pulse-glow">
-                <CardContent className="pt-6">
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm font-medium">
-                      <span className="flex items-center gap-2 text-purple-700">
-                        <CustomLoader size="sm" className="text-purple-600" />
-                        Analisando com IA e banco de dados PubMed...
-                      </span>
-                      <span className="font-bold text-purple-600">{progress}%</span>
-                    </div>
-                    <Progress value={progress} className="h-3 bg-purple-100 [&>div]:bg-gradient-to-r [&>div]:from-purple-500 [&>div]:to-pink-600 shadow-lg" />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            {isLoading && progress > 0 && <AnalysisProgress progress={progress} colorScheme="purple" />}
             <ClinicalReport data={reportData} analysisType="simple-diagnosis" />
           </div>
         </div>
