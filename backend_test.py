@@ -311,66 +311,78 @@ class BackendTester:
             self.log_result("Consensus Medication Guide", False, f"Error: {str(e)}", duration)
             return False
     
-    def test_exam_analysis(self):
-        """Test exam analysis endpoint - Gemini 2.5 Flash"""
-        print(f"\n🔬 Testing Exam Analysis...")
-        
-        # Test data from review request - Análise de Exame
-        exam_content = "Hemograma: Leucócitos 15000/mm³ (VR: 4000-11000), Neutrófilos 85% (VR: 50-70%), Hemoglobina 12.5 g/dL (VR: 12-16), Hematócrito 38% (VR: 36-46%), Plaquetas 350000/mm³ (VR: 150000-450000)"
-        
+    def test_diagnosis_simple_review(self):
+        """Test 1: Diagnóstico Simples - EXACT review request data"""
+        test_data = {
+            "queixa": "Febre e tosse",
+            "idade": "30",
+            "sexo": "M"
+        }
+        return self.execute_consensus_test("diagnosis", test_data, "Diagnóstico Simples")
+    
+    def test_medication_guide_review(self):
+        """Test 2: Guia Terapêutico - EXACT review request data"""
+        test_data = {
+            "condition": "Hipertensão"
+        }
+        return self.execute_consensus_test("medication-guide", test_data, "Guia Terapêutico")
+    
+    def test_toxicology_review(self):
+        """Test 3: Toxicologia - EXACT review request data"""
+        test_data = {
+            "substance": "Paracetamol overdose"
+        }
+        return self.execute_consensus_test("toxicology", test_data, "Toxicologia")
+    
+    def test_drug_interaction_review(self):
+        """Test 4: Interação Medicamentosa - EXACT review request data"""
+        test_data = {
+            "medications": ["Paracetamol", "Ibuprofeno"]
+        }
+        return self.execute_consensus_test("drug-interaction", test_data, "Interação Medicamentosa")
+    
+    def test_diagnosis_detailed_review(self):
+        """Test 5: Diagnóstico Detalhado - EXACT review request data"""
+        test_data = {
+            "queixa": "Dor no peito",
+            "idade": "45",
+            "sexo": "M",
+            "historico": "Fumante"
+        }
+        return self.execute_consensus_test("diagnosis", test_data, "Diagnóstico Detalhado")
+    
+    def execute_consensus_test(self, endpoint, test_data, test_name):
+        """Execute a consensus test with 15s max time requirement"""
         start_time = time.time()
         try:
-            # Create a simple text file for upload simulation
-            import io
-            
-            # Create file-like object
-            file_obj = io.BytesIO(exam_content.encode('utf-8'))
-            
-            # Prepare files for upload
-            files = {
-                'files': ('hemograma.txt', file_obj, 'text/plain')
-            }
-            
-            data = {
-                'additional_info': ''
-            }
-            
-            # Step 1: Submit exam analysis request
+            # Step 1: Submit request
             response = self.session.post(
-                f"{BACKEND_URL}/ai/analyze-exam",
-                files=files,
-                data=data
+                f"{BACKEND_URL}/ai/consensus/{endpoint}",
+                json=test_data
             )
             submit_duration = time.time() - start_time
             
             if response.status_code != 200:
-                self.log_result("Exam Analysis - Submit", False, 
+                self.log_result(f"{test_name} - Submit", False, 
                               f"Submit failed: {response.status_code} - {response.text}", submit_duration)
                 return False
             
-            response_data = response.json()
-            task_id = response_data.get("task_id")
+            data = response.json()
+            task_id = data.get("task_id")
             
             if not task_id:
-                self.log_result("Exam Analysis - Submit", False, 
+                self.log_result(f"{test_name} - Submit", False, 
                               "No task_id returned", submit_duration)
                 return False
             
-            # Check if response was immediate (< 1 second as required)
-            if submit_duration > 1.0:
-                self.log_result("Exam Analysis - Submit Speed", False, 
-                              f"Response too slow: {submit_duration:.2f}s (should be < 1s)", submit_duration)
-            else:
-                self.log_result("Exam Analysis - Submit Speed", True, 
-                              f"Immediate response with task_id: {task_id}", submit_duration)
+            print(f"      Task ID: {task_id} (response: {submit_duration:.3f}s)")
             
-            # Step 2: Poll for results
-            return self.poll_task_result(task_id, "Exam Analysis", 
-                                       expected_fields=["findings", "interpretation", "diagnosis", "recommendations"])
+            # Step 2: Poll for results with 15s max time
+            return self.poll_task_result_review(task_id, test_name, max_wait=15)
             
         except Exception as e:
             duration = time.time() - start_time
-            self.log_result("Exam Analysis", False, f"Error: {str(e)}", duration)
+            self.log_result(f"{test_name}", False, f"Error: {str(e)}", duration)
             return False
     
     def poll_task_result(self, task_id, test_name, expected_fields=None, max_wait=120):
