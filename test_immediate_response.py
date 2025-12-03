@@ -5,7 +5,7 @@ Test to verify if endpoints return immediately with task_id
 import requests
 import time
 
-BACKEND_URL = "https://medufai.preview.emergentagent.com/api"
+BACKEND_URL = "https://medai-assist-8.preview.emergentagent.com/api"
 TEST_USERNAME = "ur1fs"
 TEST_PASSWORD = "@Fred1807"
 

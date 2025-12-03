@@ -11,7 +11,7 @@ import json
 from datetime import datetime
 
 # Configuration from environment
-BACKEND_URL = "https://744cda8f-c51f-451d-a4e3-ea6c6c66efab.preview.emergentagent.com/api"
+BACKEND_URL = "https://medai-assist-8.preview.emergentagent.com/api"
 TEST_USERNAME = "ur1fs"
 TEST_PASSWORD = "@Fred1807"
 

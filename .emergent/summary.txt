@@ -8,7 +8,6 @@ PRODUCT REQUIREMENTS:
 - The core AI logic is powered by Gemini models, using the Emergent Universal Key.
 - An hourly-updated, AI-powered epidemiological alerts feature must be present in the header.
 - A cost-tracking feature must be available in the admin panel.
-- A new Exam Reader feature that allows users to upload single or multiple exam files/images (PDF, DOC, TXT, images) for AI analysis.
 - A feedback mechanism (Helpful / Not Helpful) on all analysis results, with data displayed in the admin panel.
 - A platform-wide dark mode, accessible from the menu.
 - The application must be in Portuguese.
@@ -16,101 +15,88 @@ PRODUCT REQUIREMENTS:
 **User's preferred language**: Portuguese (Brazil). The next agent MUST respond in Portuguese.
 
 **what currently exists?**
-The Meduf AI application is a full-stack React/FastAPI app that is now functional in the production environment. The critical deployment bug has been resolved. The feedback system is fully implemented, with feedback buttons on all analysis pages and a dedicated section in the admin panel featuring a statistics chart and a detailed, scrollable table. The Exam Reader feature, after multiple bug fixes, is now operational and its analyses are correctly saved to the admin history.
+The application's backend has been completely rewritten from scratch to be simpler, more robust, and more reliable, solving numerous deployment and stability issues. The problematic Leitor de Exames feature has been entirely removed from both the frontend and backend as requested by the user.
 
-A large number of user-requested UI/UX enhancements have been implemented, including the removal of all emojis for a more professional look, a complex animated neon border on the login form, and a multi-stage login animation sequence. User account management has been improved with a deleted users archive, corrected expiration date calculations, and more robust input validation on forms. The entire platform's timezone has been standardized to São Paulo, Brazil.
+Five core AI analysis features remain: Diagnóstico Simples, Diagnóstico Detalhado, Guia Terapêutico, Interação Medicamentosa, and Toxicologia. All backend AI prompts have been re-engineered to provide technical responses suitable for medical professionals.
+
+A new  endpoint has been added to the backend for easier debugging. Critical bugs, including the profile picture upload, have been fixed. However, a major regression has occurred on the frontend: the Diagnóstico Detalhado and Interação Medicamentosa pages are no longer making API calls to the backend, despite the backend endpoints being functional.
 
 **Last working item**:
-The user requested more specific error messages on the login page for accounts that are expired or have been deleted, directing them to click the Adquirir Acesso button.
+The user reported that Diagnóstico Detalhado and Interação Medicamentosa are not working, specifically that the frontend is not making any API calls for these features.
 
-- **Last item agent was working:** Modifying the frontend logic in  to display a custom, user-friendly toast message when the backend returns an error indicating the user account is blocked (status 403) or expired.
+- **Last item agent was working:** Debugging why the Diagnóstico Detalhado and Interação Medicamentosa pages do not trigger their respective backend API calls when the analysis button is clicked. Extensive  statements were added to the relevant frontend files (, , ) to trace the execution flow and identify the point of failure.
 - **Status:** IN PROGRESS
-- **Agent Testing Done:** N
-- **Which testing method agent to use?** . The agent needs to simulate a failed login for a deleted or expired user and capture the resulting toast message to verify the text.
-- **User Testing Done:** N
+- **Agent Testing Done:** Y
+- **Which testing method agent to use?** Frontend testing agent. The agent must trigger the analysis on the Diagnóstico Detalhado and Interação Medicamentosa pages, open the browser's developer console, and capture the output to inspect the newly added logs. This will reveal why the API call is not being initiated.
+- **User Testing Done:** Y
 
 **All Pending/In progress Issue list**:
-- **Issue 1: (P0) Profile picture upload is not working.**
+- **Issue 1 (P0): Diagnóstico Detalhado functionality is broken.**
+- **Issue 2 (P0): Interação Medicamentosa functionality is broken.**
 
 Issues Detail:
-- **Issue 1:**
-  - **Description:** This bug was reported in the previous fork and re-raised by the user. The agent confirmed the frontend code in  appears correct and the backend  directory exists, but did not complete the debugging process. The feature remains broken.
-  - **Attempted fixes:** None in this session beyond a brief investigation.
+- **Issue 1 & 2:**
+  - **Description:** On the Diagnóstico Detalhado and Interação Medicamentosa pages, clicking the Gerar Análise button does nothing. The testing agent confirmed that no network request is sent to the backend. This is a frontend-specific bug, as the backend endpoints have been tested with  and are fully functional. The root cause is likely an issue within the React component's event handler or the  function that is preventing the  call from being executed.
+  - **Attempted fixes:**
+    - The backend data structures were corrected to match frontend expectations.
+    -  was correctly configured.
+    - Extensive  statements were added to , , and  to provide debug information.
   - **Next debug checklist:**
-    1.  Use  to make a direct API call to the  endpoint with a test image file.
-    2.  Check the backend logs () for any errors during the  request.
-    3.  Verify file permissions on the  directory ().
-    4.  Inspect the  function in  to trace the file saving logic.
-  - **Why fix this issue and what will be achieved with the fix?** To restore a core user profile customization feature.
-  - **Status:** NOT STARTED
+    1.  Use the .
+    2.  Navigate to the Diagnóstico Detalhado page.
+    3.  Open the browser's developer console.
+    4.  Fill out the form and click the Gerar Análise Clínica button.
+    5.  Carefully analyze the captured console logs for the custom debug messages (e.g., handleAnalyze called, Calling startAITask, Submitting data).
+    6.  Identify if  is being called and if any JavaScript error occurs before the API call is made.
+    7.  Repeat the entire process for the Interação Medicamentosa page.
+  - **Why fix this issue and what will be achieved with the fix?** These are two of the five core features of the application. Fixing them is critical to restoring full functionality.
+  - **Status:** IN PROGRESS
   - **Is recurring issue?** Y
-  - **Should Test frontend/backend/both after fix?** Both.
+  - **Should Test frontend/backend/both after fix?** Frontend.
   - **Blocked on other issue:** None.
 
 **In progress Task List**:
-- **Task 1: (P0) Implement user-friendly login error messages.**
-- **Task 2: (P1) Implement clickable user profiles in the Admin panel.**
-
-Task Detail:
-- **Task 1:**
-  - **Where to resume:** Modify the  function in . The agent has already added a check for  and needs to implement a custom toast message as requested by the user.
-  - **What will be achieved with this?** Improves user experience by providing clear instructions when a login fails due to an expired or deleted account.
-  - **Status:** IN PROGRESS
-  - **Should Test frontend/backend/both after fix?** Frontend.
-- **Task 2:**
-  - **Where to resume:** The agent added the UI structure (Dialog) and state (, ) to . The next step is to make the user's name in the user list table a clickable trigger that sets the  and opens the dialog.
-  - **What will be achieved with this?** Allows admins to quickly view user details without leaving the main user list.
-  - **Status:** IN PROGRESS
-  - **Should Test frontend/backend/both after fix?** Frontend.
+- None. All current work is captured in the issues above.
 
 **Upcoming and Future Tasks**
-- **Upcoming Tasks:**
-  - **(P1) Refactor balance-related code:** Remove the now-redundant backend code for setting and getting the balance (, the  DB collection, and the  .env variable). This is a carry-over task.
 - **Future Tasks:**
-  - **(P2) Finalize UI Overhaul:** Review and update  and  pages to ensure their design is consistent with the new immersive aesthetic. This is a carry-over task.
+  - **(P2) UI Consistency Review:** Review and update the  and  pages to ensure their design is consistent with the rest of the application's aesthetic.
 
 **Completed work in this session**
-- **CRITICAL FIX:** Resolved the recurring production deployment issue by adding the  to the backend environment, making all AI features functional.
-- **Feature Completion (Feedback System):**
-  - Integrated the  component across all analysis pages.
-  - Built the Admin UI for viewing feedback, including a  Pie chart and a scrollable table.
-  - Fixed a bug where feedback details appeared blank.
-- **Feature Completion (Exam Reader):**
-  - Fixed multiple critical bugs causing the analysis to fail (double API prefix, incorrect parameter passing, flawed progress bar).
-  - Implemented logic to correctly save Exam Reader analyses to the admin history.
-- **Feature (Account Management):**
-  - Implemented a Deleted Users feature to archive expired accounts instead of permanently deleting them.
-  - Added a new section to the admin panel to view these archived accounts.
-  - Added logic to block login attempts from deleted/expired accounts.
+- **CRITICAL: Backend V2.0 Rewrite:** The entire backend () was rewritten from scratch to improve stability, remove complexity, and ensure reliability, resolving numerous intermittent errors.
+- **CRITICAL: Feature Removal:** The Leitor de Exames (Exam Reader) feature was completely removed from the frontend (, ) and backend (, all related AI modules) as requested.
+- **CRITICAL: Deployment Failure Resolution:** Solved a persistent deployment issue by ensuring  loads environment variables correctly at server startup and by removing all hardcoded key fallbacks.
+- **Reliability Overhaul:**
+  - Implemented a robust retry mechanism with exponential backoff in the backend's .
+  - Added a  endpoint to the backend for easier production debugging.
+  - Increased frontend polling timeouts in .
 - **Bug Fixes:**
-  - Corrected the account expiration day calculation to sync perfectly between the admin panel and the user's view.
-  - Fixed an issue where login error messages (toasts) were not appearing.
-- **UI/UX Overhaul:**
-  - Removed all emojis from the application for a more professional UI.
-  - Implemented a complex, animated neon border that travels around the login form.
-  - Created a multi-stage login animation sequence (fade out form, zoom in on logo).
-  - Standardized input handling on login and admin forms (case-insensitivity, no spaces).
-- **Platform-wide Change:**
-  - Standardized the entire application's timezone to America/Sao_Paulo using .
+  - **Profile Picture Upload (P0):** Fully fixed the long-standing bug where users could not upload or display a profile picture.
+  - **AI Data Structures:** Corrected multiple frontend crashes by changing backend AI responses from strings to arrays for , , and  fields.
+  - **AI Model Correction:** Switched to a stable, working Gemini vision model () to fix image analysis.
+- **Prompt Engineering:** Rewrote all AI system prompts to target medical professionals, providing technical, actionable insights instead of patient-level advice.
+- **Refactoring:** Removed all obsolete Total Balance code from the backend and frontend.
+- **Task Completion:**
+  - Implemented specific login error messages for deleted or expired accounts, guiding users to re-subscribe.
+  - Confirmed that Clickable Admin Profiles and other minor tasks from the previous fork were already complete.
 
 **Earlier issues found/mentioned but not fixed**
-- **Issue 1: Profile picture upload.** (Now listed as P0 in Pending Issues)
+- None.
 
 **Known issue recurrence from previous fork**
-- **Issue:** Analysis fails in production/deploy environment.
-- **Recurrence count:** 1
-- **Status:** RESOLVED. The root cause was a missing  in the production environment, which has been added.
+- **Issue:** Intermittent analysis failures in the deployed environment.
+- **Recurrence count:** 3+
+- **Status:** RESOLVED. This was addressed by rewriting the backend, adding , removing hardcoded keys, and implementing robust retry logic. The new recurring issue is the frontend API call failure.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Frontend:** React, Tailwind CSS, Shadcn UI, Axios,  (for charts), .
-- **Backend:** Python, FastAPI, Motor (MongoDB), ,  (for timezones).
-- **State Management:** React Hooks (, ).
-- **Asynchronous Tasks:** Backend uses a  via a  to handle long-running AI analyses.
-- **API/DB Interaction:** Refactored logic to save consultations to the database upon successful completion of a task, triggered by a frontend poll to the task status endpoint.
-- **CSS Animations:** Extensive use of CSS keyframes and pseudo-elements (, ) to create complex, multi-stage animations on the login page.
+- **Frontend:** React, Tailwind CSS, Shadcn UI, Axios, .
+- **Backend:** Python, FastAPI, Motor (MongoDB), , .
+- **AI Integration:** Uses  with the Emergent LLM Key. All text-based analyses use .
+- **Asynchronous Tasks:** Backend  handles long-running AI jobs with a robust retry mechanism.
+- **Debugging:** A new  endpoint was added to the backend. Extensive  statements were added to the frontend for debugging.
 
 **key DB schema**
 - : 
@@ -119,76 +105,69 @@ Task Detail:
 - : 
 
 **changes in tech stack**
-- **Dependencies Added:**  (frontend),  (backend).
+-  is now a critical part of the backend startup process.
 
 **All files of reference**
-- : Heavily modified for bug fixes, new endpoints (), timezone correction, and improved authentication logic.
-- : Heavily modified to add a feedback chart, a deleted users list, clickable user rows, and bug fixes.
-- : Heavily modified for new animations, improved input validation, and adding the Toaster for error messages.
-- : Modified to handle the new, complex login animations.
-- : New keyframe animations added for the login page effects.
-- : Refactored to correctly handle saving consultations to the database.
-- : Refactored to fix parameter passing to background tasks.
-- : New file to provide a centralized timezone-aware  function.
-- All analysis pages (, , etc.) were modified to integrate the  component.
+- : **Completely rewritten.** The new source of truth for all backend logic.
+- : **Needs debugging.** Contains logs to investigate the missing API call.
+- : **Needs debugging.** Contains logs to investigate the missing API call.
+- : Modified with longer timeouts and logs.
+- : Modified with robust retry logic.
+- : Prompts and data structures were updated.
+- :  route was removed.
+- : **Deleted.**
+- : **Deleted.**
 
 **Areas that need refactoring**:
-- The backend code related to the old Total Balance feature should be removed.
-- The CSS in  for the login effects is complex and could be simplified or better commented.
+- The extensive  statements added for debugging in , , and  should be removed once the core issue is resolved.
 
 **key api endpoints**
-- : Starts an exam analysis task.
-- : Polls for the status and result of a background task. Now saves consultation on completion.
-- : Modified to block deleted/expired users.
-- : Modified to exclude deleted users.
-- : **(New)** Fetches all archived (expired) users.
-- : Modified to return  field correctly.
+- : The single, unified endpoint for all 5 AI analyses.
+- : Polls for the status of a background task.
+- : **(New)** Checks the health and configuration of the backend.
+- : For profile picture uploads.
+- : Fetches current user data.
+- **REMOVED:**  and all other specific analysis endpoints.
 
 **Critical Info for New Agent**
-- **Profile Picture Upload is the highest priority bug.** It has been pending for a long time. Start by debugging this with  and checking backend logs.
-- The login page animations (, , ) are complex and have been iterated on many times. Be cautious when making changes there to avoid breaking the visual effects or user interaction.
-- The Exam Reader feature has been a recurring source of bugs. While it is currently working, any changes to the backend task management or analysis flow should be tested thoroughly.
-- The application now correctly archives expired users by setting a  timestamp. All user-fetching logic must account for this field to avoid showing/allowing access to these users.
+- **The highest priority is fixing the two broken frontend pages: Diagnóstico Detalhado and Interação Medicamentosa.** The problem is that no API call is being made. The backend is stable and has been rewritten.
+- **Your starting point for debugging is to use the frontend testing agent to inspect the browser console logs.** The previous agent added extensive logging to pinpoint the failure.
+- Do not touch the backend unless the frontend logs point to a new, undiscovered backend issue. The backend V2.0 has been heavily tested and is considered stable.
+- The Leitor de Exames feature is gone permanently. Do not attempt to restore it.
 
 **Last 10 User Messages and any pending user messages**
-1.  **User:** Login box is not clickable. (RESOLVED)
-2.  **User:** Zoom effect on login is wrong, should be on the logo only. (RESOLVED)
-3.  **User:** Neon animation is not fluid. (RESOLVED after several attempts)
-4.  **User:** Neon animation is a ball, should be a line. (RESOLVED)
-5.  **User:** Change login animation sequence: fade box -> zoom logo. (RESOLVED)
-6.  **User:** Exam progress bar is stuck, make it simulated like other pages. (RESOLVED)
-7.  **User:** Exam analysis is not working. (RESOLVED - multiple times)
-8.  **User:** Exam analysis not showing in admin history. (RESOLVED - multiple times)
-9.  **User:** Platform time is wrong, set to São Paulo. (RESOLVED)
-10. **User:** Exam history and feedback details are still not working. (RESOLVED)
-11. **Pending:** Add scrollbar to feedback table. (RESOLVED)
-12. **Pending:** Exam analysis broken again after deploy. (RESOLVED)
-13. **Pending:** Account time sync is still wrong. (RESOLVED)
-14. **Pending:** Improve login/admin input fields. (RESOLVED)
-15. **Pending:** Add error messages to login. (RESOLVED)
-16. **Pending:** Change button colors to light blue. (RESOLVED)
-17. **Pending:** Create a deleted users section in admin. (RESOLVED)
-18. **Pending:** Confirm deleted users cannot log in. (RESOLVED, after a fix was added)
-19. **Pending:** Add specific error message for deleted users to prompt them to re-subscribe. (IN PROGRESS - Last working item)
+1.  **User:** Analysis fails after deploy. (RESOLVED, after many attempts)
+2.  **User:** None of the functions are working, rewrite the AI integrations. (COMPLETED - AI integrations were rewritten)
+3.  **User:** Diagnóstico detalhado is not working. (IN PROGRESS)
+4.  **User:** Interação medicamentosa is throwing an error. (RESOLVED - backend data structure was fixed, but frontend call is still broken)
+5.  **User:** Toxicologia is throwing an error. (RESOLVED - backend data structure was fixed)
+6.  **User:** Leitor de exames is throwing an error. (RESOLVED, then the feature was removed)
+7.  **User:** AI responses are for patients, not doctors. (COMPLETED - Prompts were rewritten)
+8.  **User:** Leitor de exames is not reading the file content. (RESOLVED, then the feature was removed)
+9.  **User:** Leitor de exames should use vision to read images, not text. (COMPLETED, then the feature was removed)
+10. **User:** The platform is still unreliable and fails intermittently. (COMPLETED - Addressed with backend rewrite and retry logic)
+11. **Pending:** Delete the exam reader option completely and rewrite the backend completely. (COMPLETED)
+12. **Pending:** Diagnóstico Detalhado and Interação Medicamentosa are still not working. (IN PROGRESS - Current main issue)
 
 **Project Health Check:**
 - **Broken:**
-  - Profile picture upload functionality.
+  - Diagnóstico Detalhado frontend functionality.
+  - Interação Medicamentosa frontend functionality.
 - **Mocked:**
   - The PubMed text in the UI has no backend integration.
 
 **3rd Party Integrations**:
-- **Gemini 2.0/2.5 Flash (via emergentintegrations)** — uses Emergent LLM Key
-- **tiktoken** — for token counting
-- **html2canvas** — for save as image functionality
-- **recharts** - for charts in the admin panel
-- **pytz** - for timezone handling
+- **Gemini 2.0 Flash (via emergentintegrations)** — uses Emergent LLM Key for all text-based analysis.
+- **tiktoken** — for token counting.
+- **html2canvas** — for save as image functionality.
+- **recharts** - for charts in the admin panel.
+- **pytz** - for timezone handling.
 
 **Testing status**
-- **Testing agent used after significant changes:** YES. Was instrumental in fixing the Exam Reader and backend bugs.
-- **Troubleshoot agent used after agent stuck in loop:** YES. Was used to diagnose the double API prefix and missing environment key.
+- **Testing agent used after significant changes:** YES. It was used extensively and helped identify the current frontend-only bug.
+- **Troubleshoot agent used after agent stuck in loop:** YES.
 - **Test files created:** None.
-- **Known regressions:** The Exam Reader feature broke and was fixed multiple times during the session.
+- **Known regressions:** Diagnóstico Detalhado and Interação Medicamentosa stopped working on the frontend after the major backend rewrite.
 
 **Credentials to test flow:**
 - **Admin:**
@@ -196,6 +175,4 @@ Task Detail:
   - **Password:** 
 
 **What agent forgot to execute**
-- Fully debugging and fixing the profile picture upload functionality.
-- Refactoring the old, unused balance code from the backend.
-- A final UI consistency review for the  and  pages.</analysis>
+- The low-priority (P2) task to perform a final UI consistency review for the  and  pages.</analysis>
