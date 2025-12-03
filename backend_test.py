@@ -9,8 +9,8 @@ import time
 import json
 from datetime import datetime
 
-# Configuration
-BACKEND_URL = "http://localhost:8001/api"
+# Configuration - Use production URL from frontend .env
+BACKEND_URL = "https://medufai.preview.emergentagent.com/api"
 TEST_USERNAME = "ur1fs"
 TEST_PASSWORD = "@Fred1807"
 
