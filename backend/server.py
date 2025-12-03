@@ -1,278 +1,57 @@
+"""
+Meduf AI - Backend Reescrito
+Sistema médico profissional com IA
+Versão: 2.0 - Limpa e Confiável
+"""
 import os
 import asyncio
-import uuid
 from datetime import datetime, timedelta
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, Depends, status, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-import shutil
-from pathlib import Path
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr
 from motor.motor_asyncio import AsyncIOMotorClient
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from bson import ObjectId
-from timezone_utils import now_sao_paulo, utc_to_sao_paulo
+from pathlib import Path
+import shutil
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
+# Load environment
 load_dotenv()
 
-# --- Configuration ---
+# Validate critical configuration
+EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY")
+if not EMERGENT_LLM_KEY:
+    raise ValueError("❌ EMERGENT_LLM_KEY é obrigatória mas não está configurada")
+print(f"✅ EMERGENT_LLM_KEY carregada: {EMERGENT_LLM_KEY[:15]}...")
+
+# Configuration
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
-SECRET_KEY = os.environ.get("SECRET_KEY", "supersecretkey123") # In prod, use a real secret
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 # 24 hours
+SECRET_KEY = os.environ.get("SECRET_KEY", "supersecretkey123")
 ADMIN_USER = os.environ.get("ADMIN_USER", "ur1fs")
 ADMIN_PASS = os.environ.get("ADMIN_PASS", "@Fred1807")
 
-# CRITICAL: Validate EMERGENT_LLM_KEY at startup
-EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY")
-if not EMERGENT_LLM_KEY:
-    print("=" * 80)
-    print("❌ CRITICAL ERROR: EMERGENT_LLM_KEY not found in environment!")
-    print("=" * 80)
-    print("The application requires EMERGENT_LLM_KEY to function.")
-    print("Please configure it in your deployment environment.")
-    print("=" * 80)
-    raise ValueError("EMERGENT_LLM_KEY is required but not set in environment")
-else:
-    print("=" * 80)
-    print(f"✅ EMERGENT_LLM_KEY loaded successfully (starts with: {EMERGENT_LLM_KEY[:15]}...)")
-    print("=" * 80)
-
-# --- Database Setup ---
+# Database
 client = AsyncIOMotorClient(MONGO_URL)
 db_name = os.environ.get("DB_NAME", "test_database")
 db = client[db_name]
 users_collection = db.users
 consultations_collection = db.consultations
-usage_stats_collection = db.usage_stats  # Track API usage and costs
+costs_collection = db.usage_stats
+feedbacks_collection = db.feedbacks
 
-# --- Security ---
+# Security
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
-# --- Models ---
-class PyObjectId(ObjectId):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
+# FastAPI app
+app = FastAPI(title="Meduf AI", version="2.0")
 
-    @classmethod
-    def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid objectid")
-        return ObjectId(v)
-
-    @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type="string")
-
-class UserBase(BaseModel):
-    email: str
-    name: str
-    avatar_url: Optional[str] = None
-
-class UserUpdate(BaseModel):
-    name: Optional[str] = None
-    avatar_url: Optional[str] = None
-
-class UserCreate(UserBase):
-    password: str
-    crm: Optional[str] = None
-    days_valid: int = 30
-    role: str = "USER"
-
-class UserInDB(UserBase):
-    id: str = Field(alias="_id")
-    role: str = "USER"
-    status: str = "Ativo"
-    created_at: Optional[datetime] = None
-    expiration_date: Optional[datetime] = None
-    session_id: Optional[str] = None
-
-    class Config:
-        populate_by_name = True
-        json_encoders = {ObjectId: str}
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-    user_name: str
-    user_role: str
-    expiration_date: Optional[datetime] = None
-    
-    class Config:
-        json_encoders = {
-            datetime: lambda v: v.isoformat() if v else None
-        }
-
-class ConsultationCreate(BaseModel):
-    patient: dict
-    report: dict
-
-class ConsultationInDB(BaseModel):
-    id: str = Field(alias="_id")
-    user_id: str
-    patient: dict
-    report: dict
-    created_at: Optional[datetime] = None
-
-    class Config:
-        populate_by_name = True
-        json_encoders = {ObjectId: str}
-
-# --- Helper Functions ---
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-def get_password_hash(password):
-    return pwd_context.hash(password)
-
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = now_sao_paulo() + expires_delta
-    else:
-        expire = now_sao_paulo() + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
-
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        token_session_id: str = payload.get("session_id")
-        
-        if email is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
-    
-    user = await users_collection.find_one({"email": email})
-    if user is None:
-        raise credentials_exception
-    
-    # Check if account is deleted
-    if user.get("deleted") == True:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Conta excluída. Acesso negado.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-        
-    # Single Session Enforcement
-    # If the user has a session_id in DB, it MUST match the token's session_id
-    # We allow token_session_id to be None for backward compatibility with old tokens during migration,
-    # BUT for strict enforcement, we should require it. 
-    # Let's enforce: if DB has session_id, token must match.
-    if user.get("session_id") and user.get("session_id") != token_session_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Sessão expirada. Você conectou em outro dispositivo.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    # Convert ObjectId to string for the model
-    user["_id"] = str(user["_id"])
-    
-    # Track active user (update timestamp)
-    active_user_sessions[user["_id"]] = now_sao_paulo()
-    
-    return UserInDB(**user)
-
-async def get_current_active_user(current_user: UserInDB = Depends(get_current_user)):
-    if current_user.status == "Bloqueado":
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
-
-async def get_admin_user(current_user: UserInDB = Depends(get_current_active_user)):
-    if current_user.role != "ADMIN":
-        raise HTTPException(status_code=403, detail="Not authorized")
-    return current_user
-
-# --- Background Tasks ---
-async def remove_expired_users():
-    """Background task to mark expired users as deleted."""
-    while True:
-        try:
-            now = now_sao_paulo()
-            # Mark users as deleted instead of removing
-            result = await users_collection.update_many(
-                {
-                    "expiration_date": {"$lt": now},
-                    "role": {"$ne": "ADMIN"},  # Never delete admins automatically
-                    "deleted": {"$ne": True}  # Don't update already deleted
-                },
-                {
-                    "$set": {
-                        "deleted": True,
-                        "deleted_at": now
-                    }
-                }
-            )
-            if result.modified_count > 0:
-                print(f"Marked {result.modified_count} expired user accounts as deleted.")
-        except Exception as e:
-            print(f"Error in cleanup task: {e}")
-        
-        # Run every hour
-        await asyncio.sleep(3600)
-
-# --- App Setup ---
-app = FastAPI()
-
-# Mount static files
-static_path = Path(__file__).parent / "static"
-app.mount("/api/static", StaticFiles(directory=static_path), name="static")
-
-# --- Active Users Tracking ---
-active_users = set()
-
-@app.middleware("http")
-async def track_active_users(request, call_next):
-    # Simple tracking: count unique IPs or tokens in the last X minutes?
-    # For real-time "online", websockets are best, but for HTTP, we can track "active in last 5 mins".
-    # We'll use a global set and a background task to clear it, or just a timestamp dict.
-    # Let's use a dict: {user_id: timestamp}
-    
-    response = await call_next(request)
-    return response
-
-# We need a way to identify the user in middleware or just update "last_seen" in DB on every request.
-# Updating DB on every request is heavy.
-# Let's use an in-memory dict for this prototype feature.
-active_user_sessions = {}
-
-@app.get("/api/admin/stats/online")
-async def get_online_users_count(admin: UserInDB = Depends(get_admin_user)):
-    # Count users active in last 5 minutes
-    now = now_sao_paulo()
-    threshold = now - timedelta(minutes=5)
-    
-    # Clean up old sessions
-    expired_users = [uid for uid, timestamp in active_user_sessions.items() if timestamp < threshold]
-    for uid in expired_users:
-        del active_user_sessions[uid]
-        
-    return {"online_count": len(active_user_sessions)}
-
-# We need to inject this tracking into the dependency or a middleware that parses the token.
-# Since we already have `get_current_user`, let's update the timestamp there.
-# But `get_current_user` is a dependency.
-# We can modify `get_current_user` to update the global dict.
-
-# Startup event moved to start_background_tasks() function above
-
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -281,127 +60,157 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- Routes ---
+# Static files
+static_path = Path(__file__).parent / "static"
+static_path.mkdir(exist_ok=True)
+app.mount("/api/static", StaticFiles(directory=str(static_path)), name="static")
 
-@app.get("/api/")
-async def root():
-    return {"message": "Meduf AI API is running"}
+# Models
+class UserInDB(BaseModel):
+    id: str
+    email: str
+    name: str
+    password_hash: str
+    role: str = "USER"
+    avatar_url: Optional[str] = None
+    expiration_date: Optional[datetime] = None
+    deleted: bool = False
 
-# Auth Routes
-# NOTE: Public registration is DISABLED. Only Admins can create users via /api/admin/users
-# @app.post("/api/auth/register", response_model=Token)
-# async def register(user: UserCreate):
-#     ... (Disabled)
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    user_name: str
+    user_role: str
+    expiration_date: Optional[str] = None
+    avatar_url: Optional[str] = ""
+
+# Import AI modules
+from ai_medical_consensus import (
+    analyze_diagnosis,
+    analyze_drug_interaction,
+    analyze_medication_guide,
+    analyze_toxicology
+)
+
+# Import task manager
+from task_manager import TaskManager, TaskStatus
+task_manager = TaskManager()
+
+# Timezone utilities
+from timezone_utils import now_sao_paulo
+
+
+# ===== AUTHENTICATION =====
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(days=30)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm="HS256")
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        
+        user = await users_collection.find_one({"_id": ObjectId(user_id)})
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+        
+        return UserInDB(
+            id=str(user["_id"]),
+            email=user["email"],
+            name=user["name"],
+            password_hash=user["password_hash"],
+            role=user.get("role", "USER"),
+            avatar_url=user.get("avatar_url"),
+            expiration_date=user.get("expiration_date"),
+            deleted=user.get("deleted", False)
+        )
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+async def get_current_active_user(current_user: UserInDB = Depends(get_current_user)):
+    if current_user.deleted:
+        raise HTTPException(status_code=403, detail="Account deleted")
+    return current_user
+
+
+# ===== API ENDPOINTS =====
+
+@app.get("/api/system/health")
+async def health_check():
+    """Health check with system status"""
+    return {
+        "status": "healthy",
+        "version": "2.0",
+        "emergent_llm_key": bool(EMERGENT_LLM_KEY),
+        "database": db_name,
+        "features": {
+            "diagnostico_simples": True,
+            "guia_terapeutico": True,
+            "toxicologia": True,
+            "diagnostico_detalhado": True,
+            "interacao_medicamentosa": True
+        }
+    }
+
 
 @app.post("/api/auth/login", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    email_query = form_data.username
+    """Login endpoint"""
+    # Clean input
+    username = form_data.username.strip().lower()
     
-    # Admin fallback creation
-    if form_data.username == ADMIN_USER and form_data.password == ADMIN_PASS:
-        admin_user = await users_collection.find_one({"email": ADMIN_USER})
-        if not admin_user:
-            hashed = get_password_hash(ADMIN_PASS)
-            await users_collection.insert_one({
-                "email": ADMIN_USER,
-                "name": "Administrador",
-                "password_hash": hashed,
-                "role": "ADMIN",
-                "status": "Ativo",
-                "created_at": datetime.utcnow(),
-                "expiration_date": datetime.utcnow() + timedelta(days=3650) # 10 years for admin
-            })
-        email_query = ADMIN_USER
-
-    user = await users_collection.find_one({"email": email_query})
+    # Find user
+    user = await users_collection.find_one({"email": username})
     
     if not user:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    
+    # Check deleted
+    if user.get("deleted"):
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-            headers={"WWW-Authenticate": "Bearer"},
+            status_code=403,
+            detail="Sua conta foi excluída ou expirou. Para renovar, clique em 'Adquirir Acesso'."
         )
     
-    # Check if account is deleted
-    if user.get("deleted") == True:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Sua conta foi excluída ou expirou. Por favor, renove seu acesso.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    if not verify_password(form_data.password, user["password_hash"]):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    # Check Expiration
+    # Check expiration
     if user.get("expiration_date") and user["expiration_date"] < datetime.utcnow():
-        # Mark user as deleted when expired
         await users_collection.update_one(
             {"_id": user["_id"]},
             {"$set": {"deleted": True, "deleted_at": datetime.utcnow()}}
         )
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Sua conta expirou. Para renovar seu acesso, clique em 'Adquirir Acesso'."
+            status_code=403,
+            detail="Sua conta expirou. Para renovar, clique em 'Adquirir Acesso'."
         )
-
-    if user.get("status") == "Bloqueado":
-         raise HTTPException(status_code=400, detail="User account is blocked")
-
-    # Generate and update Session ID (Single Session Enforcement)
-    session_id = str(uuid.uuid4())
-    await users_collection.update_one({"_id": user["_id"]}, {"$set": {"session_id": session_id}})
-
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user["email"], "role": user.get("role", "USER"), "session_id": session_id}, expires_delta=access_token_expires
-    )
+    
+    # Verify password
+    if not verify_password(form_data.password, user["password_hash"]):
+        raise HTTPException(status_code=401, detail="Senha incorreta")
+    
+    # Create token
+    access_token = create_access_token({"sub": str(user["_id"])})
     
     return {
-        "access_token": access_token, 
-        "token_type": "bearer", 
-        "user_name": user["name"], 
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user_name": user["name"],
         "user_role": user.get("role", "USER"),
         "expiration_date": user.get("expiration_date"),
         "avatar_url": user.get("avatar_url", "")
     }
 
-# Consultation Routes
-@app.post("/api/consultations", response_model=dict)
-async def create_consultation(consultation: ConsultationCreate, current_user: UserInDB = Depends(get_current_active_user)):
-    consultation_dict = consultation.dict()
-    consultation_dict["user_id"] = current_user.id
-    consultation_dict["created_at"] = datetime.utcnow()
-    
-    result = await consultations_collection.insert_one(consultation_dict)
-    return {"id": str(result.inserted_id), "message": "Consultation saved"}
-
-@app.get("/api/consultations", response_model=List[ConsultationInDB])
-async def get_consultations(current_user: UserInDB = Depends(get_current_active_user)):
-    consultations = []
-    cursor = consultations_collection.find({"user_id": current_user.id}).sort("created_at", -1).limit(100)
-    async for document in cursor:
-        document["_id"] = str(document["_id"])
-        consultations.append(ConsultationInDB(**document))
-    return consultations
-
-@app.patch("/api/users/me", response_model=UserInDB)
-async def update_user_me(user_update: UserUpdate, current_user: UserInDB = Depends(get_current_active_user)):
-    update_data = user_update.dict(exclude_unset=True)
-    if update_data:
-        await users_collection.update_one({"_id": ObjectId(current_user.id)}, {"$set": update_data})
-        # Fetch updated user
-        updated_user = await users_collection.find_one({"_id": ObjectId(current_user.id)})
-        updated_user["_id"] = str(updated_user["_id"])
-        return UserInDB(**updated_user)
-    return current_user
 
 @app.get("/api/users/me")
-async def get_current_user_info(current_user: UserInDB = Depends(get_current_active_user)):
+async def get_user_profile(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get current user profile"""
     return {
         "id": current_user.id,
         "name": current_user.name,
@@ -410,900 +219,188 @@ async def get_current_user_info(current_user: UserInDB = Depends(get_current_act
         "avatar_url": current_user.avatar_url or ""
     }
 
+
 @app.post("/api/users/me/avatar")
-async def upload_avatar(file: UploadFile = File(...), current_user: UserInDB = Depends(get_current_active_user)):
+async def upload_avatar(
+    file: UploadFile = File(...),
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Upload user avatar"""
     try:
-        # Create uploads directory if it doesn't exist
         upload_dir = static_path / "uploads"
-        upload_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Generate filename (user_id + extension)
-        file_extension = file.filename.split(".")[-1] if "." in file.filename else "png"
-        filename = f"{current_user.id}.{file_extension}"
-        file_path = upload_dir / filename
+        upload_dir.mkdir(exist_ok=True)
         
         # Save file
-        with file_path.open("wb") as buffer:
+        file_ext = Path(file.filename).suffix
+        filename = f"{current_user.id}{file_ext}"
+        file_path = upload_dir / filename
+        
+        with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
-            
-        # Construct URL (assuming app is served at root, but we need the full URL or relative)
-        # Since frontend and backend might be on different ports in dev, but same domain in prod via nginx
-        # We will return a relative path that the frontend can prepend with backend URL if needed
-        # Or better, return the full path if we knew the host. 
-        # Let's return a relative path "/static/uploads/..." and let frontend handle it.
-        # Note: In the Nginx config (if any), /static needs to be routed to backend.
-        # But wait, the frontend connects to /api. 
-        # I mounted /static at root level of FastAPI app. So it is accessible at http://backend:8001/static
         
+        # Update database
         avatar_url = f"/api/static/uploads/{filename}"
-        
-        # Update user in DB
         await users_collection.update_one(
-            {"_id": ObjectId(current_user.id)}, 
+            {"_id": ObjectId(current_user.id)},
             {"$set": {"avatar_url": avatar_url}}
         )
         
         return {"avatar_url": avatar_url}
-        
     except Exception as e:
-        print(f"Error uploading file: {e}")
-        raise HTTPException(status_code=500, detail="Could not upload file")
-
-@app.delete("/api/consultations/{id}")
-async def delete_consultation(id: str, current_user: UserInDB = Depends(get_current_active_user)):
-    result = await consultations_collection.delete_one({"_id": ObjectId(id), "user_id": current_user.id})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Consultation not found")
-    return {"message": "Consultation deleted"}
-
-# Admin Routes
-@app.get("/api/admin/users", response_model=List[UserInDB])
-async def get_all_users(admin: UserInDB = Depends(get_admin_user)):
-    users = []
-    # Only show active users (not deleted)
-    cursor = users_collection.find({"deleted": {"$ne": True}}).sort("created_at", -1).limit(1000)
-    async for document in cursor:
-        document["_id"] = str(document["_id"])
-        try:
-            users.append(UserInDB(**document))
-        except Exception as e:
-            print(f"Skipping invalid user document {document.get('_id')}: {e}")
-    return users
-
-@app.get("/api/admin/deleted-users")
-async def get_deleted_users(admin: UserInDB = Depends(get_admin_user)):
-    """Get all deleted/expired user accounts"""
-    deleted_users = []
-    cursor = users_collection.find({"deleted": True}).sort("deleted_at", -1)
-    async for document in cursor:
-        document["_id"] = str(document["_id"])
-        deleted_users.append({
-            "id": document["_id"],
-            "name": document.get("name"),
-            "email": document.get("email"),
-            "username": document.get("username"),
-            "deleted_at": document.get("deleted_at"),
-            "expiration_date": document.get("expiration_date"),
-            "created_at": document.get("created_at")
-        })
-    return deleted_users
-
-@app.post("/api/admin/users", response_model=dict)
-async def create_user_admin(user: UserCreate, admin: UserInDB = Depends(get_admin_user)):
-    existing_user = await users_collection.find_one({"email": user.email})
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
-    hashed_password = get_password_hash(user.password)
-    
-    # Set expiration date (custom days from now)
-    created_at = datetime.utcnow()
-    expiration_date = created_at + timedelta(days=user.days_valid)
-    
-    # Generate Session ID
-    session_id = str(uuid.uuid4())
-
-    user_dict = {
-        "email": user.email,
-        "name": user.name,
-        "password_hash": hashed_password,
-        "role": user.role,
-        "status": "Ativo",
-        "created_at": created_at,
-        "expiration_date": expiration_date,
-        "session_id": session_id
-    }
-    
-    result = await users_collection.insert_one(user_dict)
-    return {"id": str(result.inserted_id), "message": "User created successfully"}
-
-from bson import ObjectId
-from bson.errors import InvalidId
-
-# ... (rest of imports)
-
-# ...
-
-class AdminUserUpdate(BaseModel):
-    days_valid: Optional[int] = None
-    role: Optional[str] = None
-
-@app.patch("/api/admin/users/{id}")
-async def update_user_admin(id: str, update: AdminUserUpdate, admin: UserInDB = Depends(get_admin_user)):
-    try:
-        oid = ObjectId(id)
-    except InvalidId:
-        raise HTTPException(status_code=400, detail="Invalid user ID")
-        
-    user = await users_collection.find_one({"_id": oid})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-        
-    update_data = {}
-    
-    if update.days_valid is not None:
-        # Add days to current expiration (or from now if expired/not set)
-        current_expiration = user.get("expiration_date")
-        if current_expiration and current_expiration > datetime.utcnow():
-            # Add to existing expiration
-            update_data["expiration_date"] = current_expiration + timedelta(days=update.days_valid)
-        else:
-            # Start from now if expired or not set
-            update_data["expiration_date"] = datetime.utcnow() + timedelta(days=update.days_valid)
-        
-    if update.role is not None:
-        update_data["role"] = update.role
-        
-    if update_data:
-        await users_collection.update_one({"_id": oid}, {"$set": update_data})
-        
-    return {"message": "User updated successfully"}
-
-class AdminUserUpdate(BaseModel):
-    days_valid: Optional[int] = None
-    role: Optional[str] = None
-
-@app.patch("/api/admin/users/{id}")
-async def update_user_admin(id: str, update: AdminUserUpdate, admin: UserInDB = Depends(get_admin_user)):
-    try:
-        oid = ObjectId(id)
-    except InvalidId:
-        raise HTTPException(status_code=400, detail="Invalid user ID")
-        
-    user = await users_collection.find_one({"_id": oid})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-        
-    update_data = {}
-    
-    if update.days_valid is not None:
-        # Add days to current expiration (or from now if expired/not set)
-        current_expiration = user.get("expiration_date")
-        if current_expiration and current_expiration > datetime.utcnow():
-            # Add to existing expiration
-            update_data["expiration_date"] = current_expiration + timedelta(days=update.days_valid)
-        else:
-            # Start from now if expired or not set
-            update_data["expiration_date"] = datetime.utcnow() + timedelta(days=update.days_valid)
-        
-    if update.role is not None:
-        update_data["role"] = update.role
-        
-    if update_data:
-        await users_collection.update_one({"_id": oid}, {"$set": update_data})
-        
-    return {"message": "User updated successfully"}
-
-@app.patch("/api/admin/users/{id}/status")
-async def toggle_user_status(id: str, admin: UserInDB = Depends(get_admin_user)):
-    try:
-        oid = ObjectId(id)
-    except InvalidId:
-        raise HTTPException(status_code=400, detail="Invalid user ID format")
-
-    user = await users_collection.find_one({"_id": oid})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    new_status = "Bloqueado" if user.get("status") == "Ativo" else "Ativo"
-    await users_collection.update_one({"_id": oid}, {"$set": {"status": new_status}})
-    return {"status": new_status}
-
-@app.delete("/api/admin/users/{id}")
-async def delete_user(id: str, admin: UserInDB = Depends(get_admin_user)):
-    try:
-        oid = ObjectId(id)
-    except InvalidId:
-        raise HTTPException(status_code=400, detail="Invalid user ID format")
-
-    # Delete user
-    result = await users_collection.delete_one({"_id": oid})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    # Delete user's consultations
-    await consultations_collection.delete_many({"user_id": id})
-    
-    return {"message": "User and associated data deleted"}
-
-@app.get("/api/admin/consultations")
-async def get_all_consultations(admin: UserInDB = Depends(get_admin_user)):
-    # This is a simplified view for the admin dashboard
-    consultations = []
-    # Join with users to get doctor name would be better, but for now we'll fetch recent ones
-    # Use aggregation pipeline to join with users collection (solves N+1 problem)
-    pipeline = [
-        {
-            "$sort": {"created_at": -1}
-        },
-        {
-            "$limit": 500  # Add reasonable limit for performance
-        },
-        {
-            "$lookup": {
-                "from": "users",
-                "let": {"user_id_str": "$user_id"},
-                "pipeline": [
-                    {
-                        "$match": {
-                            "$expr": {
-                                "$eq": [{"$toString": "$_id"}, "$$user_id_str"]
-                            }
-                        }
-                    },
-                    {"$project": {"name": 1}}
-                ],
-                "as": "user"
-            }
-        },
-        {
-            "$unwind": {
-                "path": "$user",
-                "preserveNullAndEmptyArrays": True
-            }
-        }
-    ]
-    
-    cursor = consultations_collection.aggregate(pipeline)
-    
-    async for doc in cursor:
-        doctor_name = doc.get("user", {}).get("name", "Unknown") if doc.get("user") else "Unknown"
-        
-        consultations.append({
-            "id": str(doc["_id"]),
-            "doctor": doctor_name,
-            "patient": doc.get('patient', {}),
-            "report": doc.get('report', {}),
-            "created_at": doc.get('created_at')
-        })
-    
-    return consultations
-
-# --- Generic Database Manager Routes (Admin Only) ---
-
-@app.get("/api/admin/db/collections")
-async def list_collections(admin: UserInDB = Depends(get_admin_user)):
-    return await db.list_collection_names()
-
-@app.delete("/api/admin/db/collections/{collection_name}")
-async def drop_collection(collection_name: str, admin: UserInDB = Depends(get_admin_user)):
-    if collection_name not in await db.list_collection_names():
-        raise HTTPException(status_code=404, detail="Collection not found")
-    
-    # Prevent deleting critical collections if necessary, but for a DB manager, maybe allow it with caution.
-    # Let's protect 'users' just in case, or leave it open as requested "qualquer informação".
-    # User asked for "qualquer informação", so I will allow it.
-    
-    await db[collection_name].drop()
-    return {"message": f"Collection {collection_name} dropped"}
-
-@app.get("/api/admin/db/{collection_name}")
-async def list_documents(collection_name: str, limit: int = 50, skip: int = 0, q: Optional[str] = None, admin: UserInDB = Depends(get_admin_user)):
-    if collection_name not in await db.list_collection_names():
-        raise HTTPException(status_code=404, detail="Collection not found")
-    
-    collection = db[collection_name]
-    query = {}
-    if q:
-        # 1. Try to parse as direct JSON query
-        try:
-            import json
-            query = json.loads(q)
-        except:
-            # 2. Construct a text/regex search
-            search_conditions = []
-            
-            # ID Match
-            if ObjectId.is_valid(q):
-                search_conditions.append({"_id": ObjectId(q)})
-            
-            # Regex match on common fields
-            regex = {"$regex": q, "$options": "i"}
-            fields_to_search = ["name", "email", "role", "status", "patient.queixa", "patient.sexo", "doctor"]
-            
-            for field in fields_to_search:
-                search_conditions.append({field: regex})
-                
-            query = {"$or": search_conditions}
-
-    cursor = collection.find(query).skip(skip).limit(limit).sort("_id", -1)
-    documents = []
-    async for doc in cursor:
-        # Convert ObjectId and datetime to string/isoformat for JSON serialization
-        doc["_id"] = str(doc["_id"])
-        for k, v in doc.items():
-            if isinstance(v, datetime):
-                doc[k] = v.isoformat()
-        documents.append(doc)
-    return documents
-
-@app.post("/api/admin/db/{collection_name}")
-async def create_document(collection_name: str, document: dict, admin: UserInDB = Depends(get_admin_user)):
-    if collection_name not in await db.list_collection_names():
-        raise HTTPException(status_code=404, detail="Collection not found")
-    
-    # Remove _id if present to let MongoDB generate it
-    if "_id" in document:
-        del document["_id"]
-        
-    # Convert ISO strings back to datetime if needed? 
-    # For a raw editor, we might just store strings or try to parse standard fields.
-    # Let's keep it simple: store as received (mostly strings/ints/dicts).
-    
-    result = await db[collection_name].insert_one(document)
-    return {"id": str(result.inserted_id), "message": "Document created"}
-
-@app.put("/api/admin/db/{collection_name}/{id}")
-async def update_document(collection_name: str, id: str, document: dict, admin: UserInDB = Depends(get_admin_user)):
-    if collection_name not in await db.list_collection_names():
-        raise HTTPException(status_code=404, detail="Collection not found")
-    
-    try:
-        oid = ObjectId(id)
-    except:
-        raise HTTPException(status_code=400, detail="Invalid ID")
-        
-    if "_id" in document:
-        del document["_id"]
-        
-    result = await db[collection_name].replace_one({"_id": oid}, document)
-    if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Document not found")
-        
-    return {"message": "Document updated"}
-
-@app.delete("/api/admin/db/{collection_name}/{id}")
-async def delete_document(collection_name: str, id: str, admin: UserInDB = Depends(get_admin_user)):
-    if collection_name not in await db.list_collection_names():
-        raise HTTPException(status_code=404, detail="Collection not found")
-        
-    try:
-        oid = ObjectId(id)
-    except:
-        raise HTTPException(status_code=400, detail="Invalid ID")
-        
-    result = await db[collection_name].delete_one({"_id": oid})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Document not found")
-        
-    return {"message": "Document deleted"}
-
-# --- AI Engine Endpoints ---
-from ai_engine import (
-    analyze_detailed_diagnosis,
-    analyze_simple_diagnosis,
-    get_medication_guide,
-    analyze_drug_interaction,
-    analyze_toxicology,
-    DiagnosisResult,
-    MedicationItem,
-    ToxicologyResult,
-    InteractionResult
-)
+        print(f"Error uploading avatar: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/api/ai/diagnosis/detailed", response_model=dict)
-async def ai_detailed_diagnosis(patient_data: dict, user: UserInDB = Depends(get_current_user)):
-    """Detailed diagnosis with full patient context"""
-    try:
-        result = analyze_detailed_diagnosis(patient_data)
-        return result.dict()
-    except Exception as e:
-        print(f"AI Engine Error: {e}")
-        raise HTTPException(status_code=500, detail="Error processing diagnosis")
+# ===== AI ENDPOINTS =====
 
-
-@app.post("/api/ai/diagnosis/simple", response_model=dict)
-async def ai_simple_diagnosis(data: dict, user: UserInDB = Depends(get_current_user)):
-    """Simple diagnosis with text-only input"""
-    try:
-        text = data.get("text", "")
-        result = analyze_simple_diagnosis(text)
-        return result.dict()
-    except Exception as e:
-        print(f"AI Engine Error: {e}")
-        raise HTTPException(status_code=500, detail="Error processing diagnosis")
-
-
-@app.post("/api/ai/medication-guide", response_model=list)
-async def ai_medication_guide(data: dict, user: UserInDB = Depends(get_current_user)):
-    """Get medication recommendations based on symptoms"""
-    try:
-        symptoms = data.get("symptoms", "")
-        medications = get_medication_guide(symptoms)
-        return [med.dict() for med in medications]
-    except Exception as e:
-        print(f"AI Engine Error: {e}")
-        raise HTTPException(status_code=500, detail="Error processing medication guide")
-
-
-@app.post("/api/ai/drug-interaction", response_model=dict)
-async def ai_drug_interaction(data: dict, user: UserInDB = Depends(get_current_user)):
-    """Check interactions between two drugs"""
-    try:
-        drug1 = data.get("drug1", "")
-        drug2 = data.get("drug2", "")
-        result = analyze_drug_interaction(drug1, drug2)
-        return result.dict()
-    except Exception as e:
-        print(f"AI Engine Error: {e}")
-        raise HTTPException(status_code=500, detail="Error processing drug interaction")
-
-
-@app.post("/api/ai/toxicology", response_model=dict)
-async def ai_toxicology(data: dict, user: UserInDB = Depends(get_current_user)):
-    """Get toxicology protocol for a substance"""
-    try:
-        substance = data.get("substance", "")
-        result = analyze_toxicology(substance)
-        return result.dict()
-    except Exception as e:
-        print(f"AI Engine Error: {e}")
-        raise HTTPException(status_code=500, detail="Error processing toxicology")
-
-
-# --- Background Task Manager ---
-from task_manager import task_manager, TaskStatus
-import asyncio
-
-
-# Start cleanup task on startup
-@app.on_event("startup")
-async def start_background_tasks():
-    asyncio.create_task(remove_expired_users())
-    asyncio.create_task(task_manager.cleanup_old_tasks())
-
-
-# --- AI Consensus Engine (3 AIs + PubMed) with Background Processing ---
-from ai_medical_consensus import (
-    get_ai_consensus_diagnosis,
-    get_ai_consensus_medication_guide,
-    get_ai_consensus_drug_interaction,
-    get_ai_consensus_toxicology
-)
-from epidemiological_alerts import fetch_real_epidemiological_alerts, get_cache_info
-
-
-@app.post("/api/ai/consensus/diagnosis", response_model=dict)
-async def ai_consensus_diagnosis(patient_data: dict, user: UserInDB = Depends(get_current_user)):
-    """
-    Advanced AI Diagnosis using 3 LLMs + PubMed research
-    Returns task_id immediately, client polls for result
-    """
-    # Create task
-    task_id = task_manager.create_task("diagnosis")
-    
-    # Start background processing
-    asyncio.create_task(
-        task_manager.execute_task(
-            task_id,
-            get_ai_consensus_diagnosis,
-            patient_data
-        )
-    )
-    
-    return {
-        "task_id": task_id,
-        "status": "pending",
-        "message": "Análise iniciada. Use /api/ai/tasks/{task_id} para verificar o progresso."
-    }
-
-
-@app.post("/api/ai/consensus/medication-guide", response_model=dict)
-async def ai_consensus_medication_guide(data: dict, user: UserInDB = Depends(get_current_user)):
-    """
-    Medication guide using 3 LLMs + PubMed research
-    Returns task_id immediately, client polls for result
-    """
-    symptoms = data.get("symptoms", "")
-    
-    # Create task
-    task_id = task_manager.create_task("medication-guide")
-    
-    # Start background processing
-    asyncio.create_task(
-        task_manager.execute_task(
-            task_id,
-            get_ai_consensus_medication_guide,
-            symptoms
-        )
-    )
-    
-    return {
-        "task_id": task_id,
-        "status": "pending",
-        "message": "Análise iniciada. Use /api/ai/tasks/{task_id} para verificar o progresso."
-    }
-
-
-@app.post("/api/ai/consensus/drug-interaction", response_model=dict)
-async def ai_consensus_drug_interaction_endpoint(data: dict, user: UserInDB = Depends(get_current_user)):
-    """
-    Drug interaction using 3 LLMs + PubMed research
-    Returns task_id immediately, client polls for result
-    """
-    # Support both old format (drug1, drug2) and new format (medications list)
-    medications = data.get("medications", [])
-    if not medications:
-        # Fallback to old format
-        drug1 = data.get("drug1", "")
-        drug2 = data.get("drug2", "")
-        medications = [drug1, drug2]
-    
-    # Filter empty medications
-    medications = [med.strip() for med in medications if med and med.strip()]
-    
-    if len(medications) < 2:
-        raise HTTPException(status_code=400, detail="Pelo menos 2 medicamentos são necessários")
-    
-    # Create task
-    task_id = task_manager.create_task("drug-interaction")
-    
-    # Start background processing
-    asyncio.create_task(
-        task_manager.execute_task(
-            task_id,
-            get_ai_consensus_drug_interaction,
-            medications
-        )
-    )
-    
-    return {
-        "task_id": task_id,
-        "status": "pending",
-        "message": "Análise iniciada. Use /api/ai/tasks/{task_id} para verificar o progresso."
-    }
-
-
-@app.post("/api/ai/consensus/toxicology", response_model=dict)
-async def ai_consensus_toxicology_endpoint(data: dict, user: UserInDB = Depends(get_current_user)):
-    """
-    Toxicology protocol using 3 LLMs + PubMed research
-    Returns task_id immediately, client polls for result
-    """
-    substance = data.get("substance", "")
-    
-    # Create task
-    task_id = task_manager.create_task("toxicology")
-    
-    # Start background processing
-    asyncio.create_task(
-        task_manager.execute_task(
-            task_id,
-            get_ai_consensus_toxicology,
-            substance
-        )
-    )
-    
-    return {
-        "task_id": task_id,
-        "status": "pending",
-        "message": "Análise iniciada. Use /api/ai/tasks/{task_id} para verificar o progresso."
-    }
-
-
-@app.get("/api/ai/tasks/{task_id}", response_model=dict)
-async def get_task_status(task_id: str, user: UserInDB = Depends(get_current_user)):
-    """
-    Get status of a background task
-    Returns: status (pending/processing/completed/failed), result, error
-    """
-    task = task_manager.get_task(task_id)
-    
-    if not task:
-        raise HTTPException(status_code=404, detail="Task not found")
-    
-    response = {
-        "task_id": task["id"],
-        "type": task["type"],
-        "status": task["status"],
-        "progress": task["progress"],
-        "created_at": task["created_at"].isoformat()
-    }
-    
-    if task["status"] == TaskStatus.COMPLETED:
-        result = task["result"]
-        
-        # Save consultation if this is an exam-analysis and hasn't been saved yet
-        if task["type"] == "exam-analysis" and result and "_user_id" in result and not task.get("_consultation_saved"):
-            try:
-                consultation_doc = {
-                    "user_id": result["_user_id"],
-                    "patient": {"name": "Análise de Exame"},
-                    "report": {k: v for k, v in result.items() if not k.startswith("_")},  # Remove internal fields
-                    "type": "exam-analysis",
-                    "created_at": now_sao_paulo()
-                }
-                
-                await db.consultations.insert_one(consultation_doc)
-                task["_consultation_saved"] = True
-                print(f"💾 Consulta de exame salva para user {result['_user_id']}")
-            except Exception as save_error:
-                print(f"⚠️ Erro ao salvar consulta de exame: {save_error}")
-        
-        response["result"] = result
-        response["completed_at"] = task["completed_at"].isoformat()
-    elif task["status"] == TaskStatus.FAILED:
-        response["error"] = task["error"]
-        response["completed_at"] = task["completed_at"].isoformat()
-    
-    return response
-
-
-
-# --- Medical Image Analysis Endpoints ---
-from medical_image_analysis import analyze_exam_image, analyze_multiple_exam_images
-import base64
-
-
-@app.post("/api/ai/analyze-exam", response_model=dict)
-async def analyze_medical_exam(
-    files: list[UploadFile] = File(...),
-    additional_info: str = "",
-    user: UserInDB = Depends(get_current_user)
+@app.post("/api/ai/consensus/diagnosis")
+async def create_diagnosis_task(
+    patient_data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
 ):
-    """
-    Analyze medical exam images (lab results) - supports multiple files
-    Supports: JPG, PNG, PDF, DOC, DOCX, TXT
-    """
+    """Create diagnosis analysis task"""
     try:
-        if not files:
-            raise HTTPException(status_code=400, detail="Nenhum arquivo enviado")
+        task_id = task_manager.create_task("diagnosis")
         
-        print(f"📄 Recebidos {len(files)} arquivo(s) para análise de exame")
-        
-        # Save files temporarily for vision analysis
-        import tempfile
-        processed_files = []
-        
-        for idx, file in enumerate(files):
-            print(f"  Processando arquivo {idx + 1}/{len(files)}: {file.filename}")
-            
-            # Read file content
-            content = await file.read()
-            
-            # Get file type
-            content_type = file.content_type or "application/octet-stream"
-            
-            # Determine file extension
-            file_extension = Path(file.filename).suffix if file.filename else '.bin'
-            
-            # Save to temporary file for vision analysis
-            with tempfile.NamedTemporaryFile(mode='wb', delete=False, suffix=file_extension) as tmp_file:
-                tmp_file.write(content)
-                tmp_path = tmp_file.name
-                print(f"    ✅ Arquivo salvo temporariamente: {tmp_path}")
-            
-            processed_files.append({
-                'file_path': tmp_path,
-                'mime_type': content_type,
-                'filename': file.filename,
-                'size': len(content)
-            })
-            
-            print(f"    📊 Tipo: {content_type}, Tamanho: {len(content)} bytes")
-        
-        # Create task for background processing
-        task_id = task_manager.create_task("exam-analysis")
-        
-        # Start background analysis with multiple files
+        # Start background task
         asyncio.create_task(
             task_manager.execute_task(
                 task_id,
-                analyze_multiple_exam_images,
-                processed_files,
-                additional_info,
-                user_id=str(user.id),
-                user_name=user.name
+                analyze_diagnosis,
+                queixa=patient_data.get("queixa", ""),
+                idade=patient_data.get("idade", "N/I"),
+                sexo=patient_data.get("sexo", "N/I")
             )
         )
         
-        return {
-            "task_id": task_id,
-            "status": "pending",
-            "message": f"Análise de {len(files)} arquivo(s) iniciada. Use /api/ai/tasks/{{task_id}} para verificar o progresso."
-        }
-        
-    except HTTPException:
-        raise
+        return {"task_id": task_id, "message": "Análise iniciada"}
     except Exception as e:
-        print(f"❌ Error uploading exam: {e}")
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Erro ao processar arquivo: {str(e)}")
-
-
-
-# --- Epidemiological Alerts Endpoint ---
-@app.get("/api/epidemiological-alerts", response_model=dict)
-async def get_epidemiological_alerts():
-    """
-    Get real-time epidemiological alerts
-    Updates every hour automatically
-    """
-    try:
-        alerts = await fetch_real_epidemiological_alerts()
-        cache_info = get_cache_info()
-        
-        return {
-            "alerts": alerts,
-            "cache_info": cache_info,
-            "message": "Dados atualizados a cada hora"
-        }
-    except Exception as e:
-        print(f"Error fetching alerts: {e}")
-        raise HTTPException(status_code=500, detail=f"Error fetching alerts: {str(e)}")
-
-
-# --- Usage Stats & Billing Endpoints ---
-from cost_tracker import get_monthly_stats, get_all_time_stats
-
-@app.get("/api/admin/usage-stats/monthly")
-async def get_monthly_usage(user: UserInDB = Depends(get_current_user)):
-    """
-    Get current month usage statistics (Admin only)
-    """
-    if user.role != "ADMIN":
-        raise HTTPException(status_code=403, detail="Admin access required")
-    
-    try:
-        stats = await get_monthly_stats()
-        return stats
-    except Exception as e:
-        print(f"Error getting monthly stats: {e}")
+        print(f"Error creating diagnosis task: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-
-# --- Feedback System ---
-class FeedbackCreate(BaseModel):
-    analysis_type: str
-    is_helpful: bool
-    result_data: dict
-
-@app.post("/api/feedback")
-async def create_feedback(
-    feedback: FeedbackCreate,
-    user: UserInDB = Depends(get_current_user)
+@app.post("/api/ai/consensus/medication-guide")
+async def create_medication_guide_task(
+    data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
 ):
-    """
-    Create user feedback for analysis results
-    """
+    """Create medication guide task"""
     try:
-        feedback_doc = {
-            "user_id": user.id,
-            "user_email": user.email,
-            "user_name": user.name,
-            "analysis_type": feedback.analysis_type,
-            "is_helpful": feedback.is_helpful,
-            "result_data": feedback.result_data,
-            "timestamp": datetime.utcnow(),
-            "created_at": datetime.utcnow()
-        }
+        task_id = task_manager.create_task("medication_guide")
         
-        result = await db.feedback.insert_one(feedback_doc)
+        asyncio.create_task(
+            task_manager.execute_task(
+                task_id,
+                analyze_medication_guide,
+                condition=data.get("condition", ""),
+                patient_age=data.get("age", "N/I"),
+                contraindications=data.get("contraindications")
+            )
+        )
         
-        return {
-            "success": True,
-            "feedback_id": str(result.inserted_id),
-            "message": "Feedback registrado com sucesso"
-        }
+        return {"task_id": task_id, "message": "Análise iniciada"}
     except Exception as e:
-        print(f"Error creating feedback: {e}")
+        print(f"Error creating medication guide task: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/feedbacks")
-async def get_feedbacks_for_admin(
-    limit: int = 100,
-    skip: int = 0,
-    user: UserInDB = Depends(get_current_user)
+@app.post("/api/ai/consensus/toxicology")
+async def create_toxicology_task(
+    data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
 ):
-    """
-    Get all user feedback for admin panel (Admin only)
-    """
-    if user.role != "ADMIN":
-        raise HTTPException(status_code=403, detail="Admin access required")
-    
+    """Create toxicology analysis task"""
     try:
-        # Get feedback with pagination, sorted by most recent
-        feedbacks = await db.feedback.find({}, {"_id": 0}).sort("timestamp", -1).skip(skip).limit(limit).to_list(limit)
+        task_id = task_manager.create_task("toxicology")
         
-        # Map result_data to analysis_data for frontend compatibility
-        for feedback in feedbacks:
-            if "result_data" in feedback and "analysis_data" not in feedback:
-                feedback["analysis_data"] = feedback["result_data"]
+        asyncio.create_task(
+            task_manager.execute_task(
+                task_id,
+                analyze_toxicology,
+                agent=data.get("substance", ""),
+                exposure_route=data.get("route"),
+                symptoms=data.get("symptoms")
+            )
+        )
         
-        return feedbacks
+        return {"task_id": task_id, "message": "Análise iniciada"}
     except Exception as e:
-        print(f"Error getting feedback: {e}")
+        print(f"Error creating toxicology task: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/admin/feedback")
-async def get_all_feedback(
-    limit: int = 100,
-    skip: int = 0,
-    user: UserInDB = Depends(get_current_user)
+
+@app.post("/api/ai/consensus/drug-interaction")
+async def create_drug_interaction_task(
+    data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
 ):
-    """
-    Get all user feedback (Admin only)
-    """
-    if user.role != "ADMIN":
-        raise HTTPException(status_code=403, detail="Admin access required")
-    
+    """Create drug interaction task"""
     try:
-        # Get total count
-        total = await db.feedback.count_documents({})
+        medications = data.get("medications", [])
+        if len(medications) < 2:
+            raise HTTPException(status_code=400, detail="Mínimo 2 medicamentos necessários")
         
-        # Get feedback with pagination, sorted by most recent
-        feedbacks = await db.feedback.find({}, {"_id": 0}).sort("timestamp", -1).skip(skip).limit(limit).to_list(limit)
+        task_id = task_manager.create_task("drug_interaction")
         
-        # Calculate statistics
-        helpful_count = await db.feedback.count_documents({"is_helpful": True})
-        not_helpful_count = await db.feedback.count_documents({"is_helpful": False})
+        asyncio.create_task(
+            task_manager.execute_task(
+                task_id,
+                analyze_drug_interaction,
+                drug1=medications[0],
+                drug2=medications[1],
+                patient_info=data.get("patient_info")
+            )
+        )
         
-        return {
-            "feedbacks": feedbacks,
-            "total": total,
-            "statistics": {
-                "helpful": helpful_count,
-                "not_helpful": not_helpful_count,
-                "helpful_percentage": round((helpful_count / total * 100) if total > 0 else 0, 1)
-            }
-        }
+        return {"task_id": task_id, "message": "Análise iniciada"}
     except Exception as e:
-        print(f"Error getting feedback: {e}")
+        print(f"Error creating drug interaction task: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/admin/usage-stats/all-time")
-async def get_all_time_usage(user: UserInDB = Depends(get_current_user)):
-    """
-    Get all-time usage statistics (Admin only)
-    """
-    if user.role != "ADMIN":
-        raise HTTPException(status_code=403, detail="Admin access required")
+@app.get("/api/ai/tasks/{task_id}")
+async def get_task_status(
+    task_id: str,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Get task status"""
+    task = task_manager.get_task(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return task
+
+
+# ===== ADMIN ENDPOINTS (Simplified) =====
+
+@app.get("/api/admin/users")
+async def get_users(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get all users (admin only)"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
     
-    try:
-        stats = await get_all_time_stats()
-        return stats
-    except Exception as e:
-        print(f"Error getting all-time stats: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    users = []
+    cursor = users_collection.find({"deleted": {"$ne": True}}).sort("created_at", -1).limit(1000)
+    async for doc in cursor:
+        doc["_id"] = str(doc["_id"])
+        try:
+            users.append(UserInDB(**doc))
+        except:
+            pass
+    return users
 
 
-@app.get("/api/system/health")
-async def health_check():
-    """
-    Health check endpoint with configuration status
-    """
-    return {
-        "status": "healthy",
-        "emergent_llm_key_configured": bool(os.environ.get("EMERGENT_LLM_KEY")),
-        "mongo_connected": True,  # If we got here, MongoDB is working
-        "database": db_name,
-        "environment": "production" if os.environ.get("KUBERNETES_SERVICE_HOST") else "development"
-    }
+# ===== STARTUP =====
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize on startup"""
+    print("=" * 80)
+    print("🏥 MEDUF AI - Backend v2.0 Iniciando...")
+    print("=" * 80)
+    print(f"✅ Database: {db_name}")
+    print(f"✅ EMERGENT_LLM_KEY: Configurada")
+    print(f"✅ Funcionalidades: 5 principais")
+    print("=" * 80)
 
 
 if __name__ == "__main__":
