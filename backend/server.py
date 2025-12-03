@@ -465,8 +465,8 @@ async def startup_event():
     print("🏥 MEDUF AI - Backend v2.0 Iniciando...")
     print("=" * 80)
     print(f"✅ Database: {db_name}")
-    print(f"✅ EMERGENT_LLM_KEY: Configurada")
-    print(f"✅ Funcionalidades: 5 principais")
+    print("✅ EMERGENT_LLM_KEY: Configurada")
+    print("✅ Funcionalidades: 5 principais")
     print("=" * 80)
 
 
