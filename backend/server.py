@@ -516,15 +516,29 @@ async def get_consultations(
 async def get_epidemiological_alerts():
     """Get epidemiological alerts (mock for now)"""
     return {
-        "alerts": [
+        "brazil": [
             {
-                "id": "1",
+                "state": "São Paulo",
                 "disease": "Dengue",
-                "severity": "Alto",
-                "region": "Nacional",
-                "updated": datetime.now(timezone.utc).isoformat()
+                "level": "Alto",
+                "date": "Hoje"
+            },
+            {
+                "state": "Rio de Janeiro",
+                "disease": "Dengue",
+                "level": "Médio",
+                "date": "Hoje"
             }
-        ]
+        ],
+        "world": [
+            {
+                "country": "Global",
+                "disease": "Monitoramento Ativo",
+                "level": "Médio",
+                "date": "Hoje"
+            }
+        ],
+        "cache_info": "Atualizado em " + datetime.now(timezone.utc).isoformat()
     }
 
 
