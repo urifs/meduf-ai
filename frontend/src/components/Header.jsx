@@ -37,10 +37,19 @@ export const Header = () => {
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/epidemiological-alerts`);
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/epidemiological-alerts`);
         if (response.ok) {
           const data = await response.json();
-          setOutbreaks(data.alerts);
+          // Check if data has brazil and world properties
+          if (data.brazil && data.world) {
+            setOutbreaks(data);
+          } else {
+            // Fallback if wrong format
+            setOutbreaks({
+              brazil: data.brazil || [],
+              world: data.world || []
+            });
+          }
           console.log('Alertas epidemiológicos atualizados:', data.cache_info);
         }
       } catch (error) {
