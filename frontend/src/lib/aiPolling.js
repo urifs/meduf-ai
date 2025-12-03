@@ -56,10 +56,10 @@ export async function pollTask(taskId, onProgress = null, pollInterval = 2000, m
         throw new Error('Tarefa não encontrada no servidor');
       }
       
-      // If too many consecutive errors, fail
-      if (consecutiveErrors >= 5) {
-        console.error('Too many consecutive polling errors');
-        throw new Error('Erro de conexão. Por favor, tente novamente.');
+      // If too many consecutive errors, fail (increased to 10)
+      if (consecutiveErrors >= 10) {
+        console.error('[aiPolling] Too many consecutive polling errors');
+        throw new Error('Erro de conexão persistente. Por favor, verifique sua internet e tente novamente.');
       }
       
       // Other errors, retry
