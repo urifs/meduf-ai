@@ -478,11 +478,20 @@ const DrugInteraction = () => {
 
                   {/* Monitoring */}
                   {result.monitoring && (
-                    <Alert>
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertTitle>Monitoramento Necessário</AlertTitle>
-                      <AlertDescription className="text-sm">
-                        {typeof result.monitoring === 'string' ? result.monitoring : JSON.stringify(result.monitoring)}
+                    <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950/20">
+                      <AlertTriangle className="h-4 w-4 text-amber-600" />
+                      <AlertTitle className="text-amber-900 dark:text-amber-300">Monitoramento Necessário</AlertTitle>
+                      <AlertDescription className="text-sm text-amber-800 dark:text-amber-400 whitespace-pre-line">
+                        {typeof result.monitoring === 'string' 
+                          ? result.monitoring 
+                          : typeof result.monitoring === 'object' && result.monitoring !== null
+                            ? Object.entries(result.monitoring).map(([key, value]) => {
+                                const label = key === 'renal' ? 'Renal' : key === 'hepatic' ? 'Hepático' : 'Outros';
+                                const items = Array.isArray(value) ? value.join(', ') : value;
+                                return `${label}: ${items}`;
+                              }).join('\n\n')
+                            : 'Monitoramento clínico regular recomendado'
+                        }
                       </AlertDescription>
                     </Alert>
                   )}
