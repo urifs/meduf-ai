@@ -101,7 +101,7 @@ class TaskManager:
                     result = loop.run_until_complete(func(*args, **kwargs))
                     print(f"[Task {task_id}] Function completed successfully!")
                     
-                    # Track usage for cost calculation
+                    # Track usage for cost calculation BEFORE closing loop
                     task = self.tasks.get(task_id)
                     if task and result:
                         try:
@@ -109,7 +109,7 @@ class TaskManager:
                             input_text = json.dumps(args[0]) if args else "{}"
                             output_text = json.dumps(result) if result else "{}"
                             
-                            # Track usage asynchronously
+                            # Track usage while loop is still open
                             loop.run_until_complete(track_usage(
                                 user_id="system",
                                 consultation_type=task.get("type", "unknown"),
@@ -125,7 +125,11 @@ class TaskManager:
                     return  # Success! Exit function
                         
                 finally:
-                    loop.close()
+                    # Close loop only after all async operations are done
+                    try:
+                        loop.close()
+                    except:
+                        pass  # Ignore errors when closing loop
                 
             except Exception as e:
                 retry_count += 1
