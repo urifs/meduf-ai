@@ -403,7 +403,7 @@ async def create_consultation(
     """Save consultation to database"""
     try:
         consultation = {
-            "user_id": current_user.username,
+            "user_id": current_user.email,
             "user_email": current_user.email,
             "timestamp": datetime.now(timezone.utc),
             "patient": data.get("patient", {}),
