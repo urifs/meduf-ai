@@ -150,21 +150,25 @@ export const Header = () => {
                       🇧🇷 Brasil (Estados)
                     </h5>
                     <div className="space-y-2">
-                      {outbreaks.brazil.map((item, i) => (
-                        <div key={i} className="flex items-start justify-between text-sm border-b pb-2 last:border-0 last:pb-0">
-                          <div>
-                            <p className="font-medium text-slate-800">{item.disease}</p>
-                            <p className="text-xs text-slate-500">{item.state}</p>
+                      {outbreaks.brazil && outbreaks.brazil.length > 0 ? (
+                        outbreaks.brazil.map((item, i) => (
+                          <div key={i} className="flex items-start justify-between text-sm border-b pb-2 last:border-0 last:pb-0">
+                            <div>
+                              <p className="font-medium text-slate-800">{item.disease}</p>
+                              <p className="text-xs text-slate-500">{item.state}</p>
+                            </div>
+                            <Badge variant="outline" className={
+                              item.level === "Alto" ? "text-red-600 border-red-200 bg-red-50" :
+                              item.level === "Médio" ? "text-orange-600 border-orange-200 bg-orange-50" :
+                              "text-blue-600 border-blue-200 bg-blue-50"
+                            }>
+                              {item.level}
+                            </Badge>
                           </div>
-                          <Badge variant="outline" className={
-                            item.level === "Alto" ? "text-red-600 border-red-200 bg-red-50" :
-                            item.level === "Médio" ? "text-orange-600 border-orange-200 bg-orange-50" :
-                            "text-blue-600 border-blue-200 bg-blue-50"
-                          }>
-                            {item.level}
-                          </Badge>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <p className="text-xs text-muted-foreground">Nenhum alerta no momento</p>
+                      )}
                     </div>
                   </div>
 
@@ -174,21 +178,25 @@ export const Header = () => {
                       🌍 Mundo
                     </h5>
                     <div className="space-y-2">
-                      {outbreaks.world.map((item, i) => (
-                        <div key={i} className="flex items-start justify-between text-sm border-b pb-2 last:border-0 last:pb-0">
-                          <div>
-                            <p className="font-medium text-slate-800">{item.disease}</p>
-                            <p className="text-xs text-slate-500">{item.country}</p>
+                      {outbreaks.world && outbreaks.world.length > 0 ? (
+                        outbreaks.world.map((item, i) => (
+                          <div key={i} className="flex items-start justify-between text-sm border-b pb-2 last:border-0 last:pb-0">
+                            <div>
+                              <p className="font-medium text-slate-800">{item.disease}</p>
+                              <p className="text-xs text-slate-500">{item.country}</p>
+                            </div>
+                            <Badge variant="outline" className={
+                              item.level === "Alto" ? "text-red-600 border-red-200 bg-red-50" :
+                              item.level === "Médio" ? "text-orange-600 border-orange-200 bg-orange-50" :
+                              "text-blue-600 border-blue-200 bg-blue-50"
+                            }>
+                              {item.level}
+                            </Badge>
                           </div>
-                          <Badge variant="outline" className={
-                            item.level === "Alto" ? "text-red-600 border-red-200 bg-red-50" :
-                            item.level === "Médio" ? "text-orange-600 border-orange-200 bg-orange-50" :
-                            "text-blue-600 border-blue-200 bg-blue-50"
-                          }>
-                            {item.level}
-                          </Badge>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <p className="text-xs text-muted-foreground">Nenhum alerta no momento</p>
+                      )}
                     </div>
                   </div>
                 </div>
