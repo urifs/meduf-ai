@@ -17,8 +17,6 @@ export async function pollTask(taskId, onProgress = null, pollInterval = 2000, m
   let attempts = 0;
   let consecutiveErrors = 0;
   
-  console.log(`[aiPolling] Starting polling for task ${taskId} (max ${maxAttempts} attempts = ${maxAttempts * pollInterval / 60000} minutes)`);
-  
   while (attempts < maxAttempts) {
     try {
       // Get task status
