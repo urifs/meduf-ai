@@ -334,11 +334,13 @@ async def create_drug_interaction_task(
     data: dict,
     current_user: UserInDB = Depends(get_current_active_user)
 ):
-    """Create drug interaction task"""
+    """Create drug interaction task - supports 2 to 10 medications"""
     try:
         medications = data.get("medications", [])
         if len(medications) < 2:
             raise HTTPException(status_code=400, detail="Mínimo 2 medicamentos necessários")
+        if len(medications) > 10:
+            raise HTTPException(status_code=400, detail="Máximo 10 medicamentos permitidos")
         
         task_id = task_manager.create_task("drug_interaction")
         
@@ -346,13 +348,12 @@ async def create_drug_interaction_task(
             task_manager.execute_task(
                 task_id,
                 analyze_drug_interaction,
-                drug1=medications[0],
-                drug2=medications[1],
+                medications=medications,
                 patient_info=data.get("patient_info")
             )
         )
         
-        return {"task_id": task_id, "message": "Análise iniciada"}
+        return {"task_id": task_id, "message": f"Análise iniciada para {len(medications)} medicamentos"}
     except Exception as e:
         print(f"Error creating drug interaction task: {e}")
         raise HTTPException(status_code=500, detail=str(e))
