@@ -13,9 +13,11 @@ import api from './api';
  * @param {number} maxAttempts - Max polling attempts (default 150 = 5 minutes)
  * @returns {Promise<object>} - Final result when task completes
  */
-export async function pollTask(taskId, onProgress = null, pollInterval = 2000, maxAttempts = 300) {
+export async function pollTask(taskId, onProgress = null, pollInterval = 2000, maxAttempts = 600) {
   let attempts = 0;
   let consecutiveErrors = 0;
+  
+  console.log(`[aiPolling] Starting polling for task ${taskId} (max ${maxAttempts} attempts = ${maxAttempts * pollInterval / 60000} minutes)`);
   
   while (attempts < maxAttempts) {
     try {
