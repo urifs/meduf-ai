@@ -127,29 +127,37 @@ Forneça análise clínica completa no formato JSON especificado.
         raise
 
 
-async def analyze_drug_interaction(drug1: str, drug2: str, patient_info: Optional[str] = None) -> Dict[str, Any]:
+async def analyze_drug_interaction(medications: List[str], patient_info: Optional[str] = None) -> Dict[str, Any]:
     """
-    Analisa interação medicamentosa usando Gemini 2.0 Flash
+    Analisa interação medicamentosa de múltiplos medicamentos usando Gemini 2.0 Flash
+    Aceita de 2 a 10 medicamentos para análise completa
     """
     try:
-        system_prompt = """Você é um farmacêutico clínico especializado auxiliando MÉDICOS PROFISSIONAIS. Analise a interação medicamentosa com detalhes técnicos:
+        if not medications or len(medications) < 2:
+            raise ValueError("Mínimo de 2 medicamentos necessários")
+        
+        medications_list = "\n".join([f"{i+1}. {med}" for i, med in enumerate(medications)])
+        
+        system_prompt = """Você é um farmacêutico clínico especializado auxiliando MÉDICOS PROFISSIONAIS. Analise a interação medicamentosa de TODOS os medicamentos fornecidos com detalhes técnicos:
 
-1. **Classificação de Severidade** (Leve/Moderada/Grave/Contraindicada)
+**IMPORTANTE**: Analise TODAS as interações possíveis entre os medicamentos listados, não apenas pares isolados.
+
+1. **Classificação de Severidade Global** (Leve/Moderada/Grave/Contraindicada) - considere a interação mais grave
 2. **Farmacocinética e Farmacodinâmica** (impacto renal, hepático, interações CYP450)
-3. **Mecanismo Molecular** da interação
+3. **Mecanismo Molecular** das interações
 4. **Protocolo de Monitoramento** (parâmetros laboratoriais, timing, valores críticos)
 
 Responda APENAS com JSON:
 ```json
 {
-  "severity": "Leve|Moderada|Grave",
-  "summary": "Resumo breve da interação em 1-2 frases",
-  "details": "Explicação detalhada da interação medicamentosa",
-  "recommendations": "Recomendações práticas para o médico prescritor",
-  "renal_impact": "Descrição do impacto renal",
-  "hepatic_impact": "Descrição do impacto hepático",
-  "mechanism": "Mecanismo da interação",
-  "monitoring": "Texto descritivo do monitoramento necessário (exames, frequência, valores críticos)"
+  "severity": "Leve|Moderada|Grave|Contraindicada",
+  "summary": "Resumo breve das principais interações encontradas entre TODOS os medicamentos",
+  "details": "Explicação detalhada de TODAS as interações medicamentosas identificadas (liste cada par problemático e seu impacto)",
+  "recommendations": "Recomendações práticas para o médico prescritor considerando TODA a prescrição",
+  "renal_impact": "Descrição do impacto renal CUMULATIVO de todos os medicamentos",
+  "hepatic_impact": "Descrição do impacto hepático CUMULATIVO de todos os medicamentos",
+  "mechanism": "Mecanismos das principais interações (CYP450, transportadores, farmacodinâmica)",
+  "monitoring": "Texto descritivo do monitoramento necessário para TODOS os medicamentos (exames, frequência, valores críticos)"
 }
 ```"""
         
@@ -160,11 +168,12 @@ Responda APENAS com JSON:
         ).with_model("gemini", GEMINI_MODEL)
         
         prompt = f"""
-Medicamento 1: {drug1}
-Medicamento 2: {drug2}
+MEDICAMENTOS A ANALISAR ({len(medications)} no total):
+{medications_list}
+
 {f"Informações do Paciente: {patient_info}" if patient_info else ""}
 
-Analise a interação medicamentosa.
+Analise TODAS as interações medicamentosas possíveis entre estes {len(medications)} medicamentos. Não analise apenas pares isolados - considere o efeito cumulativo e todas as combinações relevantes.
 """
         
         response = await chat.send_message(UserMessage(text=prompt))
@@ -183,8 +192,8 @@ Analise a interação medicamentosa.
             "summary": "Sistema temporariamente indisponível. Consultar literatura atualizada.",
             "details": "Por favor, consulte referências atualizadas sobre interações medicamentosas e diretrizes clínicas.",
             "recommendations": "Avaliar relação risco-benefício, considerar alternativas terapêuticas e monitoramento intensivo.",
-            "renal_impact": "Avaliar clearance de creatinina e necessidade de ajuste de dose",
-            "hepatic_impact": "Avaliar função hepática (TGO, TGP, bilirrubinas) e metabolização",
+            "renal_impact": "Avaliar clearance de creatinina e necessidade de ajuste de dose para todos os medicamentos",
+            "hepatic_impact": "Avaliar função hepática (TGO, TGP, bilirrubinas) e metabolização de todos os medicamentos",
             "mechanism": f"Sistema temporariamente indisponível: {str(e)}",
             "monitoring": "Monitorar função renal (creatinina, TFG), função hepática (AST/ALT, bilirrubinas), sinais de toxicidade e considerar ajuste de dose conforme necessário."
         }
