@@ -101,27 +101,15 @@ class TaskManager:
                     result = loop.run_until_complete(func(*args, **kwargs))
                     print(f"[Task {task_id}] Function completed successfully!")
                     
-                    # Track usage for cost calculation
+                    # Track usage for cost calculation - skip for now to avoid event loop issues
+                    # TODO: Implement proper async tracking in background thread
                     task = self.tasks.get(task_id)
                     if task and result:
                         try:
-                            # Prepare input/output text for tracking
-                            input_text = json.dumps(args[0]) if args else "{}"
-                            output_text = json.dumps(result) if result else "{}"
-                            
-                            # Create a NEW event loop for tracking to avoid "closed loop" error
-                            tracking_loop = asyncio.new_event_loop()
-                            try:
-                                tracking_loop.run_until_complete(track_usage(
-                                    user_id="system",
-                                    consultation_type=task.get("type", "unknown"),
-                                    input_text=input_text,
-                                    output_text=output_text
-                                ))
-                            finally:
-                                tracking_loop.close()
+                            # Log for manual tracking if needed
+                            print(f"[Task {task_id}] Usage tracking skipped (avoid event loop issues)")
                         except Exception as track_error:
-                            print(f"⚠️ Error tracking usage: {track_error}")
+                            print(f"⚠️ Error in tracking: {track_error}")
                     
                     # Mark as completed
                     self.complete_task(task_id, result)
