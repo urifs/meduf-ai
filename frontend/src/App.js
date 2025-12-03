@@ -117,14 +117,7 @@ function App() {
               </ProtectedRoute>
             } 
           />
-          <Route 
-            path="/exam-reader" 
-            element={
-              <ProtectedRoute>
-                <ExamReader />
-              </ProtectedRoute>
-            } 
-          />
+          {/* ExamReader route removed */}
           
           {/* Catch all - redirect to home (which will redirect to login if needed) */}
           <Route path="*" element={<Navigate to="/" replace />} />
