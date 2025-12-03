@@ -457,60 +457,100 @@ class BackendTester:
             self.log_result(f"{test_name} - Polling", False, f"Polling error: {str(e)}", duration)
             return False
     
-    def run_all_tests(self):
-        """Run all backend tests"""
-        print("🚀 Starting Meduf AI Backend Task System Tests")
-        print("=" * 60)
+    def run_review_request_tests(self):
+        """Run EXACT tests from review request - 5 functionalities, 2x each = 10 total tests"""
+        print("🚀 TESTE DO BACKEND REESCRITO - 5 Funcionalidades Essenciais")
+        print("CREDENCIAIS: ur1fs / @Fred1807")
+        print("TESTAR CADA FUNCIONALIDADE 2 VEZES (confirmar estabilidade)")
+        print("=" * 80)
         
         # Step 1: Authentication
         if not self.authenticate():
             print("\n❌ Authentication failed - cannot proceed with tests")
             return False
         
-        # Step 2: Test consensus endpoints (at least 2 as required)
         tests_passed = 0
-        total_tests = 0
+        total_tests = 10  # 5 functionalities × 2 times each
+        failed_tests = []
         
-        # Test 1: Consensus Diagnosis (Simple)
-        total_tests += 1
-        if self.test_consensus_diagnosis_simple():
-            tests_passed += 1
+        # 1. Diagnóstico Simples (2x)
+        print(f"\n1️⃣ DIAGNÓSTICO SIMPLES (2x)")
+        for attempt in [1, 2]:
+            print(f"\n   Tentativa {attempt}/2:")
+            if self.test_diagnosis_simple_review():
+                tests_passed += 1
+                print(f"   ✅ Tentativa {attempt} - SUCESSO")
+            else:
+                failed_tests.append(f"Diagnóstico Simples - Tentativa {attempt}")
+                print(f"   ❌ Tentativa {attempt} - FALHOU")
         
-        # Test 2: Consensus Diagnosis (Detailed)
-        total_tests += 1
-        if self.test_consensus_diagnosis_detailed():
-            tests_passed += 1
+        # 2. Guia Terapêutico (2x)
+        print(f"\n2️⃣ GUIA TERAPÊUTICO (2x)")
+        for attempt in [1, 2]:
+            print(f"\n   Tentativa {attempt}/2:")
+            if self.test_medication_guide_review():
+                tests_passed += 1
+                print(f"   ✅ Tentativa {attempt} - SUCESSO")
+            else:
+                failed_tests.append(f"Guia Terapêutico - Tentativa {attempt}")
+                print(f"   ❌ Tentativa {attempt} - FALHOU")
         
-        # Test 3: Consensus Drug Interaction  
-        total_tests += 1
-        if self.test_consensus_drug_interaction():
-            tests_passed += 1
+        # 3. Toxicologia (2x)
+        print(f"\n3️⃣ TOXICOLOGIA (2x)")
+        for attempt in [1, 2]:
+            print(f"\n   Tentativa {attempt}/2:")
+            if self.test_toxicology_review():
+                tests_passed += 1
+                print(f"   ✅ Tentativa {attempt} - SUCESSO")
+            else:
+                failed_tests.append(f"Toxicologia - Tentativa {attempt}")
+                print(f"   ❌ Tentativa {attempt} - FALHOU")
         
-        # Test 4: Consensus Medication Guide
-        total_tests += 1
-        if self.test_consensus_medication_guide():
-            tests_passed += 1
+        # 4. Interação Medicamentosa (2x)
+        print(f"\n4️⃣ INTERAÇÃO MEDICAMENTOSA (2x)")
+        for attempt in [1, 2]:
+            print(f"\n   Tentativa {attempt}/2:")
+            if self.test_drug_interaction_review():
+                tests_passed += 1
+                print(f"   ✅ Tentativa {attempt} - SUCESSO")
+            else:
+                failed_tests.append(f"Interação Medicamentosa - Tentativa {attempt}")
+                print(f"   ❌ Tentativa {attempt} - FALHOU")
         
-        # Test 5: Consensus Toxicology
-        total_tests += 1
-        if self.test_consensus_toxicology():
-            tests_passed += 1
+        # 5. Diagnóstico Detalhado (2x)
+        print(f"\n5️⃣ DIAGNÓSTICO DETALHADO (2x)")
+        for attempt in [1, 2]:
+            print(f"\n   Tentativa {attempt}/2:")
+            if self.test_diagnosis_detailed_review():
+                tests_passed += 1
+                print(f"   ✅ Tentativa {attempt} - SUCESSO")
+            else:
+                failed_tests.append(f"Diagnóstico Detalhado - Tentativa {attempt}")
+                print(f"   ❌ Tentativa {attempt} - FALHOU")
         
-        # Test 6: Exam Analysis (Gemini 2.5 Flash)
-        total_tests += 1
-        if self.test_exam_analysis():
-            tests_passed += 1
-        
-        # Summary
-        print("\n" + "=" * 60)
-        print(f"📊 TEST SUMMARY: {tests_passed}/{total_tests} tests passed")
+        # Final Results
+        print("\n" + "=" * 80)
+        print(f"📊 RESULTADO FINAL: {tests_passed}/{total_tests} tentativas COMPLETARAM")
+        success_rate = (tests_passed / total_tests) * 100
+        print(f"📈 Taxa de Sucesso: {success_rate:.1f}%")
         
         if tests_passed == total_tests:
-            print("🎉 ALL TESTS PASSED - Background task system working correctly!")
+            print("🎉 ✅ TODAS as 10 tentativas COMPLETARAM (100%)")
+            print("🎉 ✅ Tempo máximo 15s por análise - VERIFICADO")
+            print("🎉 ✅ Taxa de falha DEVE ser 0% - ALCANÇADO")
+            print("🎉 BACKEND V2.0 - LIMPO E CONFIÁVEL!")
             return True
         else:
-            print(f"⚠️  {total_tests - tests_passed} tests failed - see details above")
+            print(f"⚠️ ❌ {total_tests - tests_passed} tentativas FALHARAM")
+            print(f"⚠️ ❌ Taxa de falha: {100 - success_rate:.1f}% (DEVE ser 0%)")
+            print("❌ TESTES FALHARAM:")
+            for failed_test in failed_tests:
+                print(f"   - {failed_test}")
             return False
+
+    def run_all_tests(self):
+        """Run all backend tests - wrapper for review request tests"""
+        return self.run_review_request_tests()
 
 def main():
     """Main test execution"""
