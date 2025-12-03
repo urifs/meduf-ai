@@ -69,9 +69,9 @@ export async function pollTask(taskId, onProgress = null, pollInterval = 2000, m
     }
   }
   
-  // Timeout - but this should be rare with 300 attempts (10 minutes)
-  console.error('Polling timeout after', attempts, 'attempts');
-  throw new Error('Análise está demorando mais que o esperado. Por favor, tente novamente.');
+  // Timeout - with 600 attempts at 2s each = 20 minutes
+  console.error('[aiPolling] Polling timeout after', attempts, 'attempts (', (attempts * pollInterval / 60000), 'minutes)');
+  throw new Error('Análise está demorando mais que o esperado (>20min). A análise pode ter sido concluída. Tente recarregar a página ou consultar o histórico.');
 }
 
 /**
