@@ -2,16 +2,14 @@ import React, { useState } from 'react';
 import { Header } from '@/components/Header';
 import { PatientForm } from '@/components/PatientForm';
 import { ClinicalReport } from '@/components/ClinicalReport';
+import { AnalysisProgress } from '@/components/AnalysisProgress';
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import { Activity, ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from 'react-router-dom';
 import api from '@/lib/api';
 import { startAITask } from '@/lib/aiPolling';
-import { CustomLoader } from '@/components/ui/custom-loader';
 import '../styles/animations.css';
 
 const Dashboard = () => {
@@ -21,44 +19,29 @@ const Dashboard = () => {
   const [progress, setProgress] = useState(0);
 
   const handleAnalyze = async (formData) => {
-    console.log("[Dashboard] Starting analysis with formData:", formData);
     setIsLoading(true);
     setReportData(null);
     setProgress(10);
 
     try {
       const progressInterval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 85) return prev;
-          return prev + 5;
-        });
+        setProgress(prev => prev >= 85 ? prev : prev + 5);
       }, 1500);
 
-      console.log("[Dashboard] Calling startAITask with endpoint: /ai/consensus/diagnosis");
       const aiReport = await startAITask(
         '/ai/consensus/diagnosis',
         formData,
         (task) => {
-          console.log(`[Dashboard] Task status: ${task.status}, progress: ${task.progress}%`);
           if (task.status === 'processing' && task.progress > 0) {
             setProgress(prev => Math.max(prev, task.progress));
           }
         }
       );
       
-      console.log("[Dashboard] AI task completed, result:", aiReport);
-      
       clearInterval(progressInterval);
       setProgress(100);
       
-      console.log("AI task completed successfully!");
-      console.log("Result structure:", {
-        hasDiagnoses: !!aiReport?.diagnoses,
-        count: aiReport?.diagnoses?.length
-      });
-      
-      if (!aiReport || !aiReport.diagnoses) {
-        console.error("Invalid response");
+      if (!aiReport?.diagnoses) {
         throw new Error("Resposta inválida. Tente novamente.");
       }
       
@@ -85,12 +68,8 @@ const Dashboard = () => {
       localStorage.setItem('meduf_history', JSON.stringify(existingHistory.slice(0, 50)));
       
     } catch (error) {
-      console.error("AI Consensus Error:", error);
-      console.error("Error details:", error.message, error.response);
-      
       const errorMsg = error.message || "Erro ao processar análise. Por favor, tente novamente.";
       toast.error(errorMsg);
-      
     } finally {
       setIsLoading(false);
       setProgress(0);
@@ -133,22 +112,7 @@ const Dashboard = () => {
 
           {/* Right Column: Output */}
           <div className="lg:col-span-7 xl:col-span-8 animate-slide-in-right">
-            {isLoading && progress > 0 && (
-              <Card className="mb-4 glass-card border-2 border-blue-200 shadow-xl animate-pulse-glow">
-                <CardContent className="pt-6">
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm font-medium">
-                      <span className="flex items-center gap-2 text-blue-700">
-                        <CustomLoader size="sm" className="text-blue-600" />
-                        Analisando com IA e banco de dados PubMed...
-                      </span>
-                      <span className="font-bold text-blue-600">{progress}%</span>
-                    </div>
-                    <Progress value={progress} className="h-3 bg-blue-100 [&>div]:bg-gradient-to-r [&>div]:from-blue-500 [&>div]:to-purple-600 shadow-lg" />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            {isLoading && progress > 0 && <AnalysisProgress progress={progress} colorScheme="blue" />}
             <ClinicalReport data={reportData} analysisType="diagnosis" />
           </div>
         </div>

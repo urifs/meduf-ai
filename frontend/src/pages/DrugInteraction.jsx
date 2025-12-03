@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Header } from '@/components/Header';
+import { AnalysisProgress } from '@/components/AnalysisProgress';
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { Activity, ArrowLeft, Plus, Trash2, AlertTriangle, CheckCircle2, Info, ShieldAlert, HeartPulse, Brain } from 'lucide-react';
@@ -8,13 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { useNavigate } from 'react-router-dom';
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import api from '@/lib/api';
 import { startAITask } from '@/lib/aiPolling';
-import { CustomLoader } from '@/components/ui/custom-loader';
 import '../styles/animations.css';
 
 const DrugInteraction = () => {
@@ -99,44 +98,44 @@ const DrugInteraction = () => {
         (has(classes.anticoagulants) && has(classes.antiplatelets)) ||
         (has(classes.antiplatelets) && has(classes.nsaids))) {
       interactions.push({
-        pair: "Antitrombóticos + AINEs",
+        pair: "Anticoagulante/Antiplaquetário + AINE",
         severity: "Alta",
         type: "Farmacodinâmica",
-        effect: "Efeito aditivo na inibição da hemostasia. Lesão direta da mucosa gástrica (AINEs).",
-        toxicity: "Hemorragia gastrointestinal, hematúria, sangramento intracraniano.",
-        conduct: "Suspender AINE. Usar analgésicos simples (Dipirona/Paracetamol). Se uso obrigatório, associar IBP (Omeprazol)."
+        effect: "Somação de efeitos antitrombóticos com inibição plaquetária.",
+        toxicity: "Risco de hemorragia gastrointestinal, cerebral ou em outros órgãos.",
+        conduct: "Evitar AINEs. Preferir paracetamol para analgesia. Monitorar sinais de sangramento."
       });
     }
 
-    // --- RULE 3: Hyperkalemia (Potassium) ---
+    // --- RULE 3: Hypotension (PDE5 + Nitrates) ---
+    if (has(classes.pde5) && has(classes.nitrates)) {
+      interactions.push({
+        pair: "Sildenafil/Tadalafila + Nitrato",
+        severity: "Contraindicação Absoluta",
+        type: "Farmacodinâmica",
+        effect: "Vasodilatação severa por sinergismo.",
+        toxicity: "Hipotensão grave, choque circulatório, infarto do miocárdio.",
+        conduct: "NUNCA associar. Aguardar 24-48h após nitrato para usar PDE5."
+      });
+    }
+
+    // --- RULE 4: Hyperkalemia (IECA/BRA + Poupadores de K) ---
     if ((has(classes.ace_inhibitors) || has(classes.arbs)) && has(classes.diuretics_k)) {
       interactions.push({
-        pair: "Bloqueio RAAS + Espironolactona",
-        severity: "Moderada a Grave",
-        type: "Metabólica",
-        effect: "Retenção cumulativa de potássio.",
-        toxicity: "Hipercalemia severa (>6.0), arritmias cardíacas, parada em diástole.",
-        conduct: "Monitorar K+ sérico e Creatinina em 1 semana. Ajustar dieta."
+        pair: "IECA/BRA + Espironolactona",
+        severity: "Alta",
+        type: "Farmacodinâmica",
+        effect: "Ambos elevam os níveis de potássio sérico.",
+        toxicity: "Hipercalemia grave: arritmias cardíacas, parada cardíaca.",
+        conduct: "Monitorar K+ semanal. Se K+ > 5.5, reduzir dose ou suspender."
       });
     }
 
-    // --- RULE 4: Hypotension / Cardiovascular ---
-    if (has(classes.nitrates) && has(classes.pde5)) {
-      interactions.push({
-        pair: "Nitratos + Inibidor PDE-5",
-        severity: "Gravíssima",
-        type: "Hemodinâmica",
-        effect: "Vasodilatação sistêmica maciça e incontrolável.",
-        toxicity: "Choque hipotenso refratário, isquemia miocárdica, óbito.",
-        conduct: "CONTRAINDICAÇÃO ABSOLUTA. Intervalo mínimo de 24h (Sildenafil) a 48h (Tadalafila)."
-      });
-    }
-
-    // --- RULE 5: Serotonin Syndrome ---
+    // --- RULE 5: Serotonin Syndrome (SSRI + Tramadol) ---
     if (has(classes.ssri) && has(classes.opioids)) {
       interactions.push({
-        pair: "ISRS + Tramadol/Opioide",
-        severity: "Moderada",
+        pair: "Antidepressivo (SSRI) + Tramadol",
+        severity: "Moderada a Alta",
         type: "Neurotransmissão",
         effect: "Aumento da serotonina na fenda sináptica.",
         toxicity: "Síndrome Serotoninérgica: tremor, hiperreflexia, agitação, hipertermia.",
@@ -197,10 +196,8 @@ const DrugInteraction = () => {
 
   const handleAnalyze = async (e) => {
     e.preventDefault();
-    console.log("[DrugInteraction] handleAnalyze called");
     
     const activeMeds = medications.filter(m => m.trim() !== "");
-    console.log("[DrugInteraction] Active medications:", activeMeds);
     
     if (activeMeds.length < 2) {
       toast.error("Insira pelo menos 2 medicamentos.");
@@ -209,41 +206,28 @@ const DrugInteraction = () => {
 
     setIsLoading(true);
     setResult(null);
-    setProgress(10); // Start with 10% immediately
+    setProgress(10);
 
     try {
-      // Simulate smooth progress animation
       const progressInterval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 85) return prev; // Cap at 85% until real completion
-          return prev + 5; // Increment by 5% every 1.5 seconds
-        });
+        setProgress(prev => prev >= 85 ? prev : prev + 5);
       }, 1500);
 
-      console.log("[DrugInteraction] Calling startAITask...");
-      // Call AI Consensus Engine with polling - send ALL medications
       const interactionData = await startAITask(
         '/ai/consensus/drug-interaction',
-        {
-          medications: activeMeds  // Send all medications as an array
-        },
+        { medications: activeMeds },
         (task) => {
-          console.log("[DrugInteraction] Task progress:", task.status, task.progress);
           if (task.status === 'processing' && task.progress > 0) {
             setProgress(prev => Math.max(prev, task.progress));
           }
         }
       );
       
-      console.log("[DrugInteraction] Task completed, data:", interactionData);
-      
-      // Clear interval and set to 100%
       clearInterval(progressInterval);
       setProgress(100);
       
-      // Format for display - include ALL medications
       const mockResponse = {
-        medications: activeMeds,  // All medications
+        medications: activeMeds,
         severity: interactionData.severity,
         summary: interactionData.summary,
         details: interactionData.details,
@@ -253,11 +237,10 @@ const DrugInteraction = () => {
         monitoring: interactionData.monitoring
       };
 
-      // Save to consultation history
       try {
         await api.post('/consultations', {
           patient: { 
-            queixa: `[Interação] ${activeMeds.join(' + ')}`,  // All medications
+            queixa: `[Interação] ${activeMeds.join(' + ')}`,
             idade: "N/I", 
             sexo: "N/I" 
           },
@@ -266,7 +249,7 @@ const DrugInteraction = () => {
             conduct: { 
               advice: interactionData.recommendations
             },
-            medications: activeMeds.map(med => ({  // All medications
+            medications: activeMeds.map(med => ({
               name: med, 
               dosage: "Ver impacto", 
               mechanism: "Renal/Hepático analisado"
@@ -369,7 +352,7 @@ const DrugInteraction = () => {
                   >
                     {isLoading ? (
                       <span className="flex items-center gap-2">
-                        <CustomLoader size="sm" /> Verificando...
+                        <span className="animate-spin">⏳</span> Verificando...
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
@@ -384,22 +367,7 @@ const DrugInteraction = () => {
 
           {/* Output Section */}
           <div className="lg:col-span-7 xl:col-span-8 animate-slide-in-right">
-            {isLoading && progress > 0 && (
-              <Card className="mb-4 glass-card border-2 border-orange-200 shadow-xl animate-pulse-glow">
-                <CardContent className="pt-6">
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm font-medium">
-                      <span className="flex items-center gap-2 text-orange-700">
-                        <CustomLoader size="sm" className="text-orange-600" />
-                        Analisando com IA e banco de dados PubMed...
-                      </span>
-                      <span className="font-bold text-orange-600">{progress}%</span>
-                    </div>
-                    <Progress value={progress} className="h-3 bg-orange-100 [&>div]:bg-gradient-to-r [&>div]:from-orange-500 [&>div]:to-red-600 shadow-lg" />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            {isLoading && progress > 0 && <AnalysisProgress progress={progress} colorScheme="orange" />}
             {result ? (
               <div className="space-y-6 animate-scale-in">
                 <div className="flex items-center justify-between">
@@ -409,120 +377,90 @@ const DrugInteraction = () => {
                   </h2>
                 </div>
 
-                <div ref={reportRef} className="space-y-4 p-4 bg-white rounded-lg">
-                  {result ? (
-                    <div className="space-y-4">
-                      {/* Severity Alert */}
-                      <Alert variant={result.severity.includes("GRAVE") ? "destructive" : "default"} 
-                             className={result.severity.includes("GRAVE") ? "bg-red-50 border-red-200 text-red-900" : "bg-blue-50 border-blue-200 text-blue-900"}>
-                        <ShieldAlert className="h-4 w-4" />
-                        <AlertTitle>Nível de Interação: {result.severity}</AlertTitle>
-                        <AlertDescription>
-                          {result.summary}
-                        </AlertDescription>
-                      </Alert>
-                      
-                      {/* Interaction Details */}
-                      <Card className="border-l-4 border-l-blue-500 shadow-sm">
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-lg text-blue-700">
-                            {result.medications.join(' + ')}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-4">
-                            <div>
-                              <span className="text-xs font-bold text-muted-foreground uppercase">Detalhes</span>
-                              <p className="text-sm text-foreground mt-1">{result.details}</p>
-                            </div>
-                            <div className="bg-blue-50 p-3 rounded-md border border-blue-100">
-                              <span className="text-xs font-bold text-blue-800 uppercase flex items-center gap-1">
-                                <Brain className="h-3 w-3" /> Recomendações
-                              </span>
-                              <p className="text-sm text-blue-900 mt-1 font-medium">{result.recommendations}</p>
-                            </div>
+                <div ref={reportRef} className="space-y-6">
+                  {/* Severity Badge */}
+                  <Card className="border-2 border-orange-200 shadow-xl">
+                    <CardContent className="pt-6">
+                      <div className="flex items-center gap-3">
+                        <ShieldAlert className="h-6 w-6 text-orange-600" />
+                        <div>
+                          <span className="text-sm font-medium text-muted-foreground">Nível de Interação:</span>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge 
+                              className={`text-base px-3 py-1 ${
+                                result.severity === 'Grave' ? 'bg-red-600 hover:bg-red-700' :
+                                result.severity === 'Moderada' ? 'bg-orange-500 hover:bg-orange-600' :
+                                'bg-yellow-500 hover:bg-yellow-600'
+                              }`}
+                            >
+                              {result.severity}
+                            </Badge>
                           </div>
-                        </CardContent>
-                      </Card>
-                      
-                      {/* NEW: Renal Impact Section */}
-                      <Card className="border-l-4 border-l-amber-500 shadow-sm">
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-lg text-amber-700 flex items-center gap-2">
-                            Impacto Renal
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-2 text-sm whitespace-pre-line">
-                            {result.renal_impact || "Sem informações específicas disponíveis."}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Medications List */}
+                  <Card className="border-2 border-orange-100">
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Info className="h-5 w-5 text-blue-600" />
+                        {result.medications.join(' + ')}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
+                            📋 RECOMENDAÇÕES
+                          </h4>
+                          <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-900">
+                            <p className="text-sm text-foreground whitespace-pre-line">{result.recommendations}</p>
                           </div>
-                        </CardContent>
-                      </Card>
-                      
-                      {/* NEW: Hepatic Impact Section */}
-                      <Card className="border-l-4 border-l-orange-500 shadow-sm">
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-lg text-orange-700 flex items-center gap-2">
-                            Impacto Hepático
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-2 text-sm whitespace-pre-line">
-                            {result.hepatic_impact || "Sem informações específicas disponíveis."}
-                          </div>
-                        </CardContent>
-                      </Card>
-                      
-                      {/* NEW: Monitoring Recommendations */}
-                      {result.monitoring && (result.monitoring.renal.length > 0 || result.monitoring.hepatic.length > 0 || result.monitoring.outros.length > 0) && (
-                        <Card className="border-l-4 border-l-purple-500 shadow-sm bg-purple-50/30">
-                          <CardHeader className="pb-2">
-                            <CardTitle className="text-lg text-purple-700 flex items-center gap-2">
-                              <Activity className="h-5 w-5" />
-                              Exames de Monitoramento Recomendados
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="grid md:grid-cols-3 gap-4">
-                              {result.monitoring.renal.length > 0 && (
-                                <div className="bg-white p-3 rounded border border-amber-100">
-                                  <span className="text-xs font-bold text-amber-800 block mb-2">Função Renal</span>
-                                  <ul className="text-xs text-amber-900 space-y-1">
-                                    {result.monitoring.renal.map((exam, i) => (
-                                      <li key={i}>• {exam}</li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-                              {result.monitoring.hepatic.length > 0 && (
-                                <div className="bg-white p-3 rounded border border-orange-100">
-                                  <span className="text-xs font-bold text-orange-800 block mb-2">Função Hepática</span>
-                                  <ul className="text-xs text-orange-900 space-y-1">
-                                    {result.monitoring.hepatic.map((exam, i) => (
-                                      <li key={i}>• {exam}</li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-                              {result.monitoring.outros.length > 0 && (
-                                <div className="bg-white p-3 rounded border border-purple-100">
-                                  <span className="text-xs font-bold text-purple-800 block mb-2">Outros</span>
-                                  <ul className="text-xs text-purple-900 space-y-1">
-                                    {result.monitoring.outros.map((exam, i) => (
-                                      <li key={i}>• {exam}</li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      )}
-                    </div>
-                  ) : null}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Renal Impact */}
+                  <Card className="border-l-4 border-l-yellow-500">
+                    <CardHeader>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <HeartPulse className="h-5 w-5 text-yellow-600" />
+                        Impacto Renal
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">{result.renal_impact}</p>
+                    </CardContent>
+                  </Card>
+
+                  {/* Hepatic Impact */}
+                  <Card className="border-l-4 border-l-emerald-500">
+                    <CardHeader>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Brain className="h-5 w-5 text-emerald-600" />
+                        Impacto Hepático
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">{result.hepatic_impact}</p>
+                    </CardContent>
+                  </Card>
+
+                  {/* Monitoring */}
+                  {result.monitoring && (
+                    <Alert>
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertTitle>Monitoramento Necessário</AlertTitle>
+                      <AlertDescription className="text-sm">
+                        {typeof result.monitoring === 'string' ? result.monitoring : JSON.stringify(result.monitoring)}
+                      </AlertDescription>
+                    </Alert>
+                  )}
                 </div>
 
-                {/* ResultActions Component */}
                 <ResultActions 
                   resultRef={reportRef}
                   resultData={result}
