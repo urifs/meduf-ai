@@ -299,6 +299,7 @@ Analise o caso toxicológico.
             "agent": agent,
             "antidote": "Sistema indisponível - consultar CIATOX ou protocolos locais",
             "mechanism": f"Erro: {str(e)}",
+            "protocol": "Consultar protocolos específicos do CIATOX e diretrizes institucionais. Contato: 0800 722 6001 (Nacional) ou 0800 014 8110 (SP).",
             "conduct": [
                 "Estabilização ABC (via aérea, respiração, circulação)",
                 "Descontaminação conforme via de exposição e tempo",
