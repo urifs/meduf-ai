@@ -264,8 +264,7 @@ const DrugInteraction = () => {
       setResult(mockResponse);
       
     } catch (error) {
-      console.error("Drug interaction error:", error);
-      toast.error("Erro ao analisar interação. Tente novamente.");
+      toast.error("Não foi possível completar a análise. Por favor, tente novamente.");
     } finally {
       setIsLoading(false);
       setProgress(0);
