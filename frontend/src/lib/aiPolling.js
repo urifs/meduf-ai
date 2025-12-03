@@ -53,21 +53,18 @@ export async function pollTask(taskId, onProgress = null, pollInterval = 2000, m
         throw new Error('Tarefa não encontrada no servidor');
       }
       
-      // If too many consecutive errors, fail (increased to 10)
+      // If too many consecutive errors, fail
       if (consecutiveErrors >= 10) {
-        console.error('[aiPolling] Too many consecutive polling errors');
         throw new Error('Erro de conexão persistente. Por favor, verifique sua internet e tente novamente.');
       }
       
       // Other errors, retry
-      console.error('Polling error (attempt ' + consecutiveErrors + '):', error.message);
       await new Promise(resolve => setTimeout(resolve, pollInterval));
       attempts++;
     }
   }
   
   // Timeout - with 600 attempts at 2s each = 20 minutes
-  console.error('[aiPolling] Polling timeout after', attempts, 'attempts (', (attempts * pollInterval / 60000), 'minutes)');
   throw new Error('Análise está demorando mais que o esperado (>20min). A análise pode ter sido concluída. Tente recarregar a página ou consultar o histórico.');
 }
 
