@@ -183,20 +183,18 @@ Analise TODAS as interações medicamentosas possíveis entre estes {len(medicat
         elif response_text.startswith("```"):
             response_text = response_text.split("```")[1].split("```")[0].strip()
         
-        return json.loads(response_text)
+        result = json.loads(response_text)
+        
+        # Validate that severity is not an error message
+        if "erro" in result.get("severity", "").lower():
+            raise ValueError("Invalid severity returned")
+        
+        return result
         
     except Exception as e:
         print(f"Error in analyze_drug_interaction: {e}")
-        return {
-            "severity": "Erro no sistema - avaliar manualmente",
-            "summary": "Sistema temporariamente indisponível. Consultar literatura atualizada.",
-            "details": "Por favor, consulte referências atualizadas sobre interações medicamentosas e diretrizes clínicas.",
-            "recommendations": "Avaliar relação risco-benefício, considerar alternativas terapêuticas e monitoramento intensivo.",
-            "renal_impact": "Avaliar clearance de creatinina e necessidade de ajuste de dose para todos os medicamentos",
-            "hepatic_impact": "Avaliar função hepática (TGO, TGP, bilirrubinas) e metabolização de todos os medicamentos",
-            "mechanism": f"Sistema temporariamente indisponível: {str(e)}",
-            "monitoring": "Monitorar função renal (creatinina, TFG), função hepática (AST/ALT, bilirrubinas), sinais de toxicidade e considerar ajuste de dose conforme necessário."
-        }
+        # Re-raise to let task_manager retry instead of returning error response
+        raise Exception(f"Falha na análise de interação medicamentosa: {str(e)}")
 
 
 async def analyze_medication_guide(condition: str, patient_age: str = "N/I", contraindications: Optional[str] = None) -> Dict[str, Any]:
