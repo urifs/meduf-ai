@@ -73,18 +73,6 @@ const Selection = () => {
       iconColor: "text-rose-600",
       path: "/toxicology",
       glow: "hover:shadow-[0_0_40px_rgba(244,63,94,0.3)]"
-    },
-    {
-      title: "Leitor de Exames",
-      description: "Análise de exames laboratoriais",
-      detail: "Upload de exames para identificar alterações e interpretar resultados automaticamente.",
-      icon: FileText,
-      gradient: "from-blue-500 to-cyan-600",
-      hoverGradient: "hover:from-blue-600 hover:to-cyan-700",
-      iconBg: "bg-gradient-to-br from-blue-400/20 to-cyan-500/20",
-      iconColor: "text-blue-600",
-      path: "/exam-reader",
-      glow: "hover:shadow-[0_0_40px_rgba(59,130,246,0.3)]"
     }
   ];
 
