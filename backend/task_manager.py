@@ -81,18 +81,26 @@ class TaskManager:
     ):
         """
         Execute a task function synchronously (for thread pool)
+        WITH RETRY - NEVER GIVES UP!
         """
-        try:
-            self.update_status(task_id, TaskStatus.PROCESSING, progress=10)
-            print(f"🔄 Task {task_id} started")
-            
-            # Execute the function in sync context
-            import asyncio
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            
+        max_retries = 3
+        retry_count = 0
+        last_error = None
+        
+        while retry_count < max_retries:
             try:
-                result = loop.run_until_complete(func(*args, **kwargs))
+                self.update_status(task_id, TaskStatus.PROCESSING, progress=10)
+                print(f"🔄 Task {task_id} started (attempt {retry_count + 1}/{max_retries})")
+                
+                # Execute the function in sync context
+                import asyncio
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                
+                try:
+                    print(f"[Task {task_id}] Executing function {func.__name__}...")
+                    result = loop.run_until_complete(func(*args, **kwargs))
+                    print(f"[Task {task_id}] Function completed successfully!")
                 
                 # Track usage for cost calculation
                 task = self.tasks.get(task_id)
