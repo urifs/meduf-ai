@@ -203,7 +203,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         "token_type": "bearer",
         "user_name": user["name"],
         "user_role": user.get("role", "USER"),
-        "expiration_date": user.get("expiration_date"),
+        "expiration_date": user.get("expiration_date").isoformat() if user.get("expiration_date") else None,
         "avatar_url": user.get("avatar_url", "")
     }
 
