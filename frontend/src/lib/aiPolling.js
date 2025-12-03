@@ -83,34 +83,18 @@ export async function pollTask(taskId, onProgress = null, pollInterval = 2000, m
  */
 export async function startAITask(endpoint, data, onProgress = null) {
   try {
-    console.log("[aiPolling] Starting AI task");
-    console.log("[aiPolling] Endpoint:", endpoint);
-    console.log("[aiPolling] Data:", data);
-    
-    // Step 1: Start the task
-    console.log("[aiPolling] Making POST request to:", endpoint);
     const response = await api.post(endpoint, data);
-    console.log("[aiPolling] Response received:", response.data);
-    
     const { task_id } = response.data;
     
     if (!task_id) {
-      console.error("[aiPolling] No task_id in response:", response.data);
       throw new Error('No task_id returned from server');
     }
     
-    console.log("[aiPolling] Task ID:", task_id);
-    
-    // Step 2: Poll for result
-    console.log("[aiPolling] Starting polling for task:", task_id);
     const result = await pollTask(task_id, onProgress);
-    
-    console.log("[aiPolling] Task completed with result:", result);
     return result;
     
   } catch (error) {
-    console.error('[aiPolling] AI Task error:', error);
-    console.error('[aiPolling] Error details:', error.response?.data || error.message);
+    console.error('[aiPolling] Error:', error.message);
     throw error;
   }
 }
