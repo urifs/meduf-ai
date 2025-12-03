@@ -143,14 +143,13 @@ Responda APENAS com JSON:
 ```json
 {
   "severity": "Leve|Moderada|Grave",
+  "summary": "Resumo breve da interação em 1-2 frases",
+  "details": "Explicação detalhada da interação medicamentosa",
+  "recommendations": "Recomendações práticas para o médico prescritor",
   "renal_impact": "Descrição do impacto renal",
   "hepatic_impact": "Descrição do impacto hepático",
   "mechanism": "Mecanismo da interação",
-  "monitoring": {
-    "renal": ["Exame 1", "Exame 2"],
-    "hepatic": ["Exame 1", "Exame 2"],
-    "outros": ["Exame 1", "Exame 2"]
-  }
+  "monitoring": "Texto descritivo do monitoramento necessário (exames, frequência, valores críticos)"
 }
 ```"""
         
@@ -181,14 +180,13 @@ Analise a interação medicamentosa.
         print(f"Error in analyze_drug_interaction: {e}")
         return {
             "severity": "Erro no sistema - avaliar manualmente",
+            "summary": "Sistema temporariamente indisponível. Consultar literatura atualizada.",
+            "details": "Por favor, consulte referências atualizadas sobre interações medicamentosas e diretrizes clínicas.",
+            "recommendations": "Avaliar relação risco-benefício, considerar alternativas terapêuticas e monitoramento intensivo.",
             "renal_impact": "Avaliar clearance de creatinina e necessidade de ajuste de dose",
             "hepatic_impact": "Avaliar função hepática (TGO, TGP, bilirrubinas) e metabolização",
             "mechanism": f"Sistema temporariamente indisponível: {str(e)}",
-            "monitoring": {
-                "renal": ["Creatinina sérica", "TFG estimada", "Eletrólitos"],
-                "hepatic": ["AST/ALT", "Bilirrubinas", "TAP/INR"],
-                "outros": ["Monitorar sinais de toxicidade", "Considerar ajuste de dose"]
-            }
+            "monitoring": "Monitorar função renal (creatinina, TFG), função hepática (AST/ALT, bilirrubinas), sinais de toxicidade e considerar ajuste de dose conforme necessário."
         }
 
 
