@@ -76,8 +76,7 @@ const Toxicology = () => {
 
       setResult(aiResponse);
     } catch (error) {
-      console.error("AI Engine Error:", error);
-      toast.error("Erro ao processar análise. Tente novamente.");
+      toast.error("Não foi possível completar a análise. Por favor, tente novamente.");
     } finally {
       setIsLoading(false);
       setProgress(0);
