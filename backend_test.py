@@ -385,6 +385,70 @@ class BackendTester:
             self.log_result(f"{test_name}", False, f"Error: {str(e)}", duration)
             return False
     
+    def poll_task_result_review(self, task_id, test_name, max_wait=15):
+        """Poll task status for review request - MAX 15s per analysis"""
+        start_time = time.time()
+        poll_count = 0
+        
+        try:
+            while True:
+                poll_count += 1
+                
+                response = self.session.get(f"{BACKEND_URL}/ai/tasks/{task_id}")
+                
+                if response.status_code != 200:
+                    total_duration = time.time() - start_time
+                    print(f"      ❌ Poll failed: {response.status_code}")
+                    return False
+                
+                data = response.json()
+                status = data.get("status")
+                progress = data.get("progress", 0)
+                
+                current_duration = time.time() - start_time
+                print(f"      Poll #{poll_count}: {status} ({progress}%) - {current_duration:.1f}s")
+                
+                if status == "completed":
+                    total_duration = time.time() - start_time
+                    result = data.get("result")
+                    
+                    if not result:
+                        print(f"      ❌ No result returned")
+                        return False
+                    
+                    # Check 15s requirement
+                    if total_duration > 15.0:
+                        print(f"      ⚠️ TEMPO EXCEDIDO: {total_duration:.1f}s > 15s máximo")
+                        return False
+                    else:
+                        print(f"      ✅ COMPLETOU em {total_duration:.1f}s (< 15s)")
+                        return True
+                
+                elif status == "failed":
+                    total_duration = time.time() - start_time
+                    error = data.get("error", "Unknown error")
+                    print(f"      ❌ Task failed: {error}")
+                    return False
+                
+                elif status in ["pending", "processing"]:
+                    # Check 15s timeout
+                    if current_duration > max_wait:
+                        print(f"      ❌ TIMEOUT: {current_duration:.1f}s > {max_wait}s máximo")
+                        return False
+                    
+                    # Wait before next poll
+                    time.sleep(1)
+                    continue
+                
+                else:
+                    print(f"      ❌ Unknown status: {status}")
+                    return False
+                    
+        except Exception as e:
+            duration = time.time() - start_time
+            print(f"      ❌ Polling error: {str(e)}")
+            return False
+
     def poll_task_result(self, task_id, test_name, expected_fields=None, max_wait=120):
         """Poll task status until completion or timeout"""
         print(f"📊 Polling task {task_id} for {test_name}...")
