@@ -211,17 +211,22 @@ async def analyze_medication_guide(condition: str, patient_age: str = "N/I", con
 3. **Farmacologia Clínica** (mecanismo, farmacocinética, interações)
 4. **Precauções e Contraindicações** (absolutas e relativas, ajustes especiais)
 
-Responda APENAS com JSON:
+Responda APENAS com JSON contendo um objeto com a chave "medications":
 ```json
-[
-  {
-    "name": "Nome do medicamento",
-    "dosage": "Dose e via",
-    "mechanism": "Mecanismo",
-    "contraindications": "Contraindicações"
-  }
-]
-```"""
+{
+  "medications": [
+    {
+      "name": "Nome do medicamento",
+      "dose": "Dose exata (ex: 500mg, 10mg/kg)",
+      "frequency": "Frequência (ex: 8/8h, 12/12h, 1x/dia)",
+      "route": "Via de administração (ex: VO, IV, IM, SC)",
+      "notes": "Indicações, precauções e contraindicações importantes"
+    }
+  ]
+}
+```
+
+Forneça 3-5 medicamentos mais adequados para o tratamento."""
         
         chat = LlmChat(
             api_key=EMERGENT_KEY,
