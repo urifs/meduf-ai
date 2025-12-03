@@ -38,7 +38,6 @@ export async function pollTask(taskId, onProgress = null, pollInterval = 2000, m
       
       // Check if failed
       if (task.status === 'failed') {
-        console.error('Task failed:', task.error);
         throw new Error(task.error || 'Erro ao processar análise');
       }
       
