@@ -425,7 +425,7 @@ async def get_consultations(
     """Get user consultations"""
     try:
         # Admin sees all, users see only their own
-        query = {} if current_user.role == "ADMIN" else {"user_id": current_user.username}
+        query = {} if current_user.role == "ADMIN" else {"user_id": current_user.email}
         
         consultations = []
         cursor = consultations_collection.find(query, {"_id": 0}).sort("timestamp", -1).limit(limit)
