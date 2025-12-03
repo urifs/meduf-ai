@@ -401,7 +401,22 @@ const DrugInteraction = () => {
                     </CardContent>
                   </Card>
 
-                  {/* Medications List */}
+                  {/* Summary */}
+                  {result.summary && (
+                    <Card className="border-2 border-blue-100">
+                      <CardHeader>
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <Info className="h-5 w-5 text-blue-600" />
+                          Resumo da Interação
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground">{result.summary}</p>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Medications List with Recommendations */}
                   <Card className="border-2 border-orange-100">
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center gap-2">
@@ -411,14 +426,26 @@ const DrugInteraction = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        <div>
-                          <h4 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-                            📋 RECOMENDAÇÕES
-                          </h4>
-                          <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-900">
-                            <p className="text-sm text-foreground whitespace-pre-line">{result.recommendations}</p>
+                        {result.recommendations && (
+                          <div>
+                            <h4 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
+                              📋 RECOMENDAÇÕES
+                            </h4>
+                            <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-900">
+                              <p className="text-sm text-foreground whitespace-pre-line">{result.recommendations}</p>
+                            </div>
                           </div>
-                        </div>
+                        )}
+                        {result.details && (
+                          <div>
+                            <h4 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
+                              📄 DETALHES DA INTERAÇÃO
+                            </h4>
+                            <div className="bg-slate-50 dark:bg-slate-950/20 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
+                              <p className="text-sm text-muted-foreground whitespace-pre-line">{result.details}</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
