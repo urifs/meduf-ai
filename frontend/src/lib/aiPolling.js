@@ -13,7 +13,7 @@ import api from './api';
  * @param {number} maxAttempts - Max polling attempts (default 150 = 5 minutes)
  * @returns {Promise<object>} - Final result when task completes
  */
-export async function pollTask(taskId, onProgress = null, pollInterval = 2000, maxAttempts = 600) {
+export async function pollTask(taskId, onProgress = null, pollInterval = 3000, maxAttempts = 1200) {
   let attempts = 0;
   let consecutiveErrors = 0;
   
@@ -36,9 +36,13 @@ export async function pollTask(taskId, onProgress = null, pollInterval = 2000, m
         return task.result;
       }
       
-      // Check if failed
+      // Check if failed - but continue retrying (backend has retry mechanism)
       if (task.status === 'failed') {
-        throw new Error(task.error || 'Erro ao processar análise');
+        // Don't throw immediately, let backend retry mechanism work
+        // Only throw after many attempts
+        if (attempts > 20) {
+          throw new Error(task.error || 'Erro ao processar análise');
+        }
       }
       
       // Wait before next poll
@@ -48,24 +52,19 @@ export async function pollTask(taskId, onProgress = null, pollInterval = 2000, m
     } catch (error) {
       consecutiveErrors++;
       
-      // If it's a 404, task not found
-      if (error.response?.status === 404) {
-        throw new Error('Tarefa não encontrada no servidor');
+      // Be very patient with errors - only fail after many consecutive errors
+      if (consecutiveErrors >= 50) {
+        throw new Error('Não foi possível completar a análise. Por favor, tente novamente.');
       }
       
-      // If too many consecutive errors, fail
-      if (consecutiveErrors >= 10) {
-        throw new Error('Erro de conexão persistente. Por favor, verifique sua internet e tente novamente.');
-      }
-      
-      // Other errors, retry
+      // Other errors, retry silently (no error thrown)
       await new Promise(resolve => setTimeout(resolve, pollInterval));
       attempts++;
     }
   }
   
-  // Timeout - with 600 attempts at 2s each = 20 minutes
-  throw new Error('Análise está demorando mais que o esperado (>20min). A análise pode ter sido concluída. Tente recarregar a página ou consultar o histórico.');
+  // Timeout - with 1200 attempts at 3s each = 60 minutes (1 hour)
+  throw new Error('Análise está demorando mais que o esperado. Por favor, tente novamente.');
 }
 
 /**
