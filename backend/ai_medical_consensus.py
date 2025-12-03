@@ -265,6 +265,7 @@ Responda APENAS com JSON:
   "agent": "Nome do agente tóxico",
   "antidote": "Antídoto específico",
   "mechanism": "Mecanismo de toxicidade",
+  "protocol": "Protocolo detalhado de tratamento específico para este agente (doses, timing, critérios)",
   "conduct": ["Passo 1", "Passo 2", "Passo 3"]
 }
 ```"""
