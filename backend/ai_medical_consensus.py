@@ -199,7 +199,7 @@ Analise TODAS as interações medicamentosas possíveis entre estes {len(medicat
         }
 
 
-async def analyze_medication_guide(condition: str, patient_age: str = "N/I", contraindications: Optional[str] = None) -> List[Dict[str, Any]]:
+async def analyze_medication_guide(condition: str, patient_age: str = "N/I", contraindications: Optional[str] = None) -> Dict[str, Any]:
     """
     Gera guia terapêutico usando Gemini 2.0 Flash
     """
