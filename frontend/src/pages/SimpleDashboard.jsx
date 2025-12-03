@@ -60,7 +60,7 @@ const SimpleDashboard = () => {
           report: aiReport
         });
       } catch (error) {
-        console.error("Error saving:", error);
+        // Silent fail
       }
       
       setReportData(aiReport);
@@ -77,8 +77,7 @@ const SimpleDashboard = () => {
       localStorage.setItem('meduf_history', JSON.stringify(existingHistory.slice(0, 50)));
       
     } catch (error) {
-      console.error("AI Consensus Error:", error);
-      toast.error("Erro ao processar análise. Tente novamente.");
+      toast.error("Não foi possível completar a análise. Por favor, tente novamente.");
     } finally {
       setIsLoading(false);
       setProgress(0);

@@ -64,17 +64,14 @@ const MedicationGuide = () => {
             })) || []
           }
         });
-        toast.success("Guia completo! Análise concluída");
       } catch (error) {
-        console.error("Error saving:", error);
-        toast.success("Guia gerado (não salvo no histórico).");
+        // Silent fail
       }
 
       setResult(aiMedications.medications || []);
       
     } catch (error) {
-      console.error("AI Consensus Error:", error);
-      toast.error("Erro ao processar guia. Tente novamente.");
+      toast.error("Não foi possível completar a análise. Por favor, tente novamente.");
     } finally {
       setIsLoading(false);
       setProgress(0);
