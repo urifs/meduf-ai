@@ -249,16 +249,27 @@ Forneça guia terapêutico.
         elif response_text.startswith("```"):
             response_text = response_text.split("```")[1].split("```")[0].strip()
         
-        return json.loads(response_text)
+        result = json.loads(response_text)
+        
+        # Return the medications array directly, or wrap in expected format
+        if isinstance(result, dict) and "medications" in result:
+            return result
+        elif isinstance(result, list):
+            return {"medications": result}
+        else:
+            return {"medications": []}
         
     except Exception as e:
         print(f"Error in analyze_medication_guide: {e}")
-        return [{
-            "name": "Sistema temporariamente indisponível",
-            "dosage": "Consultar protocolos clínicos e guidelines atualizados",
-            "mechanism": f"Erro: {str(e)}",
-            "contraindications": "Avaliar contraindicações específicas do paciente e condição clínica"
-        }]
+        return {
+            "medications": [{
+                "name": "Sistema temporariamente indisponível",
+                "dose": "N/A",
+                "frequency": "N/A",
+                "route": "Consultar protocolo",
+                "notes": f"Consultar protocolos clínicos e guidelines atualizados. Erro: {str(e)}"
+            }]
+        }
 
 
 async def analyze_toxicology(agent: str, exposure_route: Optional[str] = None, symptoms: Optional[str] = None) -> Dict[str, Any]:
