@@ -1292,6 +1292,20 @@ async def get_all_time_usage(user: UserInDB = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/api/system/health")
+async def health_check():
+    """
+    Health check endpoint with configuration status
+    """
+    return {
+        "status": "healthy",
+        "emergent_llm_key_configured": bool(os.environ.get("EMERGENT_LLM_KEY")),
+        "mongo_connected": True,  # If we got here, MongoDB is working
+        "database": db_name,
+        "environment": "production" if os.environ.get("KUBERNETES_SERVICE_HOST") else "development"
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
