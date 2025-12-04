@@ -79,6 +79,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Compression middleware for faster responses
+from fastapi.middleware.gzip import GZIPMiddleware
+app.add_middleware(GZIPMiddleware, minimum_size=1000)
+
 # Static files
 static_path = Path(__file__).parent / "static"
 static_path.mkdir(exist_ok=True)
