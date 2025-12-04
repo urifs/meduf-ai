@@ -131,6 +131,28 @@ const MedicalChat = () => {
                   }`}>
                     <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                   </div>
+                  {msg.role === 'assistant' && (
+                    <div className="mt-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => handleCopy(msg.content, idx)}
+                      >
+                        {copiedIndex === idx ? (
+                          <>
+                            <Check className="h-3 w-3 mr-1" />
+                            Copiado!
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-3 w-3 mr-1" />
+                            Copiar resposta
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))
