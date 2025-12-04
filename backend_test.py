@@ -870,17 +870,17 @@ class BackendTester:
         print("URL BACKEND: https://meduf-ai-doctor.preview.emergentagent.com")
         print("=" * 80)
         
-        # Step 1: Authentication
-        if not self.authenticate():
-            print("\n❌ Authentication failed - cannot proceed with admin tests")
-            return False
-        
         tests_passed = 0
         total_tests = 3
         failed_tests = []
         
         # Test 1: Permanent User Deletion (BUG CORRECTED)
         print(f"\n1️⃣ EXCLUSÃO PERMANENTE DE USUÁRIO (BUG CORRIGIDO)")
+        # Fresh authentication for this test
+        if not self.authenticate():
+            print("\n❌ Authentication failed - cannot proceed with admin tests")
+            return False
+        
         if self.test_admin_permanent_user_deletion():
             tests_passed += 1
             print(f"   ✅ Exclusão permanente - SUCESSO")
@@ -899,7 +899,12 @@ class BackendTester:
         
         # Test 3: User Listing
         print(f"\n3️⃣ LISTAGEM DE USUÁRIOS")
-        if self.test_admin_user_listing():
+        # Fresh authentication for this test since previous test may have invalidated session
+        if not self.authenticate():
+            print("\n❌ Re-authentication failed for user listing test")
+            failed_tests.append("Listagem de Usuários")
+            print(f"   ❌ Listagem de usuários - FALHOU")
+        elif self.test_admin_user_listing():
             tests_passed += 1
             print(f"   ✅ Listagem de usuários - SUCESSO")
         else:
