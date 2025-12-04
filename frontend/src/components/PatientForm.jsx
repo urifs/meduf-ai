@@ -143,4 +143,4 @@ export const PatientForm = memo(({ onSubmit, isLoading }) => {
       </CardContent>
     </Card>
   );
-};
+});
