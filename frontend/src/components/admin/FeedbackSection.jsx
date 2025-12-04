@@ -115,8 +115,8 @@ const FeedbackSection = ({
                           {feedback.analysis_type === 'diagnosis' && 'Diagnóstico'}
                           {feedback.analysis_type === 'simple-diagnosis' && 'Diagnóstico Simples'}
                           {feedback.analysis_type === 'drug-interaction' && 'Interação'}
-                          {feedback.analysis_type === 'medication-guide' && 'Guia Terapêutico'}
-                          {feedback.analysis_type === 'toxicology' && 'Toxicologia'}
+                          {feedback.analysis_type === 'medication-guide' && 'Guia Farmacológico'}
+                          {feedback.analysis_type === 'toxicology' && 'Guia Toxicológico'}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-center">
