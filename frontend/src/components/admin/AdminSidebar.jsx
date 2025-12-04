@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Shield, FileText } from 'lucide-react';
+import { Input } from "@/components/ui/input";
+import { Shield, FileText, Search } from 'lucide-react';
 
 const AdminSidebar = ({ 
   users, 
@@ -11,6 +12,17 @@ const AdminSidebar = ({
   onConsultationClick,
   onUserClick
 }) => {
+  const [consultationsSearchTerm, setConsultationsSearchTerm] = useState('');
+
+  const filteredConsultations = consultations.filter(consult => {
+    const searchLower = consultationsSearchTerm.toLowerCase();
+    return (
+      consult.user_name?.toLowerCase().includes(searchLower) ||
+      consult.user_email?.toLowerCase().includes(searchLower) ||
+      consult.patient?.queixa?.toLowerCase().includes(searchLower) ||
+      consult.report?.diagnoses?.[0]?.name?.toLowerCase().includes(searchLower)
+    );
+  });
   return (
     <div className="xl:col-span-1 space-y-8">
       {/* Admins List Card */}
