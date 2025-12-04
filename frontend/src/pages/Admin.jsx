@@ -160,32 +160,43 @@ const Admin = () => {
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          {/* User Management Tabs */}
-          <UserManagementTabs
-            users={users}
-            deletedUsers={deletedUsers}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            formatDate={formatDate}
-            getDaysRemaining={getDaysRemaining}
-            getDaysColor={getDaysColor}
-            onUserClick={(user) => {
-              setSelectedUserProfile(user);
-              setIsProfileOpen(true);
-            }}
-            onChangeExpiration={(user) => {
-              setSelectedUserForExpiration(user);
-              setIsExpirationOpen(true);
-            }}
-            onToggleStatus={handleToggleStatus}
-            onDeleteUser={handleDeleteUser}
-            onReactivateUser={(user) => {
-              setSelectedUserForReactivation(user);
-              setIsReactivateOpen(true);
-            }}
-          />
+          {/* Left Column - User Management + Online Users */}
+          <div className="xl:col-span-2 space-y-8">
+            {/* User Management Tabs */}
+            <UserManagementTabs
+              users={users}
+              deletedUsers={deletedUsers}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              formatDate={formatDate}
+              getDaysRemaining={getDaysRemaining}
+              getDaysColor={getDaysColor}
+              onUserClick={(user) => {
+                setSelectedUserProfile(user);
+                setIsProfileOpen(true);
+              }}
+              onChangeExpiration={(user) => {
+                setSelectedUserForExpiration(user);
+                setIsExpirationOpen(true);
+              }}
+              onToggleStatus={handleToggleStatus}
+              onDeleteUser={handleDeleteUser}
+              onReactivateUser={(user) => {
+                setSelectedUserForReactivation(user);
+                setIsReactivateOpen(true);
+              }}
+            />
 
-          {/* Admin Sidebar */}
+            {/* Online Users Section */}
+            <OnlineUsersSection 
+              onUserClick={(user) => {
+                setSelectedUserProfile(user);
+                setIsProfileOpen(true);
+              }}
+            />
+          </div>
+
+          {/* Right Column - Admin Sidebar */}
           <AdminSidebar
             users={users}
             consultations={consultations}
@@ -200,14 +211,6 @@ const Admin = () => {
             }}
           />
         </div>
-
-        {/* Online Users Section */}
-        <OnlineUsersSection 
-          onUserClick={(user) => {
-            setSelectedUserProfile(user);
-            setIsProfileOpen(true);
-          }}
-        />
 
         {/* Feedbacks Section */}
         <FeedbackSection
