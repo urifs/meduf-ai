@@ -658,6 +658,34 @@ async def delete_user(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.delete("/api/admin/users/{user_id}/permanent")
+async def permanently_delete_user(
+    user_id: str,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Permanently delete user from database (admin only)"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    try:
+        # Try to find and delete by _id first
+        try:
+            result = await users_collection.delete_one({"_id": ObjectId(user_id)})
+        except:
+            # Fallback to email if _id doesn't work
+            result = await users_collection.delete_one({"email": user_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return {"message": "User permanently deleted", "deleted_count": result.deleted_count}
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error permanently deleting user: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/api/admin/users/{user_id}/reactivate")
 async def reactivate_user(
     user_id: str,
