@@ -72,7 +72,7 @@ const UserStatsCards = ({ stats, onlineCount, monthlyUsage }) => {
         <CardContent>
           <div className="flex items-center justify-between">
             <div className="text-3xl font-bold text-red-600">{stats.totalDeleted}</div>
-            <Database className="h-8 w-8 text-red-100" />
+            <UserX className="h-8 w-8 text-red-100" />
           </div>
           <p className="text-xs text-muted-foreground mt-1">
             Usuários excluídos ou expirados
