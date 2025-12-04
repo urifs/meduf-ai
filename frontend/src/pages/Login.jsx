@@ -10,6 +10,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { LogIn, ExternalLink } from 'lucide-react';
 import api from '@/lib/api';
 import { CustomLoader } from '@/components/ui/custom-loader';
+import PasswordToggle from '@/components/PasswordToggle';
 
 const Login = () => {
   const navigate = useNavigate();
