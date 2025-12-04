@@ -194,12 +194,27 @@ const DoseCalculator = () => {
                         />
                       </div>
                     </div>
-                    <Input
-                      placeholder="Altura (cm)"
-                      value={patientData.height}
-                      onChange={(e) => setPatientData({...patientData, height: e.target.value})}
-                      className="border-slate-200"
-                    />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Input
+                          placeholder="Altura (cm)"
+                          value={patientData.height}
+                          onChange={(e) => setPatientData({...patientData, height: e.target.value})}
+                          className="border-slate-200"
+                        />
+                      </div>
+                      <div>
+                        <Select value={patientData.sex} onValueChange={(value) => setPatientData({...patientData, sex: value})}>
+                          <SelectTrigger className="border-slate-200">
+                            <SelectValue placeholder="Sexo" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="masculino">Masculino</SelectItem>
+                            <SelectItem value="feminino">Feminino</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
                     <Textarea
                       placeholder="Condições especiais (gestação, lactação, insuficiências...)"
                       value={patientData.specialConditions}
