@@ -7,7 +7,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import api from '@/lib/api';
 
-const OnlineUsersSection = () => {
+const OnlineUsersSection = ({ onUserClick }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
