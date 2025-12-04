@@ -255,29 +255,7 @@ const DatabaseManager = () => {
                         <Plus className="h-4 w-4 mr-2" /> Novo
                       </Button>
                       
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="destructive" size="icon" title="Excluir Coleção">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle className="flex items-center gap-2 text-destructive">
-                              <AlertTriangle className="h-5 w-5" /> Excluir Coleção Inteira?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Você está prestes a excluir a coleção <b>{selectedCollection}</b> e TODOS os seus documentos. Esta ação não pode ser desfeita.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleDeleteCollection} className="bg-destructive hover:bg-destructive/90">
-                              Sim, Excluir Tudo
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                      {/* Botão de excluir coleção removido por segurança */}
                     </div>
                   </div>
                 </CardHeader>
