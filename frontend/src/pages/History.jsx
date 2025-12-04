@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
+import FooterLogo from '@/components/FooterLogo';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
