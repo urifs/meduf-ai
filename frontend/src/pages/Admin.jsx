@@ -108,6 +108,15 @@ const Admin = () => {
   
   // Deleted Users State
   const [deletedUsers, setDeletedUsers] = useState([]);
+  
+  // Reactivation State
+  const [isReactivateOpen, setIsReactivateOpen] = useState(false);
+  const [isReactivating, setIsReactivating] = useState(false);
+  const [selectedUserForReactivation, setSelectedUserForReactivation] = useState(null);
+  const [reactivationDays, setReactivationDays] = useState(30);
+  
+  // Active Tab State
+  const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, users, consultations, feedbacks, deleted
 
   // --- Authentication Check & Polling ---
   useEffect(() => {
