@@ -653,7 +653,55 @@ test_plan:
   test_priority: "high_first"
   test_summary: "🎉 PROFILE SAVE FUNCTIONALITY COMPLETELY FIXED AND WORKING: ✅ ROOT CAUSE IDENTIFIED AND FIXED: Backend PATCH endpoint was using incorrect MongoDB query {'id': current_user.id} instead of {'_id': ObjectId(current_user.id)}. Fixed in server.py line 268. ✅ SUCCESS TOAST: Working perfectly ✅ FRONTEND: 100% functional ✅ DATA PERSISTENCE: **COMPLETELY WORKING** - Data persists correctly after page reload. All review request criteria met - profile save functionality is now production-ready."
 
+backend:
+  - task: "Admin Panel - Permanent User Deletion (BUG FIXED)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "REVIEW REQUEST TESTING: Need to test complete permanent user deletion flow: create user → soft delete → verify in deleted list → permanent delete → verify removal. Admin credentials: ur1fs/@Fred1807"
+      - working: true
+        agent: "testing"
+        comment: "✅ PERMANENT USER DELETION FLOW VERIFIED: Complete end-to-end testing successful. ✅ CREATE USER: Successfully created test user via POST /api/admin/users ✅ SOFT DELETE: User soft deleted via DELETE /api/admin/users/{email} ✅ VERIFY IN DELETED LIST: User appears in GET /api/admin/deleted-users ✅ PERMANENT DELETE: User permanently deleted via DELETE /api/admin/users/{email}/permanent with deleted_count=1 ✅ FINAL VERIFICATION: User NO LONGER appears in GET /api/admin/deleted-users. Bug fix confirmed working - permanent deletion removes user completely from database and deleted users list."
+
+  - task: "Admin Panel - Authentication Flow"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "REVIEW REQUEST TESTING: Need to verify admin authentication flow with credentials ur1fs/@Fred1807. Login should return access_token and allow access to protected admin endpoints."
+      - working: true
+        agent: "testing"
+        comment: "✅ ADMIN AUTHENTICATION FLOW VERIFIED: Complete authentication testing successful. ✅ LOGIN: Successful authentication with ur1fs/@Fred1807 credentials returns access_token ✅ USER ROLE: Confirmed user_role='ADMIN' in login response ✅ TOKEN USAGE: Bearer token authentication works for protected admin endpoints ✅ PROTECTED ACCESS: Successfully accessed /api/admin/users with valid token. Authentication system working correctly for admin users."
+
+  - task: "Admin Panel - User Listing Endpoints"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "REVIEW REQUEST TESTING: Need to verify GET /api/admin/users returns active users (deleted=false) and GET /api/admin/deleted-users returns deleted users (deleted=true)."
+      - working: true
+        agent: "testing"
+        comment: "✅ ADMIN USER LISTING VERIFIED: Both user listing endpoints working correctly. ✅ ACTIVE USERS: GET /api/admin/users returns 6 active users with deleted=false (or not present) ✅ DELETED USERS: GET /api/admin/deleted-users returns deleted users with deleted=true ✅ DATA VALIDATION: No deleted users found in active list, no active users found in deleted list ✅ RESPONSE FORMAT: Both endpoints return proper JSON arrays with user data. User listing functionality working as expected."
+
 agent_communication:
+    - agent: "testing"
+      message: "ADMIN PANEL TESTING COMPLETED SUCCESSFULLY: Comprehensive testing of all admin panel functionalities specified in review request completed with 100% success rate. ✅ PERMANENT USER DELETION (BUG FIXED): Complete flow working - create user → soft delete → verify in deleted list → permanent delete → verify removal. Bug fix confirmed working with deleted_count=1 returned and user completely removed from system. ✅ AUTHENTICATION FLOW: Login with ur1fs/@Fred1807 credentials successful, returns access_token, confirms ADMIN role, enables access to protected endpoints. ✅ USER LISTING: Both GET /api/admin/users (active users) and GET /api/admin/deleted-users (deleted users) working correctly with proper data filtering. All review request requirements met - admin panel fully functional."
     - agent: "testing"
       message: "CRITICAL REVIEW REQUEST INVESTIGATION COMPLETED: Both 'Diagnóstico Detalhado' and 'Interação Medicamentosa' pages have CRITICAL frontend-backend integration failures. Forms appear functional but make 0 API calls to backend. Users see working UI but receive no actual medical analysis. This confirms the exact issue reported in the review request. Immediate frontend integration repair required for both pages."
     - agent: "testing"
