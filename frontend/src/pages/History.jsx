@@ -126,7 +126,7 @@ const History = () => {
                       <TableCell className="font-medium text-muted-foreground">
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4" />
-                          {format(new Date(entry.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                          {formatDate(entry.created_at)}
                         </div>
                       </TableCell>
                       <TableCell>
