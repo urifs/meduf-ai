@@ -261,7 +261,7 @@ const UserManagementTabs = ({
                                   <AlertDialogFooter>
                                     <AlertDialogCancel>Cancelar</AlertDialogCancel>
                                     <AlertDialogAction
-                                      onClick={() => onPermanentDeleteUser(user.id)}
+                                      onClick={() => onPermanentDeleteUser(user.email)}
                                       className="bg-red-600 hover:bg-red-700"
                                     >
                                       Excluir Permanentemente
