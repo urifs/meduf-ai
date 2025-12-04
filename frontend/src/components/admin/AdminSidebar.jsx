@@ -68,10 +68,19 @@ const AdminSidebar = ({
         <CardHeader>
           <CardTitle>Últimas Consultas</CardTitle>
           <CardDescription>Atividade recente na plataforma.</CardDescription>
+          <div className="relative mt-3">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por paciente, médico ou diagnóstico..."
+              className="pl-8 text-sm"
+              value={consultationsSearchTerm}
+              onChange={(e) => setConsultationsSearchTerm(e.target.value)}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2">
-            {consultations.length === 0 ? (
+            {filteredConsultations.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground text-sm">
                 Nenhuma consulta registrada ainda.
               </div>
