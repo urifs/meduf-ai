@@ -202,7 +202,12 @@ const Admin = () => {
         </div>
 
         {/* Online Users Section */}
-        <OnlineUsersSection />
+        <OnlineUsersSection 
+          onUserClick={(user) => {
+            setSelectedUserProfile(user);
+            setIsProfileOpen(true);
+          }}
+        />
 
         {/* Feedbacks Section */}
         <FeedbackSection
