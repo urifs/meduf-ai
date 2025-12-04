@@ -38,7 +38,8 @@ const UserManagementTabs = ({
   onChangeExpiration,
   onToggleStatus,
   onDeleteUser,
-  onReactivateUser
+  onReactivateUser,
+  onPermanentDeleteUser
 }) => {
   const filteredUsers = users.filter(user => 
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
