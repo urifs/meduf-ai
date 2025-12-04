@@ -625,20 +625,28 @@ async def get_admin_consultations(current_user: UserInDB = Depends(get_current_a
 
 @app.get("/api/admin/stats/online")
 async def get_online_stats(current_user: UserInDB = Depends(get_current_active_user)):
-    """Get online users stats (admin only)"""
+    """Get online users stats (admin only) - users active in the last 5 minutes"""
     if current_user.role != "ADMIN":
         raise HTTPException(status_code=403, detail="Admin only")
     
-    # Count users who have valid expiration dates and are not deleted
+    # Count users who had activity in the last 5 minutes
     now = datetime.now(timezone.utc)
-    count = await users_collection.count_documents({
-        "deleted": {"$ne": True},
-        "$or": [
-            {"expiration_date": {"$exists": False}},
-            {"expiration_date": {"$gte": now}}
-        ]
-    })
-    return {"online_count": count, "online": count}
+    five_minutes_ago = now - timedelta(minutes=5)
+    
+    # Check consultations collection for recent activity
+    recent_consultations = await consultations_collection.find({
+        "timestamp": {"$gte": five_minutes_ago}
+    }).to_list(None)
+    
+    # Get unique user emails from recent consultations
+    active_user_emails = set()
+    for consultation in recent_consultations:
+        user_email = consultation.get("user_email")
+        if user_email:
+            active_user_emails.add(user_email)
+    
+    online_count = len(active_user_emails)
+    return {"online_count": online_count, "online": online_count}
 
 
 @app.get("/api/admin/usage-stats/monthly")
