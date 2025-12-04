@@ -265,6 +265,54 @@ backend:
 user_problem_statement: "Test the Free AI Consultation (Consulta Livre com IA) functionality in Meduf AI after bug fix"
 
 frontend:
+  - task: "Fix 1 - Página Principal Abre no Topo"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/Selection.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE TESTING COMPLETED: After login with teste.chat@meduf.com/Teste123, Selection page opens at scroll position 0px (perfect top position) showing diagnostic cards (Diagnóstico Simples, Diagnóstico Detalhado, etc.) immediately visible. Does NOT auto-scroll to chat section at bottom. The useEffect with window.scrollTo(0, 0) on line 16 is working correctly. Fix verified working perfectly for both regular user and admin credentials."
+
+  - task: "Fix 2 - Histórico de Conversas com IA no Menu"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/Header.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE TESTING COMPLETED: New 'Minhas Conversas IA' option successfully added to hamburger menu (lines 268-274 in Header.jsx). Menu option visible and functional, successfully navigates to /chat-history page, displays previous conversations (5 conversations found during testing), modal opens with full conversation details, copy buttons present and functional. Both regular user (teste.chat@meduf.com) and admin (ur1fs) can access this feature. ChatHistory.jsx page loads correctly with proper title and conversation list."
+
+  - task: "Fix 3 - Botão Salvar Alterações no Perfil"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/Profile.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE TESTING COMPLETED: Profile page loads correctly with 'Meu Perfil' title. 'Salvar Alterações' button present and functional (lines 237-248 in Profile.jsx). Successfully tested updating name field to 'Teste Chat Atualizado' and bio field to 'Médico especialista em testes'. Button triggers handleSave function, makes PATCH request to /api/users/me, and updates localStorage. Works for both regular users and admin. Backend API responds with 200 OK confirming successful updates."
+
+  - task: "Fix 4 - Histórico de Consultas Funcionando"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/History.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE TESTING COMPLETED: History page loads without the previous 'history.filter is not a function' error. Page displays proper 'Histórico de Análises' title, shows 'Nenhum registro encontrado' empty state correctly when no consultations exist. The bug fix on line 31 (setHistory(Array.isArray(response.data) ? response.data : [])) ensures response.data is always treated as an array. No JavaScript errors detected during testing. Backend API calls successful (200 OK responses). Both user types can access without issues."
+
   - task: "Free AI Consultation - Single Message Test"
     implemented: true
     working: true
