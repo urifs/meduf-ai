@@ -497,19 +497,34 @@ async def toggle_user_status(
         raise HTTPException(status_code=403, detail="Admin only")
     
     try:
-        user = await users_collection.find_one({"email": user_id})
+        # Try to find user by _id first, then by email as fallback
+        try:
+            user = await users_collection.find_one({"_id": ObjectId(user_id)})
+        except:
+            user = await users_collection.find_one({"email": user_id})
+        
         if not user:
             raise HTTPException(status_code=404, detail="Usuário não encontrado")
         
         new_deleted_status = not user.get("deleted", False)
         
-        await users_collection.update_one(
-            {"email": user_id},
-            {"$set": {
-                "deleted": new_deleted_status,
-                "deleted_at": datetime.now(timezone.utc) if new_deleted_status else None
-            }}
-        )
+        # Update using the same identifier we found the user with
+        try:
+            await users_collection.update_one(
+                {"_id": ObjectId(user_id)},
+                {"$set": {
+                    "deleted": new_deleted_status,
+                    "deleted_at": datetime.now(timezone.utc) if new_deleted_status else None
+                }}
+            )
+        except:
+            await users_collection.update_one(
+                {"email": user_id},
+                {"$set": {
+                    "deleted": new_deleted_status,
+                    "deleted_at": datetime.now(timezone.utc) if new_deleted_status else None
+                }}
+            )
         
         new_status = "Inativo" if new_deleted_status else "Ativo"
         
