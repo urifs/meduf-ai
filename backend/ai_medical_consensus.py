@@ -371,10 +371,15 @@ async def analyze_dose_calculator(patient_data: Dict[str, Any], medications: Lis
         Dict com prescrição detalhada formatada em HTML
     """
     try:
+        # Generate unique session ID for this calculation
+        import uuid
+        session_id = str(uuid.uuid4())
+        
         # Create chat instance with Gemini 2.0 Flash
         chat = LlmChat(
             api_key=EMERGENT_KEY,
-            system_message="Você é um farmacologista clínico especializado em cálculos de dose. Forneça prescrições detalhadas, técnicas e completas para médicos."
+            session_id=session_id,
+            system_message="Você é um farmacologista clínico especializado para médicos especialistas. Forneça análises farmacológicas técnicas, baseadas em evidências científicas, com terminologia médica apropriada e referências a guidelines internacionais."
         ).with_model("gemini", GEMINI_MODEL)
         
         # Build patient context
