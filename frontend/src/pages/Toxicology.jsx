@@ -242,6 +242,7 @@ const Toxicology = () => {
             )}
           </div>
         </div>
+        <FooterLogo />
       </main>
       <Toaster />
     </div>
