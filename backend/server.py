@@ -95,6 +95,7 @@ class UserInDB(BaseModel):
     bio: Optional[str] = None
     expiration_date: Optional[datetime] = None
     deleted: bool = False
+    active_session_token: Optional[str] = None  # Token da sessão ativa
 
 class Token(BaseModel):
     access_token: str
