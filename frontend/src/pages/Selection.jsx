@@ -63,7 +63,7 @@ const Selection = () => {
       glow: "hover:shadow-[0_0_40px_rgba(249,115,22,0.3)]"
     },
     {
-      title: "Toxicologia",
+      title: "Guia Toxicológico",
       description: "Protocolo de intoxicação",
       detail: "ABCDE, descontaminação, antídotos específicos e suporte avançado para intoxicações.",
       icon: Skull,
