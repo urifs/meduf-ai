@@ -1073,7 +1073,7 @@ RESPOSTA TÉCNICA:"""
 
 @app.get("/api/admin/chat-history")
 async def get_all_chat_history(
-    current_user: UserInDB = Depends(get_current_admin_user)
+    current_user: UserInDB = Depends(get_current_active_user)
 ):
     """Get all chat history for admin panel"""
     try:
