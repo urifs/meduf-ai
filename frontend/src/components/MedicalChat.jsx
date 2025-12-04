@@ -123,17 +123,26 @@ const MedicalChat = () => {
                 key={idx}
                 className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
               >
-                <div className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center ${
-                  msg.role === 'user' 
-                    ? 'bg-blue-500' 
-                    : 'bg-gradient-to-br from-violet-500 to-purple-600'
-                }`}>
-                  {msg.role === 'user' ? (
-                    <User className="h-4 w-4 text-white" />
+                {msg.role === 'user' ? (
+                  // User avatar - show profile picture if available
+                  userAvatar ? (
+                    <Avatar className="h-8 w-8 flex-shrink-0">
+                      <AvatarImage src={getAvatarUrl(userAvatar)} alt={userName} />
+                      <AvatarFallback className="bg-blue-500 text-white text-xs">
+                        {userName?.charAt(0)?.toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
                   ) : (
-                    <Bot className="h-4 w-4 text-white" />
-                  )}
-                </div>
+                    <div className="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center bg-blue-500">
+                      <User className="h-4 w-4 text-white" />
+                    </div>
+                  )
+                ) : (
+                  // Meduf AI logo for assistant
+                  <div className="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-600 shadow-sm">
+                    <BrainCircuit className="h-4 w-4 text-white" />
+                  </div>
+                )}
                 
                 <div className={`flex-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
                   <div className={`inline-block p-3 rounded-lg max-w-[85%] ${
