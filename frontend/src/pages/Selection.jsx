@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { FileText, Sparkles, Syringe, Activity, Skull, ArrowRight, Zap } from 'lucide-react';
+import { FileText, Sparkles, Syringe, Activity, Skull, ArrowRight, Zap, Calculator } from 'lucide-react';
 import MedicalChat from '@/components/MedicalChat';
 import FooterLogo from '@/components/FooterLogo';
 import '../styles/animations.css';
