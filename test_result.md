@@ -540,8 +540,8 @@ frontend:
 
 metadata:
   created_by: "testing_agent"
-  version: "8.0"
-  test_sequence: 22
+  version: "9.0"
+  test_sequence: 23
   run_ui: true
   test_completed: true
   all_tests_passed: true
@@ -559,6 +559,13 @@ metadata:
   chat_copy_button_tested: true
   admin_chat_features_verified: true
   three_new_functionalities_tested: true
+  four_fixes_testing_completed: true
+  page_scroll_fix_verified: true
+  chat_history_menu_verified: true
+  profile_save_button_verified: true
+  history_error_fix_verified: true
+  modal_copy_buttons_tested: true
+  both_credentials_tested: true
 
 test_plan:
   current_focus: []
