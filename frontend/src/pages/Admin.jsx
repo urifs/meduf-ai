@@ -42,7 +42,6 @@ const Admin = () => {
     onlineCount,
     isLoading,
     lastUpdated,
-    monthlyUsage,
     deletedUsers,
     chatHistory,
     chatStats,
