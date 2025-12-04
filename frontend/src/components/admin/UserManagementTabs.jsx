@@ -227,15 +227,49 @@ const UserManagementTabs = ({
                             {formatDate(user.deleted_at)}
                           </TableCell>
                           <TableCell className="text-right">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="text-green-600 border-green-300 hover:bg-green-50"
-                              onClick={() => onReactivateUser(user)}
-                            >
-                              <RotateCcw className="h-4 w-4 mr-2" />
-                              Reativar
-                            </Button>
+                            <div className="flex gap-2 justify-end">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-green-600 border-green-300 hover:bg-green-50"
+                                onClick={() => onReactivateUser(user)}
+                              >
+                                <RotateCcw className="h-4 w-4 mr-2" />
+                                Reativar
+                              </Button>
+                              
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-red-600 border-red-300 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Excluir Definitivamente
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Excluir Definitivamente?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Esta ação é <strong>PERMANENTE</strong> e não pode ser desfeita. 
+                                      O usuário <strong>{user.name}</strong> ({user.email}) será 
+                                      removido completamente do banco de dados.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => onPermanentDeleteUser(user.id)}
+                                      className="bg-red-600 hover:bg-red-700"
+                                    >
+                                      Excluir Permanentemente
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))
