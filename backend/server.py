@@ -444,6 +444,19 @@ async def get_admin_users(current_user: UserInDB = Depends(get_current_active_us
         # Add id field from username or email
         doc["id"] = doc.get("username", doc.get("email", ""))
         doc["status"] = "Ativo" if not doc.get("deleted") else "Inativo"
+        
+        # Convert datetime fields to UTC aware
+        if "created_at" in doc:
+            doc["created_at"] = ensure_utc_timezone(doc["created_at"])
+        if "expiration_date" in doc:
+            doc["expiration_date"] = ensure_utc_timezone(doc["expiration_date"])
+        if "deleted_at" in doc:
+            doc["deleted_at"] = ensure_utc_timezone(doc["deleted_at"])
+        if "reactivated_at" in doc:
+            doc["reactivated_at"] = ensure_utc_timezone(doc["reactivated_at"])
+        if "last_activity" in doc:
+            doc["last_activity"] = ensure_utc_timezone(doc["last_activity"])
+            
         users.append(doc)
     return users
 
