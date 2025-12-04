@@ -390,6 +390,8 @@ async def analyze_dose_calculator(patient_data: Dict[str, Any], medications: Lis
             patient_context += f"\n- Idade: {patient_data['age']}"
         if patient_data.get("height"):
             patient_context += f"\n- Altura: {patient_data['height']} cm"
+        if patient_data.get("sex"):
+            patient_context += f"\n- Sexo: {patient_data['sex']}"
         if patient_data.get("specialConditions"):
             patient_context += f"\n- Condições especiais: {patient_data['specialConditions']}"
         
