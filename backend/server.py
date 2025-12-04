@@ -1215,6 +1215,30 @@ async def get_my_chat_history(
         raise HTTPException(status_code=500, detail="Erro ao buscar histórico de conversas")
 
 
+@app.delete("/api/chat-history/{chat_id}")
+async def delete_chat_history(
+    chat_id: str,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Delete a specific chat from user's history"""
+    try:
+        result = await chat_history_collection.delete_one({
+            "id": chat_id,
+            "user_id": current_user.id
+        })
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Conversa não encontrada")
+        
+        return {"message": "Conversa excluída com sucesso"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error deleting chat: {e}")
+        raise HTTPException(status_code=500, detail="Erro ao excluir conversa")
+
+
+
 # ===== ADMIN CHAT HISTORY =====
 
 @app.get("/api/admin/chat-history")
