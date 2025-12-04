@@ -595,6 +595,34 @@ async def get_deleted_users(current_user: UserInDB = Depends(get_current_active_
     return users
 
 
+@app.post("/api/feedback")
+async def submit_feedback(
+    feedback_data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Submit user feedback"""
+    try:
+        feedback = {
+            "user_id": current_user.email,
+            "user_email": current_user.email,
+            "user_name": current_user.username,
+            "analysis_type": feedback_data.get("analysis_type", "unknown"),
+            "is_helpful": feedback_data.get("is_helpful", True),
+            "result_data": feedback_data.get("result_data", {}),
+            "timestamp": datetime.now(timezone.utc)
+        }
+        
+        result = await db.feedbacks.insert_one(feedback)
+        
+        return {
+            "id": str(result.inserted_id),
+            "message": "Feedback enviado com sucesso"
+        }
+    except Exception as e:
+        print(f"Error saving feedback: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/feedbacks")
 async def get_feedbacks(current_user: UserInDB = Depends(get_current_active_user)):
     """Get all feedbacks"""
@@ -602,8 +630,10 @@ async def get_feedbacks(current_user: UserInDB = Depends(get_current_active_user
         raise HTTPException(status_code=403, detail="Admin only")
     
     feedbacks = []
-    cursor = db.feedbacks.find({}, {"_id": 0}).sort("timestamp", -1).limit(500)
+    cursor = db.feedbacks.find({}).sort("timestamp", -1).limit(500)
     async for doc in cursor:
+        # Convert ObjectId to string
+        doc["_id"] = str(doc["_id"])
         feedbacks.append(doc)
     return feedbacks
 
