@@ -101,6 +101,7 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     user_name: str
+    user_email: str
     user_role: str
     expiration_date: Optional[str] = None
     avatar_url: Optional[str] = ""
