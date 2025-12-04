@@ -518,21 +518,62 @@ async def delete_user(
     user_id: str,
     current_user: UserInDB = Depends(get_current_active_user)
 ):
-    """Delete user permanently (admin only)"""
+    """Soft delete user (admin only)"""
     if current_user.role != "ADMIN":
         raise HTTPException(status_code=403, detail="Admin only")
     
     try:
-        result = await users_collection.delete_one({"email": user_id})
+        # Soft delete instead of permanent delete
+        result = await users_collection.update_one(
+            {"email": user_id},
+            {"$set": {
+                "deleted": True,
+                "deleted_at": datetime.now(timezone.utc)
+            }}
+        )
         
-        if result.deleted_count == 0:
+        if result.modified_count == 0:
             raise HTTPException(status_code=404, detail="Usuário não encontrado")
         
-        return {"message": "Usuário excluído permanentemente"}
+        return {"message": "Usuário excluído com sucesso"}
     except HTTPException:
         raise
     except Exception as e:
         print(f"Error deleting user: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/admin/users/{user_id}/reactivate")
+async def reactivate_user(
+    user_id: str,
+    data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Reactivate deleted/expired user (admin only)"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    try:
+        days_valid = data.get("days_valid", 30)
+        new_expiration = datetime.now(timezone.utc) + timedelta(days=days_valid)
+        
+        result = await users_collection.update_one(
+            {"email": user_id},
+            {"$set": {
+                "deleted": False,
+                "deleted_at": None,
+                "expiration_date": new_expiration
+            }}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
+        
+        return {"message": f"Usuário reativado com {days_valid} dias de validade"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error reactivating user: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
