@@ -634,7 +634,7 @@ metadata:
   four_fixes_testing_completed: true
   page_scroll_fix_verified: true
   chat_history_menu_verified: true
-  profile_save_button_verified: false
+  profile_save_button_verified: true
   history_error_fix_verified: true
   modal_copy_buttons_tested: true
   both_credentials_tested: true
