@@ -143,6 +143,14 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         if not user:
             raise HTTPException(status_code=401, detail="User not found")
         
+        # Verificar se o token é o token da sessão ativa
+        active_token = user.get("active_session_token")
+        if active_token and active_token != token:
+            raise HTTPException(
+                status_code=401, 
+                detail="Sessão expirada. Sua conta foi conectada em outro dispositivo."
+            )
+        
         return UserInDB(
             id=str(user["_id"]),
             email=user["email"],
@@ -152,7 +160,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             avatar_url=user.get("avatar_url"),
             bio=user.get("bio", ""),
             expiration_date=user.get("expiration_date"),
-            deleted=user.get("deleted", False)
+            deleted=user.get("deleted", False),
+            active_session_token=user.get("active_session_token")
         )
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
