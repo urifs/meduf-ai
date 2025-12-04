@@ -10,7 +10,6 @@ const useAdminData = (userRole, navigate) => {
   const [onlineCount, setOnlineCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(new Date());
-  const [monthlyUsage, setMonthlyUsage] = useState(null);
   const [deletedUsers, setDeletedUsers] = useState([]);
   const [chatHistory, setChatHistory] = useState([]);
   const [chatStats, setChatStats] = useState(null);
