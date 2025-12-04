@@ -169,16 +169,19 @@ const Selection = () => {
             })}
           </div>
 
-          {/* Medical Chat - Free Consultation */}
-          <div className={`mt-16 ${mounted ? 'animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '700ms' }}>
-            <MedicalChat />
+          {/* Info Banner - Above Chat */}
+          <div className={`mt-16 text-center ${mounted ? 'animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '700ms' }}>
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20 backdrop-blur-sm shadow-sm">
+              <Zap className="h-4 w-4 text-violet-600" />
+              <p className="text-sm font-medium text-violet-700 dark:text-violet-400">
+                Converse livremente com o assistente IA - Análises com consenso de múltiplas IAs e base de dados PubMed
+              </p>
+            </div>
           </div>
 
-          {/* Bottom Info */}
-          <div className={`mt-12 text-center ${mounted ? 'animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '800ms' }}>
-            <p className="text-sm text-muted-foreground">
-              Todas as análises utilizam consenso de múltiplas IAs e base de dados PubMed
-            </p>
+          {/* Medical Chat - Free Consultation */}
+          <div className={`mt-6 ${mounted ? 'animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '800ms' }}>
+            <MedicalChat />
           </div>
 
           {/* Footer Logo */}
