@@ -573,8 +573,8 @@ test_plan:
   current_focus: []
   stuck_tasks: []
   test_all: false
-  test_priority: "admin_validity_update_flow_completed"
-  test_summary: "🎉 ADMIN PANEL ACCOUNT VALIDITY UPDATE FLOW TESTING COMPLETED WITH 100% SUCCESS! Complete testing of account validity management functionality: ✅ Authentication: Login with ur1fs/@Fred1807 successful ✅ User Management: Located 'Dr. Teste Silva' (teste@meduf.com) in user list ✅ Actions Menu: Three dots menu working with 'Alterar Validade' option ✅ Modal Functionality: 'Alterar Validade da Conta' modal opens correctly ✅ Input Validation: Successfully filled '90' days in input field ✅ Save Operation: 'Salvar Alteração' button working ✅ Table Update: Validity updated to approximately 90 days (89 dias displayed) ✅ Component Integration: ExpirationDialog component working properly. Minor: Block/unblock functionality encountered UI overlay issues but core validity update flow working perfectly. ALL SUCCESS CRITERIA MET!"
+  test_priority: "online_users_counter_bug_fix_completed"
+  test_summary: "🎉 ONLINE USERS COUNTER BUG FIX VERIFICATION COMPLETED WITH 100% SUCCESS! Complete testing of online users counter functionality after bug fix: ✅ Authentication: Login with ur1fs/@Fred1807 successful ✅ Counter Display: 'Usuários Online' card showing 2 users (not 44 total) ✅ Text Verification: 'Nos últimos 5 minutos' text present ✅ Multiple Users Test: Second user login successful, counter increased from 2 to 3 ✅ Real-time Updates: Counter reflects actual user activity in last 5 minutes ✅ Validation Passed: Number within expected range (1-5) for truly online users ✅ Bug Fix Confirmed: Counter now correctly shows recent activity instead of total registered users. ALL SUCCESS CRITERIA MET!"
 
 frontend:
   - task: "Toxicology Feature - Backend AI Engine Integration - Paracetamol"
