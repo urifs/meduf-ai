@@ -37,6 +37,25 @@ const ChatHistory = () => {
     }
   };
 
+  const handleDelete = async (chatId, e) => {
+    e.stopPropagation();
+    if (!window.confirm('Deseja realmente excluir esta conversa?')) {
+      return;
+    }
+    try {
+      await api.delete(`/chat-history/${chatId}`);
+      setChatHistory(chatHistory.filter(chat => chat.id !== chatId));
+      if (selectedChat?.id === chatId) {
+        setSelectedChat(null);
+        setIsDialogOpen(false);
+      }
+      toast.success('Conversa excluída com sucesso.');
+    } catch (error) {
+      console.error("Error deleting chat:", error);
+      toast.error('Erro ao excluir conversa.');
+    }
+  };
+
   const handleCopy = async (text, type) => {
     try {
       await navigator.clipboard.writeText(text);
