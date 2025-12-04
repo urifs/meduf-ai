@@ -223,6 +223,9 @@ const Admin = () => {
           formatDate={formatDate}
         />
 
+        {/* Online Users Section */}
+        <OnlineUsersSection />
+
         {/* Modals */}
         <ReactivationDialog
           isOpen={isReactivateOpen}
