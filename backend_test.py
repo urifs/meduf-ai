@@ -793,6 +793,11 @@ class BackendTester:
         
         start_time = time.time()
         try:
+            # Ensure we have a fresh authentication token
+            if not self.token:
+                if not self.authenticate():
+                    return False
+            
             # Test GET /api/admin/users (active users)
             response = self.session.get(f"{BACKEND_URL}/admin/users")
             duration = time.time() - start_time
