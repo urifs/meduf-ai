@@ -555,8 +555,8 @@ frontend:
 
 metadata:
   created_by: "testing_agent"
-  version: "9.0"
-  test_sequence: 23
+  version: "10.0"
+  test_sequence: 24
   run_ui: true
   test_completed: true
   all_tests_passed: true
@@ -581,6 +581,9 @@ metadata:
   history_error_fix_verified: true
   modal_copy_buttons_tested: true
   both_credentials_tested: true
+  meduf_20_clinic_model_verified: true
+  model_branding_correct: true
+  no_gemini_references_found: true
 
 test_plan:
   current_focus: []
