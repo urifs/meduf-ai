@@ -82,10 +82,10 @@ const AdminSidebar = ({
           <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2">
             {filteredConsultations.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground text-sm">
-                Nenhuma consulta registrada ainda.
+                {consultationsSearchTerm ? 'Nenhuma consulta encontrada com os termos de busca.' : 'Nenhuma consulta registrada ainda.'}
               </div>
             ) : (
-              consultations.map((consult, i) => (
+              filteredConsultations.map((consult, i) => (
                 <div 
                   key={i} 
                   className="flex items-start gap-4 pb-4 border-b last:border-0 last:pb-0 cursor-pointer hover:bg-slate-50 p-2 rounded-md transition-colors"
