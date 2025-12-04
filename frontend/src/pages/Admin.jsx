@@ -75,7 +75,8 @@ const Admin = () => {
     setSelectedUserForReactivation,
     reactivationDays,
     setReactivationDays,
-    handleReactivateUser
+    handleReactivateUser,
+    handlePermanentDeleteUser
   } = useUserActions(fetchData, users, setUsers);
 
   // Helper Functions
