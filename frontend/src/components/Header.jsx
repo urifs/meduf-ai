@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Activity, Stethoscope, User, FileText, ClipboardList, Pill, AlertCircle, CheckCircle2, BrainCircuit, LogOut, Shield, Menu, Clock, Settings, Database, Bell, HelpCircle, Moon, Sun, Instagram, MessageSquare } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { differenceInDays, intervalToDuration } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTheme } from "@/contexts/ThemeContext";
 
-export const Header = () => {
+export const Header = memo(() => {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, toggleTheme, isDark } = useTheme();
