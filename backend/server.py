@@ -497,7 +497,14 @@ async def get_admin_users(current_user: UserInDB = Depends(get_current_active_us
         raise HTTPException(status_code=403, detail="Admin only")
     
     users = []
-    cursor = users_collection.find({"deleted": {"$ne": True}}).sort("created_at", -1).limit(1000)
+    # Project only necessary fields to reduce payload size
+    projection = {
+        "_id": 1, "email": 1, "name": 1, "username": 1, "role": 1, "deleted": 1,
+        "created_at": 1, "expiration_date": 1, "deleted_at": 1, "reactivated_at": 1,
+        "last_activity": 1, "status": 1
+        # Exclude avatar_url to reduce payload
+    }
+    cursor = users_collection.find({"deleted": {"$ne": True}}, projection).sort("created_at", -1).limit(1000)
     async for doc in cursor:
         doc["_id"] = str(doc["_id"])
         # Add id field from username or email
