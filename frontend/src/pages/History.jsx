@@ -156,7 +156,14 @@ const History = () => {
                               <DialogHeader>
                                 <DialogTitle>Detalhes da Análise</DialogTitle>
                                 <DialogDescription>
-                                  Realizada em {format(new Date(entry.created_at), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR })}
+                                  Realizada em {entry.created_at ? (() => {
+                                    try {
+                                      const date = new Date(entry.created_at);
+                                      return !isNaN(date.getTime()) ? format(date, "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR }) : "-";
+                                    } catch (e) {
+                                      return "-";
+                                    }
+                                  })() : "-"}
                                 </DialogDescription>
                               </DialogHeader>
                               
