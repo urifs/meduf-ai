@@ -200,10 +200,10 @@ const Admin = () => {
           formatDate={formatDate}
           onViewFeedback={(feedback) => {
             setSelectedConsultation({
-              doctor: feedback.user_email,
+              doctor: feedback.user_name || feedback.user_email,
               date: feedback.timestamp,
-              patient: {},
-              report: feedback.analysis_data
+              patient: feedback.patient_data || {},
+              report: feedback.result_data || feedback.analysis_data || {}
             });
             setIsConsultationOpen(true);
           }}
