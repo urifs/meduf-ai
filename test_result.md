@@ -247,7 +247,7 @@ backend:
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the Registration Flow for Meduf Ai without the CRM field"
+user_problem_statement: "Test the Free AI Consultation (Consulta Livre com IA) functionality in Meduf AI after bug fix"
 
 frontend:
   - task: "Authentication Route Protection"
