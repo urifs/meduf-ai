@@ -50,10 +50,10 @@ const History = () => {
     }
   };
 
-  const filteredHistory = history.filter(item => 
-    (item.patient.queixa && item.patient.queixa.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (item.report.diagnoses && item.report.diagnoses[0].name.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredHistory = Array.isArray(history) ? history.filter(item => 
+    (item.patient?.queixa && item.patient.queixa.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (item.report?.diagnoses && item.report.diagnoses[0]?.name?.toLowerCase().includes(searchTerm.toLowerCase()))
+  ) : [];
 
   return (
     <div className="min-h-screen bg-background font-sans">
