@@ -47,6 +47,20 @@ const ConsultationDialog = ({
             {selectedConsultation.report ? (
               typeof selectedConsultation.report === 'object' && selectedConsultation.report.diagnoses ? (
                 <ClinicalReport data={selectedConsultation.report} />
+              ) : selectedConsultation.report.prescription ? (
+                <Card>
+                  <CardHeader className="bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-950/20 dark:to-rose-950/20 border-b border-red-100">
+                    <CardTitle className="text-xl bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">
+                      Prescrição Farmacológica
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div 
+                      className="prose prose-slate dark:prose-invert max-w-none"
+                      dangerouslySetInnerHTML={{ __html: selectedConsultation.report.prescription }}
+                    />
+                  </CardContent>
+                </Card>
               ) : (
                 <Card>
                   <CardHeader>
