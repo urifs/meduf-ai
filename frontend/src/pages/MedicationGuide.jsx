@@ -54,7 +54,7 @@ const MedicationGuide = () => {
 
       try {
         await api.post('/consultations', {
-          patient: { queixa: `[Guia Terapêutico] ${symptoms}`, idade: "N/I", sexo: "N/I" },
+          patient: { queixa: `[Guia Farmacológico] ${symptoms}`, idade: "N/I", sexo: "N/I" },
           report: { 
             diagnoses: [{ name: "Consulta Terapêutica com IA", justification: "Consenso de 3 IAs" }],
             medications: aiMedications.medications?.map(m => ({ 
