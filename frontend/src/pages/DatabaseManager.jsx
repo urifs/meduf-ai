@@ -357,7 +357,7 @@ const DatabaseManager = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-
+        <FooterLogo />
       </main>
     </div>
   );
