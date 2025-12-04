@@ -437,7 +437,8 @@ async def create_user(
             "expiration_date": expiration_date,
             "created_at": datetime.now(timezone.utc),
             "deleted": False,
-            "session_id": str(uuid4())
+            "session_id": str(uuid4()),
+            "avatar_url": ""
         }
         
         result = await users_collection.insert_one(new_user)
