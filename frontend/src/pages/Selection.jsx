@@ -154,8 +154,13 @@ const Selection = () => {
             })}
           </div>
 
+          {/* Medical Chat - Free Consultation */}
+          <div className={`mt-16 ${mounted ? 'animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '700ms' }}>
+            <MedicalChat />
+          </div>
+
           {/* Bottom Info */}
-          <div className={`mt-16 text-center ${mounted ? 'animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '600ms' }}>
+          <div className={`mt-12 text-center ${mounted ? 'animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '800ms' }}>
             <p className="text-sm text-muted-foreground">
               Todas as análises utilizam consenso de múltiplas IAs e base de dados PubMed
             </p>
