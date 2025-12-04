@@ -60,7 +60,7 @@ const OnlineUsersSection = ({ onUserClick }) => {
   };
 
   return (
-    <Card className="mt-8 border-green-200 dark:border-green-900/30">
+    <Card className="border-green-200 dark:border-green-900/30">
       <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-b border-green-100 dark:border-green-900/30">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
