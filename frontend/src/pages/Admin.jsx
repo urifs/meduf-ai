@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
+import FooterLogo from '@/components/FooterLogo';
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
