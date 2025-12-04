@@ -186,23 +186,43 @@ const History = () => {
                               </DialogHeader>
                               
                               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-                                <div className="md:col-span-1 space-y-4">
-                                  <Card>
-                                    <CardHeader className="pb-2">
-                                      <CardTitle className="text-sm font-medium text-muted-foreground">Dados do Paciente</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="text-sm space-y-2">
-                                      <div><span className="font-semibold">Idade:</span> {entry.patient.idade}</div>
-                                      <div><span className="font-semibold">Sexo:</span> {entry.patient.sexo}</div>
-                                      <div><span className="font-semibold">Queixa:</span> {entry.patient.queixa}</div>
-                                      {entry.patient.historico && (
-                                        <div><span className="font-semibold">Histórico:</span> {entry.patient.historico}</div>
-                                      )}
-                                    </CardContent>
-                                  </Card>
-                                </div>
-                                <div className="md:col-span-2">
-                                  <ClinicalReport data={entry.report} />
+                                {entry.patient && Object.keys(entry.patient).length > 0 && (
+                                  <div className="md:col-span-1 space-y-4">
+                                    <Card>
+                                      <CardHeader className="pb-2">
+                                        <CardTitle className="text-sm font-medium text-muted-foreground">Dados do Paciente</CardTitle>
+                                      </CardHeader>
+                                      <CardContent className="text-sm space-y-2">
+                                        {entry.patient.idade && <div><span className="font-semibold">Idade:</span> {entry.patient.idade}</div>}
+                                        {entry.patient.sexo && <div><span className="font-semibold">Sexo:</span> {entry.patient.sexo}</div>}
+                                        {entry.patient.peso && <div><span className="font-semibold">Peso:</span> {entry.patient.peso}</div>}
+                                        {entry.patient.altura && <div><span className="font-semibold">Altura:</span> {entry.patient.altura}</div>}
+                                        {entry.patient.queixa && <div><span className="font-semibold">Queixa:</span> {entry.patient.queixa}</div>}
+                                        {entry.patient.historico && (
+                                          <div><span className="font-semibold">Histórico:</span> {entry.patient.historico}</div>
+                                        )}
+                                      </CardContent>
+                                    </Card>
+                                  </div>
+                                )}
+                                <div className={entry.patient && Object.keys(entry.patient).length > 0 ? "md:col-span-2" : "md:col-span-3"}>
+                                  {entry.report?.prescription ? (
+                                    <Card>
+                                      <CardHeader className="bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-950/20 dark:to-rose-950/20 border-b border-red-100">
+                                        <CardTitle className="text-xl bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">
+                                          Prescrição Farmacológica
+                                        </CardTitle>
+                                      </CardHeader>
+                                      <CardContent className="p-6">
+                                        <div 
+                                          className="prose prose-slate dark:prose-invert max-w-none"
+                                          dangerouslySetInnerHTML={{ __html: entry.report.prescription }}
+                                        />
+                                      </CardContent>
+                                    </Card>
+                                  ) : (
+                                    <ClinicalReport data={entry.report} />
+                                  )}
                                 </div>
                               </div>
                             </DialogContent>
