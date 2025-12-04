@@ -110,6 +110,7 @@ const Admin = () => {
     totalConsultations: consultations.length,
     totalAdmins: users.filter(u => u.role === 'ADMIN').length,
     totalNormalUsers: users.filter(u => u.role === 'USER').length,
+    totalDeleted: deletedUsers.length,
   };
 
   if (userRole !== 'ADMIN') return null;
