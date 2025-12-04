@@ -51,18 +51,14 @@ const Profile = () => {
   // Helper to resolve avatar URL
   const getAvatarUrl = (url) => {
     if (!url) return '';
+    // If it's already a data URL (base64), return as is
+    if (url.startsWith('data:')) return url;
+    // If it's an absolute URL, return as is
     if (url.startsWith('http')) return url;
     // If relative path, prepend backend URL
-    // Use window.location.origin if REACT_APP_BACKEND_URL is not set or relative
     const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
-    // Ensure we don't double slash if backendUrl ends with / and url starts with /
     const cleanBackendUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
     const cleanUrl = url.startsWith('/') ? url : `/${url}`;
-    
-    // If the url already contains /api/static, we just need to prepend the domain if it's missing
-    // But wait, if we are in production, the backend URL might be the same as frontend URL (served via nginx)
-    // If REACT_APP_BACKEND_URL is set to the preview URL, it should work.
-    
     return `${cleanBackendUrl}${cleanUrl}`;
   };
 
