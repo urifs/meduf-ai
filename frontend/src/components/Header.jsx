@@ -313,7 +313,7 @@ export const Header = () => {
                   </button>
                 </div>
 
-                {/* Support Button */}
+                {/* Support & Social Links */}
                 <div className="pt-4 border-t space-y-2">
                   <a 
                     href="https://api.whatsapp.com/send/?phone=551152868823&text&type=phone_number&app_absent=0" 
@@ -323,6 +323,16 @@ export const Header = () => {
                   >
                     <HelpCircle className="h-4 w-4" />
                     Suporte (WhatsApp)
+                  </a>
+
+                  <a 
+                    href="https://www.instagram.com/meduf.ai/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-3 rounded-md transition-colors hover:bg-pink-50 text-pink-500 font-medium"
+                  >
+                    <Instagram className="h-4 w-4" />
+                    Siga no Instagram
                   </a>
 
                   <Button 
