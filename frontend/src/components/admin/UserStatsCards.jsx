@@ -1,10 +1,11 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Activity, Shield, FileText, UserX, TrendingUp } from 'lucide-react';
+import { Users, Activity, Shield, FileText, UserX, TrendingUp, MessageSquare } from 'lucide-react';
 
-const UserStatsCards = ({ stats, onlineCount, monthlyUsage }) => {
+const UserStatsCards = ({ stats, onlineCount, monthlyUsage, chatStats }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
+    <>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
       <Card className="border-l-4 border-l-blue-500 shadow-sm">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">Total de Usuários</CardTitle>
