@@ -715,26 +715,6 @@ async def get_online_stats(current_user: UserInDB = Depends(get_current_active_u
     return {"online_count": online_count, "online": online_count}
 
 
-@app.get("/api/admin/usage-stats/monthly")
-async def get_monthly_usage(current_user: UserInDB = Depends(get_current_active_user)):
-    """Get monthly usage statistics (admin only)"""
-    if current_user.role != "ADMIN":
-        raise HTTPException(status_code=403, detail="Admin only")
-    
-    # Get count of consultations this month
-    from datetime import datetime, timezone
-    start_of_month = datetime.now(timezone.utc).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    count = await consultations_collection.count_documents({
-        "timestamp": {"$gte": start_of_month}
-    })
-    
-    return {
-        "total_consultations": count,
-        "total_tokens": count * 2500,  # Estimate
-        "total_cost_usd": count * 0.01  # Estimate
-    }
-
-
 @app.get("/api/admin/deleted-users")
 async def get_deleted_users(current_user: UserInDB = Depends(get_current_active_user)):
     """Get deleted users (admin only)"""
