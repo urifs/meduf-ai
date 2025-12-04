@@ -157,6 +157,7 @@ const SimpleDashboard = () => {
             <ClinicalReport data={reportData} analysisType="simple-diagnosis" />
           </div>
         </div>
+        <FooterLogo />
       </main>
       <Toaster />
     </div>
