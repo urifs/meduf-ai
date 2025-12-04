@@ -123,6 +123,7 @@ const History = () => {
                     <TableHead>Paciente</TableHead>
                     <TableHead className="hidden md:table-cell">Queixa Principal</TableHead>
                     <TableHead>Diagnóstico Principal</TableHead>
+                    <TableHead className="hidden sm:table-cell">Modelo</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
