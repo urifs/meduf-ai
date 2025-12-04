@@ -597,11 +597,11 @@ frontend:
 
 metadata:
   created_by: "testing_agent"
-  version: "10.0"
-  test_sequence: 24
+  version: "11.0"
+  test_sequence: 25
   run_ui: true
   test_completed: true
-  all_tests_passed: true
+  all_tests_passed: false
   last_test_date: "2025-12-04"
   free_ai_consultation_testing_completed: true
   review_request_testing_completed: true
@@ -611,7 +611,7 @@ metadata:
   responsive_design_tested: true
   gemini_20_flash_integration_working: true
   medical_chat_backend_verified: true
-  all_success_criteria_met: true
+  all_success_criteria_met: false
   history_page_bug_fix_verified: true
   chat_copy_button_tested: true
   admin_chat_features_verified: true
@@ -619,13 +619,17 @@ metadata:
   four_fixes_testing_completed: true
   page_scroll_fix_verified: true
   chat_history_menu_verified: true
-  profile_save_button_verified: true
+  profile_save_button_verified: false
   history_error_fix_verified: true
   modal_copy_buttons_tested: true
   both_credentials_tested: true
   meduf_20_clinic_model_verified: true
   model_branding_correct: true
   no_gemini_references_found: true
+  three_review_items_tested: true
+  logo_verification_partial: true
+  emoji_removal_partial: true
+  profile_save_critical_failure: true
 
 test_plan:
   current_focus:
