@@ -147,7 +147,8 @@ const Admin = () => {
       const realConsultations = consultsRes.data.map(c => ({
         ...c,
         id: c._id || c.id,
-        date: c.date || c.created_at 
+        date: c.timestamp || c.created_at || c.date,
+        doctor: c.user_name || c.user_email || 'Desconhecido'
       }));
       setConsultations(realConsultations);
       
