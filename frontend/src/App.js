@@ -10,6 +10,7 @@ import Toxicology from "@/pages/Toxicology";
 import Selection from "@/pages/Selection";
 import Login from "@/pages/Login";
 import History from "@/pages/History";
+import ChatHistory from "@/pages/ChatHistory";
 import Admin from "@/pages/Admin";
 import Profile from "@/pages/Profile";
 import DatabaseManager from "@/pages/DatabaseManager";
