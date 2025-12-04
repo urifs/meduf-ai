@@ -375,4 +375,4 @@ export const Header = memo(() => {
       </div>
     </header>
   );
-};
+});
