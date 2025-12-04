@@ -644,7 +644,7 @@ metadata:
   three_review_items_tested: true
   logo_verification_partial: true
   emoji_removal_partial: true
-  profile_save_critical_failure: true
+  profile_save_critical_failure: false
 
 test_plan:
   current_focus: []
