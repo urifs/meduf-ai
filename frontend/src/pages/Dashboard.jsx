@@ -116,6 +116,7 @@ const Dashboard = () => {
             <ClinicalReport data={reportData} analysisType="diagnosis" />
           </div>
         </div>
+        <FooterLogo />
       </main>
       <Toaster />
     </div>
