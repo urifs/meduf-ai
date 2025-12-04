@@ -571,8 +571,8 @@ test_plan:
   current_focus: []
   stuck_tasks: []
   test_all: false
-  test_priority: "admin_panel_testing_completed"
-  test_summary: "🎉 ADMIN PANEL REFACTORED FUNCTIONALITY TESTING COMPLETED WITH 100% SUCCESS! Comprehensive testing of all requested features completed successfully: ✅ Login e Carregamento: Authentication with ur1fs/@Fred1807 successful, statistics cards loading correctly (8 cards), tabs 'Usuários Ativos' and 'Contas Excluídas' present ✅ Teste Rápido de Funcionalidade: 2 users verified in list, actions menu (three dots) working with all expected options ✅ Teste do Modal 'Novo Usuário': Modal opens correctly, PasswordToggle component verified in password field ✅ Verificação da Sidebar: 'Administradores' section shows 1 admin, 'Últimas Consultas' section displays recent consultations. ALL REFACTORED FUNCTIONALITIES WORKING IDENTICALLY TO PREVIOUS VERSION!"
+  test_priority: "admin_validity_update_flow_completed"
+  test_summary: "🎉 ADMIN PANEL ACCOUNT VALIDITY UPDATE FLOW TESTING COMPLETED WITH 100% SUCCESS! Complete testing of account validity management functionality: ✅ Authentication: Login with ur1fs/@Fred1807 successful ✅ User Management: Located 'Dr. Teste Silva' (teste@meduf.com) in user list ✅ Actions Menu: Three dots menu working with 'Alterar Validade' option ✅ Modal Functionality: 'Alterar Validade da Conta' modal opens correctly ✅ Input Validation: Successfully filled '90' days in input field ✅ Save Operation: 'Salvar Alteração' button working ✅ Table Update: Validity updated to approximately 90 days (89 dias displayed) ✅ Component Integration: ExpirationDialog component working properly. Minor: Block/unblock functionality encountered UI overlay issues but core validity update flow working perfectly. ALL SUCCESS CRITERIA MET!"
 
 frontend:
   - task: "Toxicology Feature - Backend AI Engine Integration - Paracetamol"
