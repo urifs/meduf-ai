@@ -8,72 +8,54 @@ PRODUCT REQUIREMENTS:
 - An hourly-updated, AI-powered epidemiological alerts feature must be present in the header.
 - A comprehensive admin panel must be available for user management, cost-tracking, viewing feedback, and managing the database.
 - A feedback mechanism (Helpful / Not Helpful) must be available on all analysis results.
+- A free-form AI chat for open-ended questions should be available.
 - The application must be in Portuguese.
 
 **User's preferred language**: Portuguese (Brazil). The next agent MUST respond in Portuguese.
 
 **what currently exists?**
-The application is a full-stack React/FastAPI app that is now stable and feature-complete after a massive bug-fixing and feature-implementation session. All five core AI analysis tools are fully functional. A critical deployment issue preventing production use has been resolved. The admin panel is now highly functional, featuring user creation, statistics, feedback review, and a database manager. The backend has been expanded with numerous new endpoints to support the admin panel and other missing functionalities. The entire Leitor de Exames feature has been successfully purged from the codebase and database. The system can now correctly analyze interactions for up to 10 medications. The final user request involved adding a comprehensive set of user management features to the admin panel (block, delete, change validity, reactivate, view password). The backend for these features is complete, but the frontend implementation is still in progress.
+The application is a stable, feature-rich, full-stack React/FastAPI app. All five core analysis tools are functional. A new free-form AI chat feature has been added to the main page. The admin panel is comprehensive, supporting a full user lifecycle (create, block, unblock, delete, reactivate, update validity), usage statistics, feedback review, and database viewing.
+
+The previous session involved a massive amount of work, including completing the advanced admin UI, refactoring the entire admin page into a modern component-based architecture, and fixing numerous critical bugs related to user authentication, data persistence (profile pictures, user actions), timezone display, and data accuracy (online user count). New features were also added, such as an AI-powered hourly epidemiological alert system, a disabled accounts counter, profile page enhancements (bio field), and a link to the company's Instagram. The application is now considered functionally complete and stable.
 
 **Last working item**:
-The user requested a large set of new features and fixes for the admin panel, including: fixing block/delete/validity controls, adding a reactivate account flow for deleted/expired users, and adding a view password toggle to the login and user creation forms.
+The user requested a free-form AI chat feature on the main selection page for doctors to ask open-ended questions.
 
-- **Last item agent was working:** Implementing the frontend UI in  for the advanced user management features. The agent had already created the necessary backend endpoints, added the required state and handler functions to the React component, and was in the process of adding the JSX for a tabbed interface (to separate active vs. deleted users) and a modal for account reactivation.
-- **Status:** IN PROGRESS
-- **Agent Testing Done:** N
-- **Which testing method agent to use?** Frontend testing agent. Once the UI is complete, the agent must test the full user management lifecycle:
-    1.  Create a new user.
-    2.  Block and unblock the user.
-    3.  Change the user's account validity.
-    4.  Delete the user.
-    5.  Navigate to the new Contas Excluídas tab and find the deleted user.
-    6.  Use the Reativar function to restore the user's account.
-    7.  Verify the user reappears in the Usuários Ativos list.
-    8.  Confirm the view password toggle works on both the login page and the create user form in the admin panel.
+- **Last item agent was working:** Implementing the Consulta Livre com IA (Free-form AI Consultation) feature. The agent created the  frontend component, integrated it into the  page, and added the corresponding  backend endpoint.
+- **Status:** USER VERIFICATION PENDING
+- **Agent Testing Done:** Y (The agent took a screenshot confirming the UI was rendered correctly and a test message was sent.)
+- **Which testing method agent to use?** Frontend testing agent. The agent should test the end-to-end flow: send a medical question through the new chat interface and verify that a valid, well-formatted AI response is displayed.
 - **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-There are no outstanding bugs. The current focus is on completing a feature request.
+There are no outstanding issues. The application is stable and all user-reported bugs from the session have been resolved.
 
 **In progress Task List**:
-- **Task 1: (P0) Complete Advanced Admin Panel UI**
-  - **Where to resume:** The file  needs to be updated. The backend logic and frontend state/handler functions are already in place. The agent must now add the JSX to create:
-    1.  A  component to switch between Usuários Ativos and Contas Excluídas/Expiradas.
-    2.  The user list/table for the Contas Excluídas/Expiradas tab.
-    3.  A Reativar button for each user in that list.
-    4.  A  (modal) for the reactivation form, which should prompt for a new validity period.
-    5.  Integrate the  component into the Criar Nova Conta form.
-  - **What will be achieved with this?** The admin panel will have a complete user lifecycle management system as requested by the user.
-  - **Status:** IN PROGRESS
-  - **Should Test frontend/backend/both after fix?** Frontend
-  - **Blocked on something:** None.
+- There are no tasks currently in progress. The last task was completed by the agent and is pending user verification.
 
 **Upcoming and Future Tasks**
 - **Future Tasks:**
-  - **(P2) UI Consistency Review:** Review and update the  and  pages to ensure their design is consistent with the rest of the application's aesthetic.
+  - **(P2) UI Consistency Review:** Review and update the  and  pages to ensure their design and layout are fully consistent with the rest of the application's aesthetic.
 
 **Completed work in this session**
-- **CRITICAL: Deployment Failure Resolution:** Fixed a major production bug where analyses failed post-deploy. The root cause was a hardcoded preview URL in the frontend  file, which was corrected.
-- **CRITICAL: Admin Panel & Database Functionality:**
-  - Implemented dozens of missing backend endpoints required for the admin panel and database manager to function (, , , etc.).
-  - Fixed the Database Manager page, making it fully operational for viewing collections and documents.
-  - Fixed the Admin Panel to correctly display user lists, consultation history, and feedback statistics.
-  - Fixed an issue where the doctor's name showed as Desconhecido by correctly populating and retrieving user data.
-- **Core Feature Bug Fixes:**
-  - Verified that Diagnóstico Detalhado & Interação Medicamentosa were working, correcting a false positive from a previous agent.
-  - Fixed Guia Terapêutico by aligning frontend payload keys () with backend expectations () and correcting the data structure.
-  - Fixed Interação Medicamentosa to correctly display recommendations and handle multiple medications (up to 10).
-  - Fixed Toxicologia to display the Protocolo Específico section.
-- **Feature Removal & Refactoring:**
-  - Completely removed all traces of the Leitor de Exames feature from the frontend, backend, and database.
-  - Refactored all five analysis pages to use a shared  component, reducing code duplication.
-- **User Management & Feedback System:**
-  - Implemented the user creation functionality from the admin panel.
-  - Implemented the entire feedback submission and viewing system.
+- **Feature: Free-Form AI Chat:** Added a new Gemini-powered chat component to the main selection page for open-ended medical queries.
+- **Feature: Advanced Admin Panel Completion:** Finished the UI for the advanced admin panel, including a tabbed interface for active/deleted users and a modal for account reactivation.
+- **Refactoring: Complete Admin Page Overhaul:** The monolithic  file was successfully refactored into a clean architecture using multiple granular components (e.g., , , ) and custom React hooks (, ) for better maintainability.
+- **Bug Fix: Critical Authentication & User Management:**
+  - **Login Failures:** Fixed the root cause of users being unable to log in by correcting the backend to store a  instead of a plain  during user creation. A migration script was run to fix existing accounts.
+  - **Admin Actions:** Resolved failures in blocking, deleting, and updating user validity by fixing the backend to query users by  instead of .
+- **Bug Fix: Data Accuracy & Persistence:**
+  - **Online Users Count:** Corrected the Usuários Online stat to show real-time activity (based on a  timestamp) instead of the total number of registered users.
+  - **Profile Pictures:** Solved an issue where profile pictures were not persisting across sessions by ensuring the  field is initialized in the database for all users.
+  - **Timezone Display:** Fixed all timestamps across the application (e.g., created at, consultation history) to display in the user's local timezone instead of UTC.
+- **Feature: AI-Powered Epidemiological Alerts:** Replaced the mocked alert data with a dynamic system that uses Gemini 2.0 Flash to generate and cache new epidemiological alerts every hour.
 - **UI/UX Enhancements:**
-  - Implemented a more robust loading state, preventing premature error messages during API calls.
-  - Fixed a crash in the header related to epidemiological alerts data structure.
-  - Added more comprehensive (mocked) data for the epidemiological alerts.
+  - Renamed Guia Terapêutico to Guia Farmacológico and Toxicologia to Guia Toxicológico across the UI.
+  - Improved dark mode readability by adjusting the styles for input fields and text areas.
+  - Added a Contas Desativadas card to the admin dashboard statistics.
+  - Enhanced the Meu Perfil page by adding a professional bio field and simplifying the name field.
+  - Made admin accounts in the admin sidebar clickable to view their details.
+  - Added a link to the Meduf AI Instagram page in the main navigation menu.
 
 **Earlier issues found/mentioned but not fixed**
 - None.
@@ -81,89 +63,87 @@ There are no outstanding bugs. The current focus is on completing a feature requ
 **Known issue recurrence from previous fork**
 - **Issue recurrence in previous fork:** Intermittent analysis failures and non-functional admin panel.
 - **Recurrence count:** High.
-- **Status:** RESOLVED. The agent systematically identified that these issues were caused by missing backend endpoints and incorrect environment configuration in production. A comprehensive set of endpoints has been added and the deployment environment variable issue has been fixed.
+- **Status:** RESOLVED. The previous agent performed a comprehensive bug hunt, fixing dozens of issues related to missing backend endpoints, incorrect database queries, and frontend state management, making the application stable.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Frontend:** React, Tailwind CSS, Shadcn UI, Axios, .
-- **Backend:** Python, FastAPI, Motor (MongoDB), Pydantic.
-- **Debugging:** The agent demonstrated a robust debugging process, using  to test endpoints, checking backend logs, inspecting browser console output, and using the  to identify a critical environment variable issue.
-- **Full-Stack Implementation:** The agent successfully implemented full-stack features by creating backend endpoints, writing database logic, and building the corresponding frontend components and state management.
+- **React Refactoring:** Decomposed a large, unmaintainable component () into smaller, single-responsibility components and custom hooks, following best practices.
+- **Backend Background Tasks:** Implemented an hourly scheduled task using  to automatically update data with an AI call.
+- **Full-Stack Debugging:** Systematically diagnosed and fixed complex bugs involving the entire stack, from frontend rendering and state management to backend API logic, database queries, and schema inconsistencies.
+- **Timezone Management:** Correctly handled timezones between a Python/FastAPI backend (storing UTC) and a React frontend, ensuring timestamps are always displayed in the user's local time.
+- **Data Migration:** Used a one-off Python script executed via bash to update existing records in the MongoDB database to fix schema inconsistencies (, ).
 
 **key DB schema**
-- **users**: 
-- **consultations**: 
-- **feedbacks**: 
-- **usage_stats**: (Previously named 'costs') 
+- **users**: Added , , , .
+- **epidemiological_alerts_cache**: New collection .
 
 **changes in tech stack**
-- None.
+- **Backend:** Added  to  for scheduling background jobs.
 
 **All files of reference**
-- : **The primary file for the next task.** It contains all the logic for the admin panel and needs the final UI implementation.
-- : The backend source of truth, now containing all necessary endpoints for the application to function correctly.
-- : New reusable component to be integrated.
-- : New, fully functional page.
-- : **Fixed.** The critical  was corrected to allow for successful production deployments.
+- : Contains the newly added  component.
+- : The implementation of the free-form AI chat.
+- : Contains the new  endpoint and numerous bug fixes.
+- : The refactored admin page container.
+- : A key part of the new admin architecture.
+- : The other key hook for the admin panel.
+- : The new module for handling hourly AI alerts.
+- : Contains the new bio and updated name fields.
 
 **Areas that need refactoring**:
--  is now over 1100 lines long and is becoming unmanageable. The agent noted this. After the current feature implementation is complete, it should be broken down into smaller, more focused components (e.g., , , , ).
+- The  page was successfully refactored in this session. No other major refactoring is immediately required.
 
 **key api endpoints**
-- : (New) Creates a new user.
-- : (New) Toggles a user's status (active/blocked).
-- : (New) Updates a user's account expiration date.
-- : (New) Soft-deletes a user.
-- : (New) Reactivates a soft-deleted user.
-- : (New) Retrieves all soft-deleted or expired users.
-- : (New) Gets all consultation records.
-- : (New) Gets the count of active users.
--  & : (New) Endpoints for the database manager.
-- : (New) Submits user feedback.
-- : (New) Retrieves all feedback for the admin panel.
+- ****: (New) Handles messages from the new free-form AI chat component.
+- ****: (New) Allows users to update their own profile information (name, bio).
+- ****: (Modified) Now serves AI-generated data from a time-based cache.
+- ****: (Fixed) Correctly updates user validity by querying via .
+- ****: (Fixed) Correctly toggles user status by querying via .
+- ****: (Fixed) Correctly deletes a user by querying via .
+- ****: (Fixed) Now accurately returns the count of users active in the last 5 minutes.
+- ****: (Fixed) Correctly hashes passwords on user creation.
 
 **Critical Info for New Agent**
-- **Your immediate task is to finish the frontend implementation in **. The backend logic is complete and tested. You need to add the JSX for the tabbed interface and the reactivation modal.
-- The  file is very large. Focus on completing the functionality first. A follow-up refactor to break the component down is highly recommended.
-- The major deployment blocker has been resolved. The application should deploy and run correctly in production now.
-- Do not re-investigate issues that have been marked as resolved (e.g., non-working core features, missing admin data). These were fixed by adding the now-existing backend endpoints.
+- The application is highly stable and feature-complete according to all recent user requests. Your first action should be to verify the last implemented feature: the Consulta Livre com IA chat box.
+- The most significant architectural change was the complete refactoring of the  page. Familiarize yourself with the new structure in  and .
+- Numerous critical bugs have been resolved at their root cause. Avoid re-investigating issues related to login, user management, online counts, or timezones, as these have been thoroughly fixed and tested.
 
 **documents created in this job**
 - 
 
 **Last 10 User Messages and any pending user messages**
-1.  **User:** Admin history doesn't show the doctor's name. (COMPLETED)
-2.  **User:** The Database Manager page is empty. (COMPLETED)
-3.  **User:** Continue your work. (Agent continued.)
-4.  **User:** Epidemiological alerts are showing limited data and the admin history shows Desconhecido. (COMPLETED)
-5.  **User:** The Create Account button in the admin panel does nothing. (COMPLETED)
-6.  **User:** The feedback system is not working and feedbacks don't appear in the admin panel. (COMPLETED)
-7.  **User:** Multiple admin functions (block, delete, change validity) are broken. Add a reactivate feature and a view password toggle. (IN PROGRESS - Current Task)
-8.  **User:** Continue implementing the requested features. (Agent continued.)
-9.  **User:** Please complete all pending activities. (Agent continued.)
-10. **Pending User Message:** The last message from the user was Realize todas as atividades pendentes (Complete all pending activities), which refers to the ongoing implementation of the advanced admin panel features.
+1.  **Bug:** Login fails for newly created users. (COMPLETED)
+2.  **Bug:** Updating account validity in the admin panel does nothing. (COMPLETED)
+3.  **Bug:** The Online users counter in the admin panel is incorrect. (COMPLETED)
+4.  **Multi-request:** Fix blank feedback details, implement AI-powered hourly alerts, and fix the missing deleted users tab. (COMPLETED)
+5.  **Bug Recurrence:** Online users count and update validity are still broken. (COMPLETED - Traced to a frontend cache issue, resolved by restarting the service).
+6.  **Bug:** Poor text contrast in input boxes in dark mode. (COMPLETED)
+7.  **Feature:** Add a card for Disabled Accounts to the admin panel. (COMPLETED)
+8.  **Multi-request:** Fix profile picture persistence and make admin accounts clickable in the admin list. (COMPLETED)
+9.  **Multi-request:** Add bio field to profile, remove delete collection from DB manager, sort reactivated users to the top, add Instagram link to menu. (COMPLETED)
+10. **Bug:** Timestamps across the app are in the wrong timezone. (COMPLETED)
+11. **Feature:** Rename Guia Terapêutico and Toxicologia features. (COMPLETED)
+12. **Pending User Message:** Add a free-form AI chat box to the main page. (IMPLEMENTED, PENDING USER VERIFICATION)
 
 **Project Health Check:**
-- **Broken:**
-  - The frontend UI for advanced admin functions (block, delete, change validity, reactivate) is not yet implemented, although the backend and state logic are ready.
-- **Mocked:**
-  - The PubMed text in the UI has no backend integration.
-  - The epidemiological alerts data is still mocked in the backend, though it is more extensive now.
+- **Broken:** None.
+- **Mocked:** The PubMed link in the UI is a placeholder with no backend functionality.
 
 **3rd Party Integrations**:
-- **Gemini 2.0 Flash (via emergentintegrations)** — uses Emergent LLM Key for all text-based analysis.
+- **Gemini 2.0 Flash (via emergentintegrations)** — uses Emergent LLM Key for all AI analysis and chat features.
+- **APScheduler** — used for the hourly epidemiological alert background task.
 - **tiktoken** — for token counting.
 - **html2canvas** — for save as image functionality.
 - **recharts** - for charts in the admin panel.
 - **bcrypt** - for password hashing.
 
 **Testing status**
-- **Testing agent used after significant changes:** YES, frequently used the  tool to validate UI changes and  to test backend endpoints.
-- **Troubleshoot agent used after agent stuck in loop:** YES, it successfully identified the critical production deployment issue.
+- **Testing agent used after significant changes:** YES. The agent used both screenshot tests and the full  multiple times to validate complex UI flows and confirm major bug fixes.
+- **Troubleshoot agent used after agent stuck in loop:** NO. The agent resolved all issues independently.
 - **Test files created:** None.
-- **Known regressions:** None. The agent successfully fixed all reported regressions and bugs.
+- **Known regressions:** None.
 
 **Credentials to test flow:**
 - **Admin:**
@@ -171,4 +151,4 @@ There are no outstanding bugs. The current focus is on completing a feature requ
   - **Password:** 
 
 **What agent forgot to execute**
-- The agent has not forgotten any tasks but is in the middle of a large implementation for the admin panel UI (). This task needs to be completed.</analysis>
+- The agent successfully addressed all user requests from the session. Nothing was forgotten.</analysis>
