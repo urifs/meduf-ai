@@ -226,6 +226,7 @@ const History = () => {
             )}
           </CardContent>
         </Card>
+        <FooterLogo />
       </main>
     </div>
   );
