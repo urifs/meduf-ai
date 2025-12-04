@@ -24,6 +24,18 @@ from dotenv import load_dotenv
 # Load environment
 load_dotenv()
 
+# Helper function to ensure datetime has UTC timezone
+def ensure_utc_timezone(dt):
+    """Convert naive datetime from MongoDB to UTC aware datetime"""
+    if dt is None:
+        return None
+    if isinstance(dt, datetime):
+        if dt.tzinfo is None:
+            # Naive datetime from MongoDB is actually UTC
+            return dt.replace(tzinfo=timezone.utc)
+        return dt
+    return dt
+
 # Validate critical configuration
 EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY")
 if not EMERGENT_LLM_KEY:
