@@ -191,6 +191,10 @@ const Admin = () => {
               setSelectedConsultation(consult);
               setIsConsultationOpen(true);
             }}
+            onUserClick={(user) => {
+              setSelectedUserProfile(user);
+              setIsProfileOpen(true);
+            }}
           />
         </div>
 
