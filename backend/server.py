@@ -668,21 +668,28 @@ async def permanently_delete_user(
         raise HTTPException(status_code=403, detail="Admin only")
     
     try:
-        # Try to find and delete by _id first
-        try:
-            result = await users_collection.delete_one({"_id": ObjectId(user_id)})
-        except:
-            # Fallback to email if _id doesn't work
-            result = await users_collection.delete_one({"email": user_id})
+        print(f"[PERMANENT DELETE] Attempting to delete user: {user_id}")
+        
+        # First try to find by email or username (since frontend sends email as id)
+        result = await users_collection.delete_one({"$or": [{"email": user_id}, {"username": user_id}]})
+        
+        # If not found, try by _id
+        if result.deleted_count == 0:
+            try:
+                result = await users_collection.delete_one({"_id": ObjectId(user_id)})
+            except Exception as e:
+                print(f"[PERMANENT DELETE] Failed to convert to ObjectId: {e}")
         
         if result.deleted_count == 0:
+            print(f"[PERMANENT DELETE] User not found: {user_id}")
             raise HTTPException(status_code=404, detail="User not found")
         
+        print(f"[PERMANENT DELETE] Successfully deleted {result.deleted_count} user(s)")
         return {"message": "User permanently deleted", "deleted_count": result.deleted_count}
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error permanently deleting user: {e}")
+        print(f"[PERMANENT DELETE] Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
