@@ -742,6 +742,15 @@ async def get_deleted_users(current_user: UserInDB = Depends(get_current_active_
     async for doc in cursor:
         doc["_id"] = str(doc["_id"])
         doc["id"] = doc.get("username", doc.get("email", ""))
+        
+        # Convert datetime fields to UTC aware
+        if "created_at" in doc:
+            doc["created_at"] = ensure_utc_timezone(doc["created_at"])
+        if "deleted_at" in doc:
+            doc["deleted_at"] = ensure_utc_timezone(doc["deleted_at"])
+        if "expiration_date" in doc:
+            doc["expiration_date"] = ensure_utc_timezone(doc["expiration_date"])
+            
         users.append(doc)
     return users
 
