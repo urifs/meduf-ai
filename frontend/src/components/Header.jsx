@@ -150,7 +150,7 @@ export const Header = () => {
                   {/* Brazil Section */}
                   <div>
                     <h5 className="text-xs font-bold text-muted-foreground uppercase mb-2 flex items-center gap-1">
-                      🇧🇷 Brasil (Estados)
+                      Brasil (Estados)
                     </h5>
                     <div className="space-y-2">
                       {outbreaks.brazil && outbreaks.brazil.length > 0 ? (
