@@ -866,6 +866,20 @@ frontend:
         agent: "testing"
         comment: "🎉 ADMIN PANEL ACCOUNT VALIDITY UPDATE FLOW COMPLETED SUCCESSFULLY! ✅ LOGIN: Successful authentication with ur1fs/@Fred1807 credentials ✅ USER LOCATION: Found 'Dr. Teste Silva' (teste@meduf.com) in user list with initial validity of 89 days ✅ ACTIONS MENU: Three dots menu opened successfully with 'Alterar Validade' option visible ✅ MODAL FUNCTIONALITY: 'Alterar Validade da Conta' modal opened correctly with proper title and description ✅ DAYS INPUT: Successfully filled '90' in the 'Dias de Acesso' input field ✅ SAVE OPERATION: 'Salvar Alteração' button clicked successfully ✅ VALIDITY UPDATE: Table updated showing 89 days (approximately 90 days as expected) ✅ MODAL COMPONENTS: ExpirationDialog component working with proper input validation and UI elements. Minor: Block/unblock testing encountered UI overlay issues but core validity update functionality working perfectly. ALL SUCCESS CRITERIA MET: Modal opens correctly, validity update works, table updates automatically, approximately 90 days displayed."
 
+  - task: "Admin Panel - Online Users Counter Bug Fix Verification"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/Admin.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "REVIEW REQUEST TESTING: Test online users counter after bug fix. Login ur1fs/@Fred1807, verify 'Usuários Online' card shows correct count (not 44 total users), verify 'Nos últimos 5 minutos' text present, test logout/login consistency, simulate multiple users with testeonline@meduf.com/teste123, verify counter increases, confirm number represents only users with activity in last 5 minutes."
+      - working: true
+        agent: "testing"
+        comment: "🎉 ONLINE USERS COUNTER BUG FIX VERIFICATION COMPLETED SUCCESSFULLY! ✅ INITIAL STATE: Login successful with ur1fs/@Fred1807, 'Usuários Online' card found showing 2 users (not 44 total) ✅ TEXT VERIFICATION: 'Nos últimos 5 minutos' text present and visible ✅ VALIDATION PASSED: Number (2) is NOT 44 (total users) - correctly shows only online users ✅ MULTIPLE USERS TEST: Second user login (testeonline@meduf.com/teste123) successful ✅ COUNTER BEHAVIOR: Counter increased from 2 to 3 after new user login, demonstrating real-time activity tracking ✅ REASONABLE RANGE: Final count (3) within expected range (1-5) for truly online users ✅ COMPARISON VERIFIED: Total Users = 5, Online Users = 3 - confirms counter shows different values ✅ ALL SUCCESS CRITERIA MET: Number NOT 44, reflects last 5 minutes activity, increases with new logins, proper explanatory text present. BUG FIX CONFIRMED: Counter now correctly shows users with recent activity (last 5 minutes) instead of total registered users."
   - task: "Feedback Backend Integration - API Endpoints"
     implemented: true
     working: true
