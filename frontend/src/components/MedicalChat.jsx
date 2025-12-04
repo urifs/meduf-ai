@@ -224,7 +224,7 @@ const MedicalChat = () => {
         </form>
 
         <p className="text-xs text-muted-foreground mt-3 text-center">
-          💡 IA configurada para responder com termos técnicos e baseada em evidências médicas
+          IA configurada para responder com termos técnicos e baseada em evidências médicas
         </p>
       </CardContent>
 
