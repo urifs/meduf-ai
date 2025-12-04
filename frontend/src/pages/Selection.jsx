@@ -39,7 +39,7 @@ const Selection = () => {
       glow: "hover:shadow-[0_0_40px_rgba(59,130,246,0.3)]"
     },
     {
-      title: "Guia Terapêutico",
+      title: "Guia Farmacológico",
       description: "Prescrição medicamentosa",
       detail: "Recomendações de medicamentos, doses, vias e contraindicações baseadas em evidências.",
       icon: Syringe,
