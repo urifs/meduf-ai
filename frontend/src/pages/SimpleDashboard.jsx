@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import FooterLogo from '@/components/FooterLogo';
 import { ClinicalReport } from '@/components/ClinicalReport';
@@ -21,6 +21,11 @@ const SimpleDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [anamnese, setAnamnese] = useState("");
   const [progress, setProgress] = useState(0);
+
+  // Scroll to top on component mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleAnalyze = async (e) => {
     e.preventDefault();
