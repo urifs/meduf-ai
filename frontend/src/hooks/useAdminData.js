@@ -34,9 +34,9 @@ const useAdminData = (userRole, navigate) => {
         id: u._id || u.id
       }));
       
-      // Sort users by created_at (oldest first - creation order)
+      // Sort users by created_at (newest first)
       const sortedUsers = mappedUsers.sort((a, b) => {
-        return new Date(a.created_at || 0) - new Date(b.created_at || 0);
+        return new Date(b.created_at || 0) - new Date(a.created_at || 0);
       });
       
       setUsers(sortedUsers);
