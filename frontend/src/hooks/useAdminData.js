@@ -110,6 +110,8 @@ const useAdminData = (userRole, navigate) => {
     lastUpdated,
     monthlyUsage,
     deletedUsers,
+    chatHistory,
+    chatStats,
     fetchData
   };
 };
