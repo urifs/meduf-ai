@@ -5,7 +5,7 @@ Atualiza alertas a cada hora usando Gemini 2.0 Flash
 from datetime import datetime, timezone, timedelta
 from typing import Dict, Any
 import asyncio
-from emergentintegrations import ChatGemini
+from emergentintegrations.llm.chat import LlmChat, UserMessage
 
 # Cache global
 alerts_cache = {
