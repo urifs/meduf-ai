@@ -57,9 +57,10 @@ Forneça a resposta em formato JSON estritamente seguindo este modelo:
 Responda APENAS com o JSON, sem texto adicional."""
 
     try:
-        # Usar Gemini 2.0 Flash
-        chat = ChatGemini(model="gemini-2.0-flash-exp")
-        response = await chat.ainvoke(prompt)
+        # Usar Gemini 2.0 Flash via Emergent Integrations
+        chat = LlmChat(provider="google", model="gemini-2.0-flash-exp")
+        messages = [UserMessage(content=prompt)]
+        response = await chat.ainvoke(messages)
         
         # Extrair JSON da resposta
         import json
