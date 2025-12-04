@@ -265,7 +265,7 @@ async def update_user_profile(
         
         if update_data:
             await users_collection.update_one(
-                {"id": current_user.id},
+                {"_id": ObjectId(current_user.id)},
                 {"$set": update_data}
             )
         
