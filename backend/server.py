@@ -911,80 +911,9 @@ async def get_consultations(
 
 @app.get("/api/epidemiological-alerts")
 async def get_epidemiological_alerts():
-    """Get epidemiological alerts"""
-    return {
-        "brazil": [
-            {
-                "state": "São Paulo",
-                "disease": "Dengue",
-                "level": "Alto",
-                "date": "Hoje"
-            },
-            {
-                "state": "Rio de Janeiro",
-                "disease": "Dengue",
-                "level": "Alto",
-                "date": "Hoje"
-            },
-            {
-                "state": "Minas Gerais",
-                "disease": "Dengue",
-                "level": "Médio",
-                "date": "Hoje"
-            },
-            {
-                "state": "Paraná",
-                "disease": "Dengue",
-                "level": "Médio",
-                "date": "Hoje"
-            },
-            {
-                "state": "Bahia",
-                "disease": "Dengue",
-                "level": "Baixo",
-                "date": "Hoje"
-            },
-            {
-                "state": "Amazonas",
-                "disease": "Malária",
-                "level": "Médio",
-                "date": "Hoje"
-            }
-        ],
-        "world": [
-            {
-                "country": "Argentina",
-                "disease": "Dengue",
-                "level": "Alto",
-                "date": "Hoje"
-            },
-            {
-                "country": "Paraguai",
-                "disease": "Dengue",
-                "level": "Médio",
-                "date": "Hoje"
-            },
-            {
-                "country": "Índia",
-                "disease": "Dengue",
-                "level": "Alto",
-                "date": "Hoje"
-            },
-            {
-                "country": "Tailândia",
-                "disease": "Dengue",
-                "level": "Médio",
-                "date": "Hoje"
-            },
-            {
-                "country": "África Subsaariana",
-                "disease": "Malária",
-                "level": "Alto",
-                "date": "Hoje"
-            }
-        ],
-        "cache_info": "Atualizado em " + datetime.now(timezone.utc).isoformat()
-    }
+    """Get epidemiological alerts - Updated hourly with Gemini 2.0 Flash"""
+    from epidemiological_alerts import get_cached_alerts
+    return await get_cached_alerts()
 
 
 # ===== STARTUP =====
