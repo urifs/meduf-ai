@@ -201,6 +201,9 @@ const Admin = () => {
           />
         </div>
 
+        {/* Online Users Section */}
+        <OnlineUsersSection />
+
         {/* Feedbacks Section */}
         <FeedbackSection
           feedbacks={feedbacks}
@@ -222,9 +225,6 @@ const Admin = () => {
           chatHistory={chatHistory}
           formatDate={formatDate}
         />
-
-        {/* Online Users Section */}
-        <OnlineUsersSection />
 
         {/* Modals */}
         <ReactivationDialog
