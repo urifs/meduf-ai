@@ -465,6 +465,142 @@ async def get_feedbacks(current_user: UserInDB = Depends(get_current_active_user
     return feedbacks
 
 
+# ===== DATABASE MANAGER =====
+
+@app.get("/api/admin/db/collections")
+async def get_collections(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get all database collections (admin only)"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    try:
+        collections = await db.list_collection_names()
+        # Return with count for each collection
+        result = []
+        for coll_name in collections:
+            count = await db[coll_name].count_documents({})
+            result.append({
+                "name": coll_name,
+                "count": count
+            })
+        return result
+    except Exception as e:
+        print(f"Error listing collections: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/admin/db/{collection_name}")
+async def get_collection_documents(
+    collection_name: str,
+    q: str = "",
+    limit: int = 100,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Get documents from a collection (admin only)"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    try:
+        collection = db[collection_name]
+        
+        # Build query
+        query = {}
+        if q:
+            # Simple text search in all string fields
+            query = {"$or": [
+                {field: {"$regex": q, "$options": "i"}} 
+                for field in ["email", "name", "username", "user_name", "user_email"]
+            ]}
+        
+        documents = []
+        cursor = collection.find(query).limit(limit)
+        async for doc in cursor:
+            # Convert ObjectId to string
+            doc["_id"] = str(doc["_id"])
+            documents.append(doc)
+        
+        return documents
+    except Exception as e:
+        print(f"Error fetching documents from {collection_name}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/admin/db/{collection_name}")
+async def create_document(
+    collection_name: str,
+    data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Create a new document in a collection (admin only)"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    try:
+        collection = db[collection_name]
+        result = await collection.insert_one(data)
+        return {"id": str(result.inserted_id), "message": "Document created"}
+    except Exception as e:
+        print(f"Error creating document in {collection_name}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.put("/api/admin/db/{collection_name}/{doc_id}")
+async def update_document(
+    collection_name: str,
+    doc_id: str,
+    data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Update a document in a collection (admin only)"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    try:
+        from bson import ObjectId
+        collection = db[collection_name]
+        
+        # Remove _id from data if present
+        data.pop("_id", None)
+        
+        result = await collection.update_one(
+            {"_id": ObjectId(doc_id)},
+            {"$set": data}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Document not found")
+        
+        return {"message": "Document updated"}
+    except Exception as e:
+        print(f"Error updating document in {collection_name}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/api/admin/db/{collection_name}/{doc_id}")
+async def delete_document(
+    collection_name: str,
+    doc_id: str,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Delete a document from a collection (admin only)"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    try:
+        from bson import ObjectId
+        collection = db[collection_name]
+        
+        result = await collection.delete_one({"_id": ObjectId(doc_id)})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Document not found")
+        
+        return {"message": "Document deleted"}
+    except Exception as e:
+        print(f"Error deleting document from {collection_name}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ===== CONSULTATIONS =====
 
 @app.post("/api/consultations")
