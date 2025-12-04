@@ -213,6 +213,7 @@ const MedicationGuide = () => {
             )}
           </div>
         </div>
+        <FooterLogo />
       </main>
       <Toaster />
     </div>
