@@ -1045,7 +1045,7 @@ RESPOSTA TÉCNICA:"""
         
         return {
             "response": response,
-            "model": "gemini-2.0-flash-exp"
+            "model": "gemini-2.0-flash"
         }
         
     except Exception as e:
