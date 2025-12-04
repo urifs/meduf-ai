@@ -187,6 +187,7 @@ const Admin = () => {
                 setSelectedUserForReactivation(user);
                 setIsReactivateOpen(true);
               }}
+              onPermanentDeleteUser={handlePermanentDeleteUser}
             />
 
             {/* Online Users Section */}
