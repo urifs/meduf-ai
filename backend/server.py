@@ -634,7 +634,8 @@ async def reactivate_user(
             {"$set": {
                 "deleted": False,
                 "deleted_at": None,
-                "expiration_date": new_expiration
+                "expiration_date": new_expiration,
+                "reactivated_at": datetime.now(timezone.utc)
             }}
         )
         
