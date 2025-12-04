@@ -29,6 +29,7 @@ const DoseCalculator = () => {
     weight: '',
     age: '',
     height: '',
+    sex: '',
     specialConditions: ''
   });
 
