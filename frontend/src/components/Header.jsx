@@ -45,7 +45,11 @@ export const Header = memo(() => {
   // Helper to resolve avatar URL
   const getAvatarUrl = (url) => {
     if (!url) return '';
+    // If it's already a data URL (base64), return as is
+    if (url.startsWith('data:')) return url;
+    // If it's an absolute URL, return as is
     if (url.startsWith('http')) return url;
+    // If it's a relative path, prepend backend URL
     return `${process.env.REACT_APP_BACKEND_URL}${url}`;
   };
 
