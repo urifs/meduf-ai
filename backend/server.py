@@ -1069,6 +1069,57 @@ RESPOSTA TÉCNICA:"""
         raise HTTPException(status_code=500, detail=f"Erro ao processar consulta: {str(e)}")
 
 
+# ===== ADMIN CHAT HISTORY =====
+
+@app.get("/api/admin/chat-history")
+async def get_all_chat_history(
+    current_user: UserInDB = Depends(get_current_admin_user)
+):
+    """Get all chat history for admin panel"""
+    try:
+        chats = await chat_history_collection.find(
+            {}, 
+            {"_id": 0}
+        ).sort("created_at", -1).to_list(1000)
+        
+        # Ensure timezone info
+        for chat in chats:
+            if chat.get("created_at"):
+                chat["created_at"] = ensure_utc_timezone(chat["created_at"]).isoformat()
+        
+        return chats
+    except Exception as e:
+        print(f"Error fetching chat history: {e}")
+        raise HTTPException(status_code=500, detail="Erro ao buscar histórico de conversas")
+
+
+@app.get("/api/admin/chat-history/stats")
+async def get_chat_history_stats(
+    current_user: UserInDB = Depends(get_current_admin_user)
+):
+    """Get chat history statistics"""
+    try:
+        total_chats = await chat_history_collection.count_documents({})
+        
+        # Get unique users who used chat
+        unique_users = await chat_history_collection.distinct("user_id")
+        
+        # Get chats from last 24 hours
+        yesterday = datetime.now(timezone.utc) - timedelta(days=1)
+        recent_chats = await chat_history_collection.count_documents({
+            "created_at": {"$gte": yesterday}
+        })
+        
+        return {
+            "total_conversations": total_chats,
+            "unique_users": len(unique_users),
+            "last_24h": recent_chats
+        }
+    except Exception as e:
+        print(f"Error fetching chat stats: {e}")
+        raise HTTPException(status_code=500, detail="Erro ao buscar estatísticas")
+
+
 # ===== STARTUP =====
 
 @app.on_event("startup")
