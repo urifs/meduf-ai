@@ -265,6 +265,7 @@ const Profile = () => {
           </CardContent>
         </Card>
       </main>
+      <Toaster />
     </div>
   );
 };
