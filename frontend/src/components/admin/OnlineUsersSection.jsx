@@ -153,6 +153,6 @@ const OnlineUsersSection = memo(({ onUserClick }) => {
       </CardContent>
     </Card>
   );
-};
+});
 
 export default OnlineUsersSection;
