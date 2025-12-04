@@ -605,7 +605,7 @@ async def submit_feedback(
         feedback = {
             "user_id": current_user.email,
             "user_email": current_user.email,
-            "user_name": current_user.username,
+            "user_name": getattr(current_user, 'name', None) or getattr(current_user, 'username', None) or current_user.email,
             "analysis_type": feedback_data.get("analysis_type", "unknown"),
             "is_helpful": feedback_data.get("is_helpful", True),
             "result_data": feedback_data.get("result_data", {}),
