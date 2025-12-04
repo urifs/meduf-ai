@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import FooterLogo from '@/components/FooterLogo';
 import { AnalysisProgress } from '@/components/AnalysisProgress';
@@ -24,6 +24,11 @@ const DrugInteraction = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const reportRef = useRef(null);
+
+  // Scroll to top on component mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleAddfield = () => {
     if (medications.length < 10) {
