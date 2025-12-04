@@ -20,6 +20,7 @@ import ConsultationDialog from '@/components/admin/ConsultationDialog';
 import UserManagementTabs from '@/components/admin/UserManagementTabs';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import FeedbackSection from '@/components/admin/FeedbackSection';
+import ChatHistorySection from '@/components/admin/ChatHistorySection';
 
 const Admin = () => {
   const navigate = useNavigate();
