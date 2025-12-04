@@ -406,6 +406,39 @@ async def create_toxicology_task(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/api/ai/consensus/dose-calculator")
+async def create_dose_calculator_task(
+    data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Create dose calculator task for up to 10 medications"""
+    try:
+        medications = data.get("medications", [])
+        if len(medications) < 1:
+            raise HTTPException(status_code=400, detail="Pelo menos uma medicação é necessária")
+        if len(medications) > 10:
+            raise HTTPException(status_code=400, detail="Máximo 10 medicações permitidas")
+        
+        patient_data = data.get("patient", {})
+        
+        task_id = task_manager.create_task("dose_calculator")
+        
+        asyncio.create_task(
+            task_manager.execute_task(
+                task_id,
+                analyze_dose_calculator,
+                patient_data=patient_data,
+                medications=medications
+            )
+        )
+        
+        return {"task_id": task_id, "message": f"Cálculo iniciado para {len(medications)} medicação(ões)"}
+    except Exception as e:
+        print(f"Error creating dose calculator task: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
 @app.post("/api/ai/consensus/drug-interaction")
 async def create_drug_interaction_task(
     data: dict,
