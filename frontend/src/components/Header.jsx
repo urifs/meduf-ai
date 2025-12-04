@@ -118,9 +118,12 @@ export const Header = () => {
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
             <BrainCircuit className="h-6 w-6" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-foreground">
-            Meduf <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Ai</span>
-          </span>
+          <div className="flex flex-col leading-none">
+            <span className="text-xl font-bold tracking-tight text-foreground">
+              Meduf <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Ai</span>
+            </span>
+            <span className="text-[9px] text-muted-foreground font-medium tracking-wider uppercase ml-0.5">2.0 Clinic</span>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
