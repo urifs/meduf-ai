@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Sparkles, User, Bot, Loader2, Copy, Check } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Send, Sparkles, User, BrainCircuit, Loader2, Copy, Check } from 'lucide-react';
 import { toast } from "sonner";
 import api from '@/lib/api';
 
