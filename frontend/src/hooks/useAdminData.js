@@ -83,7 +83,8 @@ const useAdminData = (userRole, navigate) => {
       navigate('/');
     } else {
       fetchData();
-      const interval = setInterval(fetchData, 3000);
+      // Reduced polling frequency from 3s to 15s for better performance
+      const interval = setInterval(fetchData, 15000);
       return () => clearInterval(interval);
     }
   }, [userRole, navigate]);
