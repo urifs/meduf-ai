@@ -205,13 +205,28 @@ const Profile = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="name">Nome Completo</Label>
+                <Label htmlFor="name">Nome</Label>
                 <Input 
                   id="name" 
                   value={user.name}
                   onChange={(e) => setUser({...user, name: e.target.value})}
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="bio">Descrição Profissional</Label>
+                <Textarea 
+                  id="bio" 
+                  placeholder="Ex: Médico Cardiologista | CRM 12345 | Especialista em Hipertensão"
+                  value={user.bio || ''}
+                  onChange={(e) => setUser({...user, bio: e.target.value})}
+                  rows={3}
+                  className="resize-none"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Uma breve descrição sobre sua atuação profissional (opcional)
+                </p>
               </div>
 
               <div className="flex justify-end">
