@@ -63,6 +63,17 @@ const MedicalChat = () => {
     }
   };
 
+  const handleCopy = async (content, index) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedIndex(index);
+      toast.success('Resposta copiada!');
+      setTimeout(() => setCopiedIndex(null), 2000);
+    } catch (error) {
+      toast.error('Erro ao copiar resposta.');
+    }
+  };
+
   return (
     <Card className="glass-card border-2 border-violet-200 dark:border-violet-500/30 shadow-2xl">
       <CardHeader className="border-b border-violet-100 dark:border-violet-500/20 bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-950/50 dark:to-purple-950/50">
