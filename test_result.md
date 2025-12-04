@@ -534,11 +534,11 @@ frontend:
 
 metadata:
   created_by: "testing_agent"
-  version: "5.2"
-  test_sequence: 19
+  version: "6.0"
+  test_sequence: 20
   run_ui: true
   test_completed: true
-  all_tests_passed: true
+  all_tests_passed: false
   last_test_date: "2025-12-04"
   critical_production_test_completed: true
   consensus_endpoints_verified: 5
@@ -568,6 +568,10 @@ metadata:
   account_validity_management_working: true
   online_users_counter_bug_fix_verified: true
   online_users_counter_working_correctly: true
+  bug_testing_completed: true
+  profile_image_upload_working: true
+  profile_image_persistence_failed: true
+  admin_clickable_functionality_working: true
 
 test_plan:
   current_focus: []
