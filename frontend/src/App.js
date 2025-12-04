@@ -154,8 +154,9 @@ function App() {
           {/* Catch all - redirect to home (which will redirect to login if needed) */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </BrowserRouter>
-    </div>
+          </Suspense>
+        </BrowserRouter>
+      </div>
     </ThemeProvider>
   );
 }
