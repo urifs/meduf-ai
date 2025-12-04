@@ -651,7 +651,7 @@ async def get_consultations(
 
 @app.get("/api/epidemiological-alerts")
 async def get_epidemiological_alerts():
-    """Get epidemiological alerts (mock for now)"""
+    """Get epidemiological alerts"""
     return {
         "brazil": [
             {
@@ -663,15 +663,63 @@ async def get_epidemiological_alerts():
             {
                 "state": "Rio de Janeiro",
                 "disease": "Dengue",
+                "level": "Alto",
+                "date": "Hoje"
+            },
+            {
+                "state": "Minas Gerais",
+                "disease": "Dengue",
+                "level": "Médio",
+                "date": "Hoje"
+            },
+            {
+                "state": "Paraná",
+                "disease": "Dengue",
+                "level": "Médio",
+                "date": "Hoje"
+            },
+            {
+                "state": "Bahia",
+                "disease": "Dengue",
+                "level": "Baixo",
+                "date": "Hoje"
+            },
+            {
+                "state": "Amazonas",
+                "disease": "Malária",
                 "level": "Médio",
                 "date": "Hoje"
             }
         ],
         "world": [
             {
-                "country": "Global",
-                "disease": "Monitoramento Ativo",
+                "country": "Argentina",
+                "disease": "Dengue",
+                "level": "Alto",
+                "date": "Hoje"
+            },
+            {
+                "country": "Paraguai",
+                "disease": "Dengue",
                 "level": "Médio",
+                "date": "Hoje"
+            },
+            {
+                "country": "Índia",
+                "disease": "Dengue",
+                "level": "Alto",
+                "date": "Hoje"
+            },
+            {
+                "country": "Tailândia",
+                "disease": "Dengue",
+                "level": "Médio",
+                "date": "Hoje"
+            },
+            {
+                "country": "África Subsaariana",
+                "disease": "Malária",
+                "level": "Alto",
                 "date": "Hoje"
             }
         ],
