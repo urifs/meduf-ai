@@ -684,6 +684,11 @@ async def get_admin_consultations(current_user: UserInDB = Depends(get_current_a
     consultations = []
     cursor = consultations_collection.find({}, {"_id": 0}).sort("timestamp", -1).limit(1000)
     async for doc in cursor:
+        # Convert timestamp to UTC aware
+        if "timestamp" in doc:
+            doc["timestamp"] = ensure_utc_timezone(doc["timestamp"])
+        if "created_at" in doc:
+            doc["created_at"] = ensure_utc_timezone(doc["created_at"])
         consultations.append(doc)
     return consultations
 
