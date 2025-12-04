@@ -624,9 +624,327 @@ class BackendTester:
                 print(f"   - {failed_test}")
             return False
 
+    def test_admin_permanent_user_deletion(self):
+        """Test permanent user deletion flow (BUG CORRECTED)"""
+        print(f"\n🗑️ Testing Admin Permanent User Deletion Flow...")
+        
+        # Step 1: Create test user
+        test_user_email = f"test_user_{int(time.time())}@meduf.test"
+        user_data = {
+            "email": test_user_email,
+            "name": "Test User for Deletion",
+            "password": "TestPassword123",
+            "role": "USER",
+            "days_valid": 30
+        }
+        
+        start_time = time.time()
+        try:
+            # Create user
+            response = self.session.post(
+                f"{BACKEND_URL}/admin/users",
+                json=user_data
+            )
+            create_duration = time.time() - start_time
+            
+            if response.status_code != 200:
+                self.log_result("Admin - Create Test User", False, 
+                              f"Failed to create user: {response.status_code} - {response.text}", create_duration)
+                return False
+            
+            self.log_result("Admin - Create Test User", True, 
+                          f"User created: {test_user_email}", create_duration)
+            
+            # Step 2: Soft delete user
+            response = self.session.delete(f"{BACKEND_URL}/admin/users/{test_user_email}")
+            if response.status_code != 200:
+                self.log_result("Admin - Soft Delete User", False, 
+                              f"Failed to soft delete: {response.status_code} - {response.text}")
+                return False
+            
+            self.log_result("Admin - Soft Delete User", True, 
+                          f"User soft deleted: {test_user_email}")
+            
+            # Step 3: Verify user appears in deleted users list
+            response = self.session.get(f"{BACKEND_URL}/admin/deleted-users")
+            if response.status_code != 200:
+                self.log_result("Admin - Get Deleted Users", False, 
+                              f"Failed to get deleted users: {response.status_code}")
+                return False
+            
+            deleted_users = response.json()
+            user_found_in_deleted = any(user.get("email") == test_user_email for user in deleted_users)
+            
+            if not user_found_in_deleted:
+                self.log_result("Admin - Verify in Deleted List", False, 
+                              f"User not found in deleted users list")
+                return False
+            
+            self.log_result("Admin - Verify in Deleted List", True, 
+                          f"User found in deleted users list")
+            
+            # Step 4: Permanent delete
+            response = self.session.delete(f"{BACKEND_URL}/admin/users/{test_user_email}/permanent")
+            if response.status_code != 200:
+                self.log_result("Admin - Permanent Delete", False, 
+                              f"Failed to permanently delete: {response.status_code} - {response.text}")
+                return False
+            
+            perm_delete_data = response.json()
+            deleted_count = perm_delete_data.get("deleted_count", 0)
+            
+            if deleted_count != 1:
+                self.log_result("Admin - Permanent Delete Count", False, 
+                              f"Expected deleted_count=1, got {deleted_count}")
+                return False
+            
+            self.log_result("Admin - Permanent Delete", True, 
+                          f"User permanently deleted, deleted_count={deleted_count}")
+            
+            # Step 5: Verify user NO LONGER appears in deleted users list
+            response = self.session.get(f"{BACKEND_URL}/admin/deleted-users")
+            if response.status_code != 200:
+                self.log_result("Admin - Final Verification", False, 
+                              f"Failed to get deleted users for verification: {response.status_code}")
+                return False
+            
+            deleted_users_after = response.json()
+            user_still_in_deleted = any(user.get("email") == test_user_email for user in deleted_users_after)
+            
+            if user_still_in_deleted:
+                self.log_result("Admin - Final Verification", False, 
+                              f"User still appears in deleted users list after permanent deletion")
+                return False
+            
+            self.log_result("Admin - Final Verification", True, 
+                          f"User successfully removed from deleted users list")
+            
+            total_duration = time.time() - start_time
+            self.log_result("Admin - Permanent Deletion Flow", True, 
+                          f"Complete flow successful: create → soft delete → verify → permanent delete → verify removal", total_duration)
+            return True
+            
+        except Exception as e:
+            duration = time.time() - start_time
+            self.log_result("Admin - Permanent Deletion Flow", False, f"Error: {str(e)}", duration)
+            return False
+    
+    def test_admin_authentication_flow(self):
+        """Test admin authentication flow"""
+        print(f"\n🔐 Testing Admin Authentication Flow...")
+        
+        start_time = time.time()
+        try:
+            # Test login with correct credentials
+            response = self.session.post(
+                f"{BACKEND_URL}/auth/login",
+                data={
+                    "username": TEST_USERNAME,
+                    "password": TEST_PASSWORD
+                }
+            )
+            duration = time.time() - start_time
+            
+            if response.status_code != 200:
+                self.log_result("Admin Authentication - Login", False, 
+                              f"Login failed: {response.status_code} - {response.text}", duration)
+                return False
+            
+            data = response.json()
+            access_token = data.get("access_token")
+            user_role = data.get("user_role")
+            user_name = data.get("user_name")
+            
+            if not access_token:
+                self.log_result("Admin Authentication - Token", False, 
+                              "No access_token returned", duration)
+                return False
+            
+            if user_role != "ADMIN":
+                self.log_result("Admin Authentication - Role", False, 
+                              f"Expected ADMIN role, got {user_role}", duration)
+                return False
+            
+            self.log_result("Admin Authentication - Login", True, 
+                          f"Login successful: {user_name} (role: {user_role})", duration)
+            
+            # Test using token for protected endpoint
+            headers = {"Authorization": f"Bearer {access_token}"}
+            response = self.session.get(f"{BACKEND_URL}/admin/users", headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Admin Authentication - Protected Access", False, 
+                              f"Protected endpoint access failed: {response.status_code}")
+                return False
+            
+            self.log_result("Admin Authentication - Protected Access", True, 
+                          "Successfully accessed protected admin endpoint")
+            
+            return True
+            
+        except Exception as e:
+            duration = time.time() - start_time
+            self.log_result("Admin Authentication Flow", False, f"Error: {str(e)}", duration)
+            return False
+    
+    def test_admin_user_listing(self):
+        """Test admin user listing endpoints"""
+        print(f"\n👥 Testing Admin User Listing...")
+        
+        start_time = time.time()
+        try:
+            # Test GET /api/admin/users (active users)
+            response = self.session.get(f"{BACKEND_URL}/admin/users")
+            duration = time.time() - start_time
+            
+            if response.status_code != 200:
+                self.log_result("Admin - Get Active Users", False, 
+                              f"Failed to get active users: {response.status_code} - {response.text}", duration)
+                return False
+            
+            active_users = response.json()
+            
+            if not isinstance(active_users, list):
+                self.log_result("Admin - Get Active Users", False, 
+                              f"Expected list, got {type(active_users)}", duration)
+                return False
+            
+            # Verify users have deleted=false (or not present, which defaults to false)
+            active_count = len(active_users)
+            deleted_in_active = sum(1 for user in active_users if user.get("deleted", False))
+            
+            if deleted_in_active > 0:
+                self.log_result("Admin - Active Users Validation", False, 
+                              f"Found {deleted_in_active} deleted users in active list")
+                return False
+            
+            self.log_result("Admin - Get Active Users", True, 
+                          f"Retrieved {active_count} active users (deleted=false)", duration)
+            
+            # Test GET /api/admin/deleted-users (deleted users)
+            response = self.session.get(f"{BACKEND_URL}/admin/deleted-users")
+            
+            if response.status_code != 200:
+                self.log_result("Admin - Get Deleted Users", False, 
+                              f"Failed to get deleted users: {response.status_code} - {response.text}")
+                return False
+            
+            deleted_users = response.json()
+            
+            if not isinstance(deleted_users, list):
+                self.log_result("Admin - Get Deleted Users", False, 
+                              f"Expected list, got {type(deleted_users)}")
+                return False
+            
+            # Verify users have deleted=true
+            deleted_count = len(deleted_users)
+            active_in_deleted = sum(1 for user in deleted_users if not user.get("deleted", False))
+            
+            if active_in_deleted > 0:
+                self.log_result("Admin - Deleted Users Validation", False, 
+                              f"Found {active_in_deleted} active users in deleted list")
+                return False
+            
+            self.log_result("Admin - Get Deleted Users", True, 
+                          f"Retrieved {deleted_count} deleted users (deleted=true)")
+            
+            total_duration = time.time() - start_time
+            self.log_result("Admin - User Listing", True, 
+                          f"Both endpoints working: {active_count} active, {deleted_count} deleted", total_duration)
+            return True
+            
+        except Exception as e:
+            duration = time.time() - start_time
+            self.log_result("Admin - User Listing", False, f"Error: {str(e)}", duration)
+            return False
+    
+    def run_admin_panel_tests(self):
+        """Run admin panel functionality tests as specified in review request"""
+        print("🔧 TESTE DO PAINEL ADMIN - Funcionalidades Específicas")
+        print("CREDENCIAIS ADMIN: ur1fs / @Fred1807")
+        print("URL BACKEND: https://meduf-ai-doctor.preview.emergentagent.com")
+        print("=" * 80)
+        
+        # Step 1: Authentication
+        if not self.authenticate():
+            print("\n❌ Authentication failed - cannot proceed with admin tests")
+            return False
+        
+        tests_passed = 0
+        total_tests = 3
+        failed_tests = []
+        
+        # Test 1: Permanent User Deletion (BUG CORRECTED)
+        print(f"\n1️⃣ EXCLUSÃO PERMANENTE DE USUÁRIO (BUG CORRIGIDO)")
+        if self.test_admin_permanent_user_deletion():
+            tests_passed += 1
+            print(f"   ✅ Exclusão permanente - SUCESSO")
+        else:
+            failed_tests.append("Exclusão Permanente de Usuário")
+            print(f"   ❌ Exclusão permanente - FALHOU")
+        
+        # Test 2: Authentication Flow
+        print(f"\n2️⃣ FLUXO DE AUTENTICAÇÃO")
+        if self.test_admin_authentication_flow():
+            tests_passed += 1
+            print(f"   ✅ Autenticação - SUCESSO")
+        else:
+            failed_tests.append("Fluxo de Autenticação")
+            print(f"   ❌ Autenticação - FALHOU")
+        
+        # Test 3: User Listing
+        print(f"\n3️⃣ LISTAGEM DE USUÁRIOS")
+        if self.test_admin_user_listing():
+            tests_passed += 1
+            print(f"   ✅ Listagem de usuários - SUCESSO")
+        else:
+            failed_tests.append("Listagem de Usuários")
+            print(f"   ❌ Listagem de usuários - FALHOU")
+        
+        # Final Results
+        print("\n" + "=" * 80)
+        print(f"📊 RESULTADO FINAL ADMIN: {tests_passed}/{total_tests} testes PASSARAM")
+        success_rate = (tests_passed / total_tests) * 100
+        print(f"📈 Taxa de Sucesso: {success_rate:.1f}%")
+        
+        if tests_passed == total_tests:
+            print("🎉 ✅ TODOS os testes do painel admin PASSARAM (100%)")
+            print("🎉 ✅ Exclusão permanente funcionando corretamente")
+            print("🎉 ✅ Autenticação com credenciais admin funcionando")
+            print("🎉 ✅ Listagem de usuários ativos e excluídos funcionando")
+            print("🎉 PAINEL ADMIN - TOTALMENTE FUNCIONAL!")
+            return True
+        else:
+            print(f"⚠️ ❌ {total_tests - tests_passed} testes FALHARAM")
+            print(f"⚠️ ❌ Taxa de falha: {100 - success_rate:.1f}%")
+            print("❌ TESTES FALHARAM:")
+            for failed_test in failed_tests:
+                print(f"   - {failed_test}")
+            return False
+
     def run_all_tests(self):
-        """Run all backend tests - wrapper for review request tests"""
-        return self.run_review_request_tests()
+        """Run all backend tests - both consensus and admin panel tests"""
+        print("🚀 TESTE COMPLETO DO BACKEND - Consenso AI + Painel Admin")
+        print("=" * 80)
+        
+        # Run admin panel tests first (as per review request)
+        admin_success = self.run_admin_panel_tests()
+        
+        print("\n" + "=" * 80)
+        
+        # Run consensus tests
+        consensus_success = self.run_review_request_tests()
+        
+        # Overall results
+        print("\n" + "=" * 80)
+        print("📊 RESULTADO GERAL:")
+        print(f"   Admin Panel: {'✅ PASSOU' if admin_success else '❌ FALHOU'}")
+        print(f"   Consensus AI: {'✅ PASSOU' if consensus_success else '❌ FALHOU'}")
+        
+        overall_success = admin_success and consensus_success
+        print(f"\n🎯 RESULTADO FINAL: {'✅ TODOS OS TESTES PASSARAM' if overall_success else '❌ ALGUNS TESTES FALHARAM'}")
+        
+        return overall_success
 
 def main():
     """Main test execution"""
