@@ -285,4 +285,4 @@ const UserManagementTabs = ({
   );
 };
 
-export default UserManagementTabs;
+export default memo(UserManagementTabs);
