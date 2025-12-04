@@ -301,21 +301,22 @@ async def upload_avatar(
     file: UploadFile = File(...),
     current_user: UserInDB = Depends(get_current_active_user)
 ):
-    """Upload user avatar"""
+    """Upload user avatar and save as base64 in database"""
     try:
-        upload_dir = static_path / "uploads"
-        upload_dir.mkdir(exist_ok=True)
+        # Read file content
+        contents = await file.read()
         
-        # Save file
-        file_ext = Path(file.filename).suffix
-        filename = f"{current_user.id}{file_ext}"
-        file_path = upload_dir / filename
+        # Convert to base64
+        import base64
+        base64_image = base64.b64encode(contents).decode('utf-8')
         
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+        # Get mime type
+        content_type = file.content_type or "image/jpeg"
         
-        # Update database
-        avatar_url = f"/api/static/uploads/{filename}"
+        # Create data URL
+        avatar_url = f"data:{content_type};base64,{base64_image}"
+        
+        # Update database with base64 image
         await users_collection.update_one(
             {"_id": ObjectId(current_user.id)},
             {"$set": {"avatar_url": avatar_url}}
