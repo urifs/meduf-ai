@@ -92,6 +92,7 @@ class UserInDB(BaseModel):
     password_hash: str
     role: str = "USER"
     avatar_url: Optional[str] = None
+    bio: Optional[str] = None
     expiration_date: Optional[datetime] = None
     deleted: bool = False
 
