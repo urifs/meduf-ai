@@ -20,6 +20,7 @@ from bson import ObjectId
 from pathlib import Path
 import shutil
 from dotenv import load_dotenv
+from emergentintegrations.llm.chat import LlmChat, UserMessage
 
 # Load environment
 load_dotenv()
