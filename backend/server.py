@@ -928,6 +928,15 @@ async def startup_event():
     print("✅ EMERGENT_LLM_KEY: Configurada")
     print("✅ Funcionalidades: 5 principais")
     print("=" * 80)
+    
+    # Iniciar task de atualização horária de alertas epidemiológicos
+    from epidemiological_alerts import start_hourly_update_task, get_cached_alerts
+    asyncio.create_task(start_hourly_update_task())
+    
+    # Carregar alertas iniciais
+    await get_cached_alerts()
+    print("✅ Sistema de alertas epidemiológicos iniciado (atualização a cada 1 hora)")
+    print("=" * 80)
 
 
 if __name__ == "__main__":
