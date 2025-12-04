@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import FooterLogo from '@/components/FooterLogo';
 import { AnalysisProgress } from '@/components/AnalysisProgress';
