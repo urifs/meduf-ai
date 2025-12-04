@@ -78,7 +78,10 @@ const DatabaseManager = () => {
       const response = await api.get('/admin/db/collections');
       setCollections(response.data);
       if (response.data.length > 0 && !selectedCollection) {
-        setSelectedCollection(response.data[0]);
+        // Extract collection name (support both string and object format)
+        const firstCollection = response.data[0];
+        const collectionName = typeof firstCollection === 'string' ? firstCollection : firstCollection.name;
+        setSelectedCollection(collectionName);
       } else if (response.data.length === 0) {
         setSelectedCollection(null);
         setDocuments([]);
