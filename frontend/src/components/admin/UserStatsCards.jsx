@@ -65,17 +65,17 @@ const UserStatsCards = ({ stats, onlineCount, monthlyUsage }) => {
         </CardContent>
       </Card>
 
-      <Card className="border-l-4 border-l-purple-500 shadow-sm">
+      <Card className="border-l-4 border-l-red-500 shadow-sm">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Status do Banco de Dados</CardTitle>
+          <CardTitle className="text-sm font-medium text-muted-foreground">Contas Desativadas</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
-            <div className="text-3xl font-bold text-green-600">Online</div>
-            <Database className="h-8 w-8 text-purple-100" />
+            <div className="text-3xl font-bold text-red-600">{stats.totalDeleted}</div>
+            <Database className="h-8 w-8 text-red-100" />
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            Conexão MongoDB estabelecida
+            Usuários excluídos ou expirados
           </p>
         </CardContent>
       </Card>
