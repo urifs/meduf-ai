@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useForm } from "react-hook-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Stethoscope, FileText, History, Activity, Sparkles } from 'lucide-react';
 import { CustomLoader } from '@/components/ui/custom-loader';
 
-export const PatientForm = ({ onSubmit, isLoading }) => {
+export const PatientForm = memo(({ onSubmit, isLoading }) => {
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
     defaultValues: {
       idade: "",
