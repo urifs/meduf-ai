@@ -547,13 +547,23 @@ async def delete_user(
     
     try:
         # Soft delete instead of permanent delete
-        result = await users_collection.update_one(
-            {"email": user_id},
-            {"$set": {
-                "deleted": True,
-                "deleted_at": datetime.now(timezone.utc)
-            }}
-        )
+        # Try to find user by _id first, then by email as fallback
+        try:
+            result = await users_collection.update_one(
+                {"_id": ObjectId(user_id)},
+                {"$set": {
+                    "deleted": True,
+                    "deleted_at": datetime.now(timezone.utc)
+                }}
+            )
+        except:
+            result = await users_collection.update_one(
+                {"email": user_id},
+                {"$set": {
+                    "deleted": True,
+                    "deleted_at": datetime.now(timezone.utc)
+                }}
+            )
         
         if result.modified_count == 0:
             raise HTTPException(status_code=404, detail="Usuário não encontrado")
