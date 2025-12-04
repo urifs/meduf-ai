@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import PasswordToggle from '@/components/PasswordToggle';
 import { 
   Users, 
   Activity, 
@@ -26,7 +27,8 @@ import {
   TrendingUp,
   MessageSquare,
   ThumbsUp,
-  ThumbsDown
+  ThumbsDown,
+  RotateCcw
 } from 'lucide-react';
 import { CustomLoader } from '@/components/ui/custom-loader';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
