@@ -16,6 +16,7 @@ export const Header = () => {
   const location = useLocation();
   const { theme, toggleTheme, isDark } = useTheme();
   const userName = localStorage.getItem('userName') || 'Dr. Silva';
+  const userEmail = localStorage.getItem('userEmail') || '';
   const userRole = localStorage.getItem('userRole');
   const userExpiration = localStorage.getItem('userExpiration');
   const userAvatar = localStorage.getItem('userAvatar');
