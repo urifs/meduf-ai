@@ -97,6 +97,18 @@ const useUserActions = (fetchData, users, setUsers) => {
     }
   };
 
+  const handlePermanentDeleteUser = async (userId) => {
+    try {
+      await api.delete(`/admin/users/${userId}/permanent`);
+      toast.success("Usuário excluído permanentemente!");
+      await fetchData();
+      return true;
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Erro ao excluir usuário permanentemente.");
+      return false;
+    }
+  };
+
   return {
     // Create User
     isCreateOpen,
