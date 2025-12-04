@@ -1076,6 +1076,9 @@ async def get_all_chat_history(
     current_user: UserInDB = Depends(get_current_active_user)
 ):
     """Get all chat history for admin panel"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
     try:
         chats = await chat_history_collection.find(
             {}, 
