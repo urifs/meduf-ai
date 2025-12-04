@@ -397,9 +397,10 @@ async def analyze_dose_calculator(patient_data: Dict[str, Any], medications: Lis
             if med.get('indication'):
                 meds_text += f" - Indicação: {med['indication']}"
         
+        no_data_msg = "\n- Dados não informados"
         prompt = f"""Analise e forneça prescrição farmacológica COMPLETA E DETALHADA para as seguintes medicações:
 
-**DADOS DO PACIENTE:**{patient_context if patient_context else "\n- Dados não informados"}
+**DADOS DO PACIENTE:**{patient_context if patient_context else no_data_msg}
 
 **MEDICAÇÕES:**{meds_text}
 
