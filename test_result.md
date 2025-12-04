@@ -575,12 +575,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Profile Image Persistence After Logout/Login"
-  stuck_tasks:
-    - "Profile Image Persistence After Logout/Login"
+    - "Free AI Consultation - Single Message Test"
+    - "Free AI Consultation - Context Maintenance Test"
+    - "Free AI Consultation - Validation and UI Test"
+  stuck_tasks: []
   test_all: false
-  test_priority: "bug_fix_verification"
-  test_summary: "BUG TESTING RESULTS: 1 of 2 bugs verified as fixed. ✅ Bug 2 (Clickable Admins): WORKING - Admin entries in sidebar are clickable and open detailed user profile modal with all required information. ❌ Bug 1 (Profile Image Persistence): PARTIALLY WORKING - Image upload functionality works correctly, but images do not persist after logout/login cycle. The avatar reverts to default state, indicating a backend persistence issue."
+  test_priority: "high_first"
+  test_summary: "REVIEW REQUEST TESTING: Testing Free AI Consultation (Consulta Livre com IA) functionality after bug fix. Need to verify single message sending, context maintenance, validation, and UI components work correctly."
 
 frontend:
   - task: "Toxicology Feature - Backend AI Engine Integration - Paracetamol"
