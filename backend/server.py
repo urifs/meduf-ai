@@ -989,6 +989,66 @@ async def get_epidemiological_alerts():
     return await get_cached_alerts()
 
 
+# ===== MEDICAL CHAT =====
+
+@app.post("/api/medical-chat")
+async def medical_chat(
+    data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Free medical consultation with AI for specialists"""
+    try:
+        user_message = data.get("message", "")
+        history = data.get("history", [])
+        
+        if not user_message:
+            raise HTTPException(status_code=400, detail="Mensagem não pode estar vazia")
+        
+        # Build conversation context
+        conversation = []
+        for msg in history[-5:]:  # Last 5 messages for context
+            conversation.append(f"{msg['role'].upper()}: {msg['content']}")
+        
+        # Create specialized medical prompt
+        system_prompt = """Você é um assistente médico especializado para médicos. 
+
+IMPORTANTE:
+- Use linguagem técnica e científica apropriada para médicos especialistas
+- Baseie suas respostas em evidências médicas e guidelines atualizados
+- Cite protocolos, diretrizes e estudos quando relevante
+- Seja preciso com dosagens, contraindicações e interações
+- Mantenha tom profissional e conciso
+- Se não tiver certeza, indique claramente
+
+Seu objetivo é auxiliar médicos em suas decisões clínicas com informações técnicas precisas."""
+
+        full_prompt = f"""{system_prompt}
+
+CONTEXTO DA CONVERSA:
+{chr(10).join(conversation) if conversation else "Primeira mensagem"}
+
+PERGUNTA DO MÉDICO:
+{user_message}
+
+RESPOSTA TÉCNICA:"""
+
+        # Use Gemini 2.0 Flash
+        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        
+        chat = LlmChat(provider="google", model="gemini-2.0-flash-exp")
+        messages = [UserMessage(content=full_prompt)]
+        response = await chat.ainvoke(messages)
+        
+        return {
+            "response": response,
+            "model": "gemini-2.0-flash-exp"
+        }
+        
+    except Exception as e:
+        print(f"Error in medical chat: {e}")
+        raise HTTPException(status_code=500, detail="Erro ao processar consulta")
+
+
 # ===== STARTUP =====
 
 @app.on_event("startup")
