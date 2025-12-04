@@ -189,21 +189,31 @@ const DatabaseManager = () => {
                 {collections.length === 0 ? (
                   <p className="text-sm text-muted-foreground p-2">Nenhuma coleção encontrada.</p>
                 ) : (
-                  collections.map(col => (
-                    <Button
-                      key={col}
-                      variant={selectedCollection === col ? "secondary" : "ghost"}
-                      className="w-full justify-start"
-                      onClick={() => {
-                        setSelectedCollection(col);
-                        setSearchTerm(""); // Reset search on collection change
-                      }}
-                    >
-                      <TableIcon className="mr-2 h-4 w-4" />
-                      {col}
-                      {selectedCollection === col && <ChevronRight className="ml-auto h-4 w-4 opacity-50" />}
-                    </Button>
-                  ))
+                  collections.map(col => {
+                    const collectionName = typeof col === 'string' ? col : col.name;
+                    const collectionCount = typeof col === 'object' ? col.count : 0;
+                    
+                    return (
+                      <Button
+                        key={collectionName}
+                        variant={selectedCollection === collectionName ? "secondary" : "ghost"}
+                        className="w-full justify-start"
+                        onClick={() => {
+                          setSelectedCollection(collectionName);
+                          setSearchTerm(""); // Reset search on collection change
+                        }}
+                      >
+                        <TableIcon className="mr-2 h-4 w-4" />
+                        <span className="flex-1 text-left">{collectionName}</span>
+                        {collectionCount > 0 && (
+                          <Badge variant="outline" className="ml-2 text-xs">
+                            {collectionCount}
+                          </Badge>
+                        )}
+                        {selectedCollection === collectionName && <ChevronRight className="ml-2 h-4 w-4 opacity-50" />}
+                      </Button>
+                    );
+                  })
                 )}
               </div>
             </CardContent>
