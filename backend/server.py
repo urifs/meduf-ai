@@ -1041,8 +1041,21 @@ RESPOSTA TÉCNICA:"""
             system_message=system_prompt
         ).with_model("gemini", "gemini-2.0-flash")
         
-        user_message = UserMessage(text=full_prompt)
-        response = await chat.send_message(user_message)
+        user_msg = UserMessage(text=full_prompt)
+        response = await chat.send_message(user_msg)
+        
+        # Save conversation to database
+        chat_entry = {
+            "id": str(uuid4()),
+            "user_id": current_user.id,
+            "user_email": current_user.email,
+            "user_name": current_user.name,
+            "user_message": user_message,
+            "ai_response": response,
+            "created_at": datetime.now(timezone.utc),
+            "model": "gemini-2.0-flash"
+        }
+        await chat_history_collection.insert_one(chat_entry)
         
         return {
             "response": response,
