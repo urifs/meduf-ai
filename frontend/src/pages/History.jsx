@@ -174,9 +174,9 @@ const History = () => {
                                   </Badge>
                                 </DialogTitle>
                                 <DialogDescription>
-                                  Realizada em {entry.created_at ? (() => {
+                                  Realizada em {(entry.timestamp || entry.created_at) ? (() => {
                                     try {
-                                      const date = new Date(entry.created_at);
+                                      const date = new Date(entry.timestamp || entry.created_at);
                                       return !isNaN(date.getTime()) ? format(date, "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR }) : "-";
                                     } catch (e) {
                                       return "-";
