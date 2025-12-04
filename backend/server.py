@@ -305,10 +305,18 @@ async def upload_avatar(
     file: UploadFile = File(...),
     current_user: UserInDB = Depends(get_current_active_user)
 ):
-    """Upload user avatar and save as base64 in database"""
+    """Upload user avatar and save as base64 in database (max 500KB)"""
     try:
         # Read file content
         contents = await file.read()
+        
+        # Check file size (max 500KB for performance)
+        max_size = 500 * 1024  # 500KB
+        if len(contents) > max_size:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Imagem muito grande. Tamanho máximo: 500KB. Tamanho atual: {len(contents) // 1024}KB"
+            )
         
         # Convert to base64
         import base64
@@ -327,6 +335,8 @@ async def upload_avatar(
         )
         
         return {"avatar_url": avatar_url}
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Error uploading avatar: {e}")
         raise HTTPException(status_code=500, detail=str(e))
