@@ -158,10 +158,9 @@ const Login = () => {
               Esqueceu a senha?
             </a>
           </div>
-          <Input 
-            id="password" 
-            type="password" 
-            placeholder="••••••••" 
+          <PasswordToggle
+            id="password"
+            placeholder="••••••••"
             value={formData.password}
             onChange={handleChange}
             required
