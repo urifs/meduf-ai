@@ -75,6 +75,14 @@ const Profile = () => {
         bio: user.bio
       });
       
+      // Update local state with response data
+      setUser({
+        name: response.data.name,
+        avatar_url: response.data.avatar_url || '',
+        bio: response.data.bio || ''
+      });
+      
+      // Update localStorage
       localStorage.setItem('userName', response.data.name);
       if (response.data.avatar_url) {
         localStorage.setItem('userAvatar', response.data.avatar_url);
@@ -82,7 +90,7 @@ const Profile = () => {
       
       toast.success("Perfil atualizado com sucesso!");
     } catch (error) {
-      console.error(error);
+      console.error("Error updating profile:", error);
       toast.error("Erro ao atualizar perfil.");
     } finally {
       setIsSaving(false);
