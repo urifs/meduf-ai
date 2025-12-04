@@ -1038,7 +1038,7 @@ RESPOSTA TÉCNICA:"""
             api_key=EMERGENT_LLM_KEY,
             session_id=f"medical_chat_{current_user.id}",
             system_message=system_prompt
-        ).with_model("gemini", "gemini-2.0-flash-exp")
+        ).with_model("gemini", "gemini-2.0-flash")
         
         user_message = UserMessage(text=full_prompt)
         response = await chat.send_message(user_message)
