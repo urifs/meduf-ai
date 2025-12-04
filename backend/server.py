@@ -1040,8 +1040,8 @@ RESPOSTA TÉCNICA:"""
             system_message=system_prompt
         ).with_model("gemini", "gemini-2.0-flash-exp")
         
-        messages = [UserMessage(content=full_prompt)]
-        response = await chat.ainvoke(messages)
+        user_message = UserMessage(text=full_prompt)
+        response = await chat.send_message(user_message)
         
         return {
             "response": response,
