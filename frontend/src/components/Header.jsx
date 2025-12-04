@@ -262,7 +262,15 @@ export const Header = () => {
                     className={`flex items-center gap-2 px-4 py-3 rounded-md transition-colors ${isActive('/history') ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted text-foreground/80'}`}
                   >
                     <ClipboardList className="h-4 w-4" />
-                    Histórico
+                    Histórico de Análises
+                  </Link>
+
+                  <Link 
+                    to="/chat-history" 
+                    className={`flex items-center gap-2 px-4 py-3 rounded-md transition-colors ${isActive('/chat-history') ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted text-foreground/80'}`}
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    Minhas Conversas IA
                   </Link>
 
                   <Link 
