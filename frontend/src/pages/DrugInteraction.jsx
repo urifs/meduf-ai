@@ -517,6 +517,7 @@ const DrugInteraction = () => {
             )}
           </div>
         </div>
+        <FooterLogo />
       </main>
       <Toaster />
     </div>
