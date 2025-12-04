@@ -71,7 +71,8 @@ const Profile = () => {
     try {
       const response = await api.patch('/users/me', {
         name: user.name,
-        avatar_url: user.avatar_url
+        avatar_url: user.avatar_url,
+        bio: user.bio
       });
       
       localStorage.setItem('userName', response.data.name);
