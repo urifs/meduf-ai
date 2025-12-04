@@ -151,6 +151,11 @@ const History = () => {
                           {entry.report.diagnoses[0].name}
                         </Badge>
                       </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        <Badge variant="secondary" className="text-xs">
+                          {entry.model || 'Meduf 2.0 Clinic'}
+                        </Badge>
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
                           <Dialog>
