@@ -217,14 +217,18 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if not verify_password(form_data.password, user["password_hash"]):
         raise HTTPException(status_code=401, detail="Senha incorreta")
     
-    # Update last activity timestamp
+    # Create new token
+    access_token = create_access_token({"sub": str(user["_id"])})
+    
+    # Update user with new session token and last activity
+    # This will invalidate any previous session
     await users_collection.update_one(
         {"_id": user["_id"]},
-        {"$set": {"last_activity": datetime.now(timezone.utc)}}
+        {"$set": {
+            "last_activity": datetime.now(timezone.utc),
+            "active_session_token": access_token  # Salva o token da sessão ativa
+        }}
     )
-    
-    # Create token
-    access_token = create_access_token({"sub": str(user["_id"])})
     
     return {
         "access_token": access_token,
