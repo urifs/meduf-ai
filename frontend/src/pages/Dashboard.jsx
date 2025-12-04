@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Header } from '@/components/Header';
+import FooterLogo from '@/components/FooterLogo';
 import { PatientForm } from '@/components/PatientForm';
 import { ClinicalReport } from '@/components/ClinicalReport';
 import { AnalysisProgress } from '@/components/AnalysisProgress';
