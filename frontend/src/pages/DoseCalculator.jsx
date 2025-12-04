@@ -37,6 +37,11 @@ const DoseCalculator = () => {
     { id: 1, name: '', route: '', indication: '' }
   ]);
 
+  // Scroll to top on component mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const addMedication = () => {
     if (medications.length < 10) {
       setMedications([...medications, {
