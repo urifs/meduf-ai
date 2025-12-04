@@ -27,10 +27,12 @@ const History = () => {
   const fetchHistory = async () => {
     try {
       const response = await api.get('/consultations');
-      setHistory(response.data);
+      // Ensure response.data is always an array
+      setHistory(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Error fetching history:", error);
       toast.error("Erro ao carregar histórico.");
+      setHistory([]);
     } finally {
       setIsLoading(false);
     }
