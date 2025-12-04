@@ -715,6 +715,57 @@ async def get_online_stats(current_user: UserInDB = Depends(get_current_active_u
     return {"online_count": online_count, "online": online_count}
 
 
+async def get_current_admin_user(current_user: UserInDB = Depends(get_current_active_user)):
+    """Helper function to get current admin user"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    return current_user
+
+
+@app.get("/api/admin/stats/online")
+async def get_online_count(
+    current_user: UserInDB = Depends(get_current_admin_user)
+):
+    """Get count of users online in the last 5 minutes"""
+    try:
+        five_minutes_ago = datetime.now(timezone.utc) - timedelta(minutes=5)
+        online_count = await users_collection.count_documents({
+            "last_activity": {"$gte": five_minutes_ago},
+            "deleted": {"$ne": True}
+        })
+        return {"online_count": online_count}
+    except Exception as e:
+        print(f"Error getting online count: {e}")
+        return {"online_count": 0}
+
+
+@app.get("/api/admin/online-users")
+async def get_online_users(
+    current_user: UserInDB = Depends(get_current_admin_user)
+):
+    """Get list of users online in the last 5 minutes"""
+    try:
+        five_minutes_ago = datetime.now(timezone.utc) - timedelta(minutes=5)
+        online_users = []
+        cursor = users_collection.find(
+            {
+                "last_activity": {"$gte": five_minutes_ago},
+                "deleted": {"$ne": True}
+            },
+            {"_id": 0, "password_hash": 0}
+        ).sort("last_activity", -1)
+        
+        async for user in cursor:
+            if user.get("last_activity"):
+                user["last_activity"] = ensure_utc_timezone(user["last_activity"]).isoformat()
+            online_users.append(user)
+        
+        return online_users
+    except Exception as e:
+        print(f"Error getting online users: {e}")
+        return []
+
+
 @app.get("/api/admin/deleted-users")
 async def get_deleted_users(current_user: UserInDB = Depends(get_current_active_user)):
     """Get deleted users (admin only)"""
