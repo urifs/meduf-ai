@@ -217,6 +217,12 @@ const Admin = () => {
           }}
         />
 
+        {/* Chat History Section */}
+        <ChatHistorySection
+          chatHistory={chatHistory}
+          formatDate={formatDate}
+        />
+
         {/* Modals */}
         <ReactivationDialog
           isOpen={isReactivateOpen}
