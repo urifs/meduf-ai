@@ -630,11 +630,11 @@ frontend:
 
 metadata:
   created_by: "testing_agent"
-  version: "12.0"
-  test_sequence: 26
+  version: "13.0"
+  test_sequence: 27
   run_ui: true
   test_completed: true
-  all_tests_passed: false
+  all_tests_passed: true
   last_test_date: "2025-01-02"
   free_ai_consultation_testing_completed: true
   review_request_testing_completed: true
@@ -668,6 +668,9 @@ metadata:
   admin_authentication_verified: true
   admin_user_listing_verified: true
   admin_panel_bug_fix_confirmed: true
+  drug_interaction_white_screen_bug_fixed: true
+  regression_testing_completed: true
+  safestringify_fix_verified: true
 
 test_plan:
   current_focus:
