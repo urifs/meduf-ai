@@ -403,6 +403,48 @@ frontend:
         agent: "testing"
         comment: "✅ MEDICAL CHAT COPY BUTTON VERIFIED: Medical chat component functional with AI responding to hypertension question. Copy button appears after AI response and copy functionality works (text copied to clipboard). Minor: Visual feedback incomplete - button doesn't change to 'Copiado!' state when clicked, but core functionality working. Copy button implementation found in lines 66-75 and 134-155 of MedicalChat.jsx."
 
+  - task: "Header Logo 2.0 Clinic Display"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/Header.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "REVIEW REQUEST TESTING: Need to verify header logo shows 'Meduf Ai' in normal size and '2.0 CLINIC' small underneath using credentials teste.chat@meduf.com/Teste123."
+      - working: "NA"
+        agent: "testing"
+        comment: "✅ PARTIAL VERIFICATION: 'Meduf Ai' text found and visible in header. However, '2.0 CLINIC' text was not found with standard selectors (text=2.0 Clinic, text=2.0 CLINIC, :has-text('2.0'), :has-text('Clinic')). Manual verification needed via screenshots. Header logo screenshot captured for visual confirmation. Code shows '2.0 CLINIC' should be on line 125 in Header.jsx as 'text-[9px] text-muted-foreground font-medium tracking-wider uppercase ml-0.5'."
+
+  - task: "Emoji Removal from Selection Page"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/pages/Selection.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ EMOJI FOUND ON SELECTION PAGE: During comprehensive emoji removal verification, found 💡 emoji still present on Selection page. Other pages (History, Chat History, Profile) are emoji-free. Need to locate and remove the 💡 emoji from Selection page content."
+
+  - task: "Profile Save Button Backend Integration"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/pages/Profile.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "REVIEW REQUEST TESTING: Need to test 'Salvar Alterações' button functionality. Change name to 'Teste Salvar Perfil' and bio to 'Testando salvamento de dados', verify success toast appears and data persists after page reload."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL PROFILE SAVE FAILURE: Save button is clickable and form accepts input changes (name changed to 'Teste Salvar Perfil', bio to 'Testando salvamento de dados'), but data persistence FAILED. No success toast appeared ('Perfil atualizado com sucesso!' not found), and after page reload, all changes reverted to original values (name: 'Teste Chat', bio: ''). Profile save functionality is NOT working - backend API integration or form submission issue detected. Screenshots captured documenting the complete test flow."
+
   - task: "Admin Panel Chat Statistics Cards"
     implemented: true
     working: true
