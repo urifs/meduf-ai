@@ -57,6 +57,7 @@ users_collection = db.users
 consultations_collection = db.consultations
 costs_collection = db.usage_stats
 feedbacks_collection = db.feedbacks
+chat_history_collection = db.chat_history
 
 # Security
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
