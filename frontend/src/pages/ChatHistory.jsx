@@ -264,6 +264,7 @@ const ChatHistory = () => {
             )}
           </DialogContent>
         </Dialog>
+        <FooterLogo />
       </main>
     </div>
   );
