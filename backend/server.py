@@ -393,6 +393,144 @@ async def get_admin_users(current_user: UserInDB = Depends(get_current_active_us
     return users
 
 
+@app.post("/api/admin/users")
+async def create_user(
+    user_data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Create a new user (admin only)"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    try:
+        # Validate required fields
+        if not user_data.get("email") or not user_data.get("password"):
+            raise HTTPException(status_code=400, detail="Email e senha são obrigatórios")
+        
+        # Check if user already exists
+        existing = await users_collection.find_one({"email": user_data.get("email")})
+        if existing:
+            raise HTTPException(status_code=400, detail="Email já cadastrado")
+        
+        # Calculate expiration date
+        days_valid = user_data.get("days_valid", 30)
+        expiration_date = datetime.now(timezone.utc) + timedelta(days=days_valid)
+        
+        # Create user document
+        new_user = {
+            "username": user_data.get("name", user_data.get("email")),
+            "name": user_data.get("name", user_data.get("email")),
+            "email": user_data.get("email"),
+            "password": get_password_hash(user_data.get("password")),
+            "role": user_data.get("role", "USER"),
+            "expiration_date": expiration_date,
+            "created_at": datetime.now(timezone.utc),
+            "deleted": False,
+            "session_id": str(uuid4())
+        }
+        
+        result = await users_collection.insert_one(new_user)
+        
+        return {
+            "id": str(result.inserted_id),
+            "message": "Usuário criado com sucesso",
+            "email": new_user["email"],
+            "name": new_user["name"]
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error creating user: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.patch("/api/admin/users/{user_id}")
+async def update_user_expiration(
+    user_id: str,
+    data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Update user expiration date (admin only)"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    try:
+        days_valid = data.get("days_valid", 30)
+        new_expiration = datetime.now(timezone.utc) + timedelta(days=days_valid)
+        
+        result = await users_collection.update_one(
+            {"email": user_id},
+            {"$set": {"expiration_date": new_expiration}}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
+        
+        return {"message": "Validade atualizada com sucesso"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error updating expiration: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.patch("/api/admin/users/{user_id}/status")
+async def toggle_user_status(
+    user_id: str,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Toggle user active/inactive status (admin only)"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    try:
+        user = await users_collection.find_one({"email": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
+        
+        new_deleted_status = not user.get("deleted", False)
+        
+        await users_collection.update_one(
+            {"email": user_id},
+            {"$set": {
+                "deleted": new_deleted_status,
+                "deleted_at": datetime.now(timezone.utc) if new_deleted_status else None
+            }}
+        )
+        
+        new_status = "Inativo" if new_deleted_status else "Ativo"
+        
+        return {"status": new_status, "message": f"Status atualizado para {new_status}"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error toggling status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/api/admin/users/{user_id}")
+async def delete_user(
+    user_id: str,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Delete user permanently (admin only)"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    try:
+        result = await users_collection.delete_one({"email": user_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
+        
+        return {"message": "Usuário excluído permanentemente"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error deleting user: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/admin/consultations")
 async def get_admin_consultations(current_user: UserInDB = Depends(get_current_active_user)):
     """Get all consultations (admin only)"""
