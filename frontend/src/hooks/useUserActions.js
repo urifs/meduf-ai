@@ -140,7 +140,10 @@ const useUserActions = (fetchData, users, setUsers) => {
     setSelectedUserForReactivation,
     reactivationDays,
     setReactivationDays,
-    handleReactivateUser
+    handleReactivateUser,
+    
+    // Permanent Delete
+    handlePermanentDeleteUser
   };
 };
 
