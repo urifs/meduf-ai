@@ -155,7 +155,8 @@ const Admin = () => {
         <UserStatsCards 
           stats={stats} 
           onlineCount={onlineCount} 
-          monthlyUsage={monthlyUsage} 
+          monthlyUsage={monthlyUsage}
+          chatStats={chatStats}
         />
 
         {/* Main Content Grid */}
