@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import FooterLogo from '@/components/FooterLogo';
 import { AnalysisProgress } from '@/components/AnalysisProgress';
@@ -23,6 +23,11 @@ const Toxicology = () => {
   const [substance, setSubstance] = useState("");
   const [progress, setProgress] = useState(0);
   const reportRef = useRef(null);
+
+  // Scroll to top on component mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleAnalyze = async (e) => {
     e.preventDefault();
