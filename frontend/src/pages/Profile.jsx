@@ -67,17 +67,13 @@ const Profile = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    console.log('[DEBUG] handleSave called');
-    console.log('[DEBUG] Current user data:', user);
     setIsSaving(true);
     try {
-      console.log('[DEBUG] Calling API...');
       const response = await api.patch('/users/me', {
         name: user.name,
         avatar_url: user.avatar_url,
         bio: user.bio
       });
-      console.log('[DEBUG] API Response:', response.data);
       
       // Update local state with response data
       setUser({
@@ -92,14 +88,12 @@ const Profile = () => {
         localStorage.setItem('userAvatar', response.data.avatar_url);
       }
       
-      console.log('[DEBUG] Showing success toast');
       toast.success("Perfil atualizado com sucesso!");
     } catch (error) {
-      console.error("[DEBUG] Error updating profile:", error);
+      console.error("Error updating profile:", error);
       toast.error("Erro ao atualizar perfil.");
     } finally {
       setIsSaving(false);
-      console.log('[DEBUG] handleSave completed');
     }
   };
 
