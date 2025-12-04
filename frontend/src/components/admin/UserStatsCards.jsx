@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Activity, Shield, FileText, UserX, TrendingUp, MessageSquare } from 'lucide-react';
 
-const UserStatsCards = ({ stats, onlineCount, monthlyUsage, chatStats }) => {
+const UserStatsCards = ({ stats, onlineCount, chatStats }) => {
   return (
     <>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
