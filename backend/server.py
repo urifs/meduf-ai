@@ -110,7 +110,8 @@ from ai_medical_consensus import (
     analyze_diagnosis,
     analyze_drug_interaction,
     analyze_medication_guide,
-    analyze_toxicology
+    analyze_toxicology,
+    analyze_dose_calculator
 )
 
 # Import task manager
