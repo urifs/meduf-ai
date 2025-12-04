@@ -14,6 +14,17 @@ const MedicalChat = () => {
   const [copiedIndex, setCopiedIndex] = useState(null);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
+  
+  // Get user info from localStorage
+  const userName = localStorage.getItem('userName') || 'Usuário';
+  const userAvatar = localStorage.getItem('userAvatar');
+  
+  // Helper to resolve avatar URL
+  const getAvatarUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `${process.env.REACT_APP_BACKEND_URL}${url}`;
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
