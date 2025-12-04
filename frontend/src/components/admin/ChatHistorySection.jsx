@@ -113,7 +113,7 @@ const ChatHistorySection = ({ chatHistory, formatDate }) => {
                             {formatDate(chat.created_at)}
                           </div>
                           <Badge variant="secondary" className="text-xs">
-                            {chat.model || 'Gemini'}
+                            Meduf 2.0 Clinic
                           </Badge>
                         </div>
                       </div>
