@@ -1044,8 +1044,10 @@ RESPOSTA TÉCNICA:"""
         }
         
     except Exception as e:
-        print(f"Error in medical chat: {e}")
-        raise HTTPException(status_code=500, detail="Erro ao processar consulta")
+        import traceback
+        print(f"❌ Error in medical chat: {type(e).__name__}: {e}")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Erro ao processar consulta: {str(e)}")
 
 
 # ===== STARTUP =====
