@@ -1058,13 +1058,13 @@ RESPOSTA TÉCNICA:"""
             "user_message": user_message,
             "ai_response": response,
             "created_at": datetime.now(timezone.utc),
-            "model": "gemini-2.0-flash"
+            "model": "Meduf 2.0 Clinic"
         }
         await chat_history_collection.insert_one(chat_entry)
         
         return {
             "response": response,
-            "model": "gemini-2.0-flash"
+            "model": "Meduf 2.0 Clinic"
         }
         
     except Exception as e:
