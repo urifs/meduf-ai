@@ -477,6 +477,7 @@ async def create_consultation(
         consultation = {
             "user_id": current_user.email,
             "user_email": current_user.email,
+            "user_name": current_user.username,  # Nome do médico
             "timestamp": datetime.now(timezone.utc),
             "patient": data.get("patient", {}),
             "report": data.get("report", {})
