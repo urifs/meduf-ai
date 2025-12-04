@@ -635,23 +635,15 @@ async def get_online_stats(current_user: UserInDB = Depends(get_current_active_u
     if current_user.role != "ADMIN":
         raise HTTPException(status_code=403, detail="Admin only")
     
-    # Count users who had activity in the last 5 minutes
+    # Count users who had activity in the last 5 minutes based on last_activity field
     now = datetime.now(timezone.utc)
     five_minutes_ago = now - timedelta(minutes=5)
     
-    # Check consultations collection for recent activity
-    recent_consultations = await consultations_collection.find({
-        "timestamp": {"$gte": five_minutes_ago}
-    }).to_list(None)
+    online_count = await users_collection.count_documents({
+        "deleted": {"$ne": True},
+        "last_activity": {"$gte": five_minutes_ago}
+    })
     
-    # Get unique user emails from recent consultations
-    active_user_emails = set()
-    for consultation in recent_consultations:
-        user_email = consultation.get("user_email")
-        if user_email:
-            active_user_emails.add(user_email)
-    
-    online_count = len(active_user_emails)
     return {"online_count": online_count, "online": online_count}
 
 
