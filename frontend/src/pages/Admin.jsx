@@ -21,6 +21,7 @@ import UserManagementTabs from '@/components/admin/UserManagementTabs';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import FeedbackSection from '@/components/admin/FeedbackSection';
 import ChatHistorySection from '@/components/admin/ChatHistorySection';
+import OnlineUsersSection from '@/components/admin/OnlineUsersSection';
 
 const Admin = () => {
   const navigate = useNavigate();
