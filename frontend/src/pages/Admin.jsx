@@ -243,12 +243,37 @@ const Admin = () => {
   };
 
   const handleDeleteUser = async (userId) => {
+    if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
     try {
       await api.delete(`/admin/users/${userId}`);
       setUsers(users.filter(u => u.id !== userId));
-      toast.success("Usuário excluído permanentemente.");
+      await fetchData(); // Refresh data
+      toast.success("Usuário excluído com sucesso");
     } catch (error) {
       toast.error("Falha ao excluir usuário.");
+    }
+  };
+  
+  const handleReactivateUser = async (e) => {
+    e.preventDefault();
+    setIsReactivating(true);
+    
+    try {
+      await api.post(`/admin/users/${selectedUserForReactivation.email}/reactivate`, {
+        days_valid: parseInt(reactivationDays)
+      });
+      
+      // Refresh data
+      await fetchData();
+      
+      setIsReactivateOpen(false);
+      setSelectedUserForReactivation(null);
+      setReactivationDays(30);
+      toast.success(`Usuário reativado com ${reactivationDays} dias de validade!`);
+    } catch (error) {
+      toast.error("Falha ao reativar usuário.");
+    } finally {
+      setIsReactivating(false);
     }
   };
 
