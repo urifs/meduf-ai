@@ -232,11 +232,25 @@ const DrugInteraction = () => {
       clearInterval(progressInterval);
       setProgress(100);
       
-      // Ensure all fields are strings, not objects
-      const safeStringify = (value) => {
+      // Convert objects to readable formatted text
+      const formatValue = (value) => {
         if (typeof value === 'string') return value;
         if (typeof value === 'object' && value !== null) {
-          return JSON.stringify(value, null, 2);
+          // If it's an array, join items
+          if (Array.isArray(value)) {
+            return value.map(item => formatValue(item)).join('\n\n');
+          }
+          // If it's an object, format as readable text
+          let formatted = '';
+          for (const [key, val] of Object.entries(value)) {
+            const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            if (typeof val === 'object' && val !== null) {
+              formatted += `\n${label}:\n${formatValue(val)}\n`;
+            } else {
+              formatted += `${label}: ${val}\n`;
+            }
+          }
+          return formatted;
         }
         return String(value || '');
       };
