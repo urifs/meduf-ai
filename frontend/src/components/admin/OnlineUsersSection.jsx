@@ -26,10 +26,10 @@ const OnlineUsersSection = memo(({ onUserClick }) => {
   useEffect(() => {
     fetchOnlineUsers();
     
-    // Auto-refresh every 5 seconds
+    // Optimized: Auto-refresh every 20 seconds (reduced from 5s)
     const interval = setInterval(() => {
       fetchOnlineUsers();
-    }, 5000);
+    }, 20000);
 
     return () => clearInterval(interval);
   }, []);
