@@ -722,7 +722,7 @@ async def get_current_admin_user(current_user: UserInDB = Depends(get_current_ac
     return current_user
 
 
-@app.get("/api/admin/stats/online")
+@app.get("/api/admin/stats/online-count")
 async def get_online_count(
     current_user: UserInDB = Depends(get_current_admin_user)
 ):
