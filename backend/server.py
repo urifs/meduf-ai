@@ -951,7 +951,8 @@ async def create_consultation(
             "user_name": getattr(current_user, 'name', None) or getattr(current_user, 'username', None) or current_user.email,
             "timestamp": datetime.now(timezone.utc),
             "patient": data.get("patient", {}),
-            "report": data.get("report", {})
+            "report": data.get("report", {}),
+            "model": "Meduf 2.0 Clinic"
         }
         
         result = await consultations_collection.insert_one(consultation)
