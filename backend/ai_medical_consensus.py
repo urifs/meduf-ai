@@ -403,78 +403,172 @@ async def analyze_dose_calculator(patient_data: Dict[str, Any], medications: Lis
                 meds_text += f" - Indicação: {med['indication']}"
         
         no_data_msg = "\n- Dados não informados"
-        prompt = f"""Analise e forneça prescrição farmacológica COMPLETA E DETALHADA para as seguintes medicações:
+        prompt = f"""**ANÁLISE FARMACOLÓGICA PARA MÉDICOS ESPECIALISTAS**
 
 **DADOS DO PACIENTE:**{patient_context if patient_context else no_data_msg}
 
-**MEDICAÇÕES:**{meds_text}
+**MEDICAÇÕES SOLICITADAS:**{meds_text}
 
-**RESPONDA EM HTML FORMATADO COM:**
+---
 
-Para CADA medicação, forneça uma seção estruturada com:
+Forneça análise farmacológica COMPLETA E TÉCNICA para cada medicação, em formato HTML estruturado:
 
-<div class="medication-section">
-<h3>🔹 [Nome da Medicação]</h3>
+Para CADA medicação, crie uma seção detalhada seguindo este template:
 
-<div class="dosage-info">
-<h4>💊 Dosagem e Prescrição</h4>
-<ul>
-  <li><strong>Dose padrão adulto:</strong> [dose com unidade]</li>
-  <li><strong>Dose pediátrica:</strong> [cálculo por kg/dia ou mg/kg] - SEMPRE incluir</li>
-  <li><strong>Dose para idosos:</strong> [ajustes necessários] - SEMPRE incluir</li>
-  <li><strong>Dose para o paciente:</strong> [cálculo específico baseado nos dados fornecidos]</li>
+<div class="medication-section" style="border-left: 4px solid #dc2626; padding-left: 20px; margin-bottom: 30px;">
+<h2 style="color: #dc2626; margin-bottom: 15px;">💊 [NOME COMERCIAL E GENÉRICO]</h2>
+
+<div class="pharmacology">
+<h3 style="color: #1e40af; border-bottom: 2px solid #3b82f6; padding-bottom: 5px;">📚 Farmacologia Clínica</h3>
+<ul style="line-height: 1.8;">
+  <li><strong>Classe farmacológica:</strong> [classe terapêutica e mecanismo de ação]</li>
+  <li><strong>Farmacocinética:</strong> [absorção, distribuição, metabolismo (CYP), excreção]</li>
+  <li><strong>Meia-vida:</strong> [t½ e implicações clínicas]</li>
+  <li><strong>Biodisponibilidade:</strong> [% e fatores que afetam]</li>
 </ul>
 </div>
 
-<div class="administration-info">
-<h4>💉 Via e Modo de Administração</h4>
-<ul>
-  <li><strong>Via recomendada:</strong> [oral/EV/IM/SC/tópica]</li>
-  <li><strong>Diluição (se EV):</strong> [detalhes completos de diluição: concentração, diluente, volume]</li>
-  <li><strong>Velocidade de infusão:</strong> [ml/h ou tempo de infusão]</li>
-  <li><strong>Posologia:</strong> [intervalo entre doses, duração do tratamento]</li>
+<div class="dosing">
+<h3 style="color: #059669; border-bottom: 2px solid #10b981; padding-bottom: 5px;">💉 Posologia Baseada em Evidências</h3>
+
+<h4 style="color: #4b5563; margin-top: 15px;">🔹 Adultos</h4>
+<ul style="line-height: 1.8;">
+  <li><strong>Dose inicial:</strong> [dose, via, frequência]</li>
+  <li><strong>Dose de manutenção:</strong> [esquema terapêutico completo]</li>
+  <li><strong>Dose máxima diária:</strong> [limite de segurança]</li>
+  <li><strong>Cálculo para este paciente (se dados fornecidos):</strong> [dose individualizada]</li>
+</ul>
+
+<h4 style="color: #4b5563; margin-top: 15px;">🔹 População Pediátrica</h4>
+<ul style="line-height: 1.8;">
+  <li><strong>Neonatos:</strong> [mg/kg/dose ou mg/kg/dia, intervalos]</li>
+  <li><strong>Lactentes e crianças:</strong> [cálculo por kg, dose máxima]</li>
+  <li><strong>Adolescentes:</strong> [transição para dose adulta]</li>
+  <li><strong>Segurança pediátrica:</strong> [aprovação FDA/ANVISA, estudos]</li>
+</ul>
+
+<h4 style="color: #4b5563; margin-top: 15px;">🔹 População Geriátrica (≥65 anos)</h4>
+<ul style="line-height: 1.8;">
+  <li><strong>Ajuste de dose:</strong> [redução necessária e justificativa]</li>
+  <li><strong>Critérios de Beers:</strong> [classificação e precauções]</li>
+  <li><strong>Clearance renal:</strong> [importância do ClCr, fórmula de Cockcroft-Gault]</li>
 </ul>
 </div>
 
-<div class="special-considerations">
-<h4>⚠️ Considerações Especiais</h4>
-<ul>
-  <li><strong>Pediatria:</strong> [cuidados específicos para crianças]</li>
-  <li><strong>Geriatria:</strong> [cuidados para idosos, ajuste renal]</li>
-  <li><strong>Gestação/Lactação:</strong> [categoria de risco, recomendações]</li>
-  <li><strong>Insuficiência renal/hepática:</strong> [ajustes de dose necessários]</li>
+<div class="administration">
+<h3 style="color: #7c3aed; border-bottom: 2px solid #8b5cf6; padding-bottom: 5px;">🔬 Técnica de Administração</h3>
+<ul style="line-height: 1.8;">
+  <li><strong>Via de administração:</strong> [VO, EV, IM, SC, SL, tópica - com justificativa]</li>
+  <li><strong>Preparo (se parenteral):</strong>
+    <ul>
+      <li>Diluente: [SF 0,9%, SG 5%, água para injeção]</li>
+      <li>Concentração final: [mg/ml]</li>
+      <li>Volume total: [ml]</li>
+      <li>Estabilidade: [tempo após reconstituição]</li>
+    </ul>
+  </li>
+  <li><strong>Velocidade de infusão:</strong> [ml/h, gotejamento, tempo de infusão]</li>
+  <li><strong>Compatibilidade:</strong> [com outros fármacos em Y, incompatibilidades]</li>
+  <li><strong>Intervalo entre doses:</strong> [h, fundamentação farmacocinética]</li>
+  <li><strong>Duração do tratamento:</strong> [dias/semanas, critérios de suspensão]</li>
+</ul>
+</div>
+
+<div class="special-populations">
+<h3 style="color: #ea580c; border-bottom: 2px solid #f97316; padding-bottom: 5px;">⚠️ Populações Especiais e Ajustes</h3>
+
+<h4 style="color: #4b5563; margin-top: 15px;">🔹 Insuficiência Renal</h4>
+<ul style="line-height: 1.8;">
+  <li><strong>ClCr &gt;50 ml/min:</strong> [ajuste]</li>
+  <li><strong>ClCr 30-50 ml/min:</strong> [ajuste]</li>
+  <li><strong>ClCr 10-30 ml/min:</strong> [ajuste]</li>
+  <li><strong>ClCr &lt;10 ml/min:</strong> [ajuste]</li>
+  <li><strong>Hemodiálise:</strong> [suplementação pós-diálise]</li>
+  <li><strong>Diálise peritoneal:</strong> [recomendações]</li>
+</ul>
+
+<h4 style="color: #4b5563; margin-top: 15px;">🔹 Insuficiência Hepática</h4>
+<ul style="line-height: 1.8;">
+  <li><strong>Child-Pugh A:</strong> [ajuste]</li>
+  <li><strong>Child-Pugh B:</strong> [ajuste]</li>
+  <li><strong>Child-Pugh C:</strong> [contraindicação ou ajuste]</li>
+</ul>
+
+<h4 style="color: #4b5563; margin-top: 15px;">🔹 Gestação</h4>
+<ul style="line-height: 1.8;">
+  <li><strong>Categoria FDA:</strong> [A, B, C, D, X com descrição]</li>
+  <li><strong>Trimestre-específico:</strong> [riscos por trimestre]</li>
+  <li><strong>Alternativas mais seguras:</strong> [se aplicável]</li>
+</ul>
+
+<h4 style="color: #4b5563; margin-top: 15px;">🔹 Lactação</h4>
+<ul style="line-height: 1.8;">
+  <li><strong>Excreção no leite:</strong> [concentração relativa]</li>
+  <li><strong>Risco para lactente:</strong> [classificação AAP/LactMed]</li>
+  <li><strong>Recomendação:</strong> [compatível, uso cauteloso, contraindicado]</li>
 </ul>
 </div>
 
 <div class="contraindications">
-<h4>🚫 Contraindicações e Interações</h4>
-<ul>
-  <li><strong>Contraindicações absolutas:</strong> [listar]</li>
-  <li><strong>Contraindicações relativas:</strong> [listar]</li>
-  <li><strong>Interações importantes:</strong> [com outros medicamentos da lista ou classes importantes]</li>
+<h3 style="color: #dc2626; border-bottom: 2px solid #ef4444; padding-bottom: 5px;">🚫 Contraindicações e Precauções</h3>
+<ul style="line-height: 1.8;">
+  <li><strong>Contraindicações absolutas:</strong> [situações que impedem o uso]</li>
+  <li><strong>Contraindicações relativas:</strong> [uso com extrema cautela]</li>
+  <li><strong>Interações medicamentosas graves:</strong> [com fármacos da lista ou principais classes]</li>
+  <li><strong>Interações alimento/fármaco:</strong> [relevantes clinicamente]</li>
+  <li><strong>Ajustes por interação CYP:</strong> [inibidores/indutores enzimáticos]</li>
+</ul>
+</div>
+
+<div class="adverse-effects">
+<h3 style="color: #b91c1c; border-bottom: 2px solid #dc2626; padding-bottom: 5px;">⚡ Reações Adversas e Toxicidade</h3>
+<ul style="line-height: 1.8;">
+  <li><strong>Reações comuns (&gt;10%):</strong> [frequentes, geralmente toleráveis]</li>
+  <li><strong>Reações graves (atenção):</strong> [raras mas importantes]</li>
+  <li><strong>Sinais de toxicidade:</strong> [clínicos e laboratoriais]</li>
+  <li><strong>Manejo de superdosagem:</strong> [antídoto, suporte, eliminação]</li>
 </ul>
 </div>
 
 <div class="monitoring">
-<h4>📊 Monitoramento</h4>
-<ul>
-  <li>[Parâmetros laboratoriais ou clínicos a monitorar]</li>
-  <li>[Sinais de toxicidade ou efeitos adversos importantes]</li>
+<h3 style="color: #0891b2; border-bottom: 2px solid #06b6d4; padding-bottom: 5px;">📊 Monitoramento Terapêutico</h3>
+<ul style="line-height: 1.8;">
+  <li><strong>Parâmetros laboratoriais:</strong> [exames necessários e frequência]</li>
+  <li><strong>Monitoramento de níveis séricos:</strong> [se aplicável: vale, pico, janela terapêutica]</li>
+  <li><strong>Avaliação clínica:</strong> [sinais vitais, sintomas, eficácia]</li>
+  <li><strong>Ajustes baseados em resposta:</strong> [titulação de dose]</li>
 </ul>
 </div>
+
+<div class="clinical-pearls">
+<h3 style="color: #7c3aed; border-bottom: 2px solid #8b5cf6; padding-bottom: 5px;">💎 Pearls Clínicos</h3>
+<ul style="line-height: 1.8;">
+  <li>[Dica prática importante para médicos]</li>
+  <li>[Consideração baseada em evidência]</li>
+  <li>[Erro comum a evitar]</li>
+</ul>
 </div>
 
-<hr/>
+<div class="references">
+<h3 style="color: #6b7280; border-bottom: 2px solid #9ca3af; padding-bottom: 5px;">📖 Referências Guidelines</h3>
+<ul style="line-height: 1.8;">
+  <li>[Guideline relevante - UpToDate, Micromedex, Diretrizes Brasileiras]</li>
+</ul>
+</div>
 
-**IMPORTANTE:**
-- Use linguagem técnica para médicos
-- Forneça cálculos precisos baseados nos dados do paciente
-- SEMPRE inclua informações pediátricas E geriátricas
-- Seja específico em diluições e velocidades de infusão
-- Considere todas as condições especiais mencionadas
-- Formate em HTML limpo e bem estruturado
-- Use <strong> para destacar termos importantes
-- Use listas <ul> para organização
+</div>
+
+<hr style="margin: 30px 0; border: none; border-top: 2px solid #e5e7eb;"/>
+
+**DIRETRIZES IMPORTANTES:**
+✅ Use terminologia médica técnica apropriada para especialistas
+✅ Baseie-se em farmacocinética e farmacodinâmica
+✅ Inclua SEMPRE populações especiais (pediátrica, geriátrica, gestantes)
+✅ Seja PRECISO em cálculos, diluições e velocidades
+✅ Cite meias-vidas, clearance, metabolismo CYP quando relevante
+✅ Considere ajustes por função renal (ClCr) e hepática (Child-Pugh)
+✅ Mencione interações farmacocinéticas e farmacodinâmicas
+✅ Formate em HTML limpo, profissional, com cores para organização visual
 """
         
         response = await chat.send_message(UserMessage(text=prompt))
