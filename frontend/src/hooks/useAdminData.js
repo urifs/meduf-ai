@@ -12,6 +12,8 @@ const useAdminData = (userRole, navigate) => {
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const [monthlyUsage, setMonthlyUsage] = useState(null);
   const [deletedUsers, setDeletedUsers] = useState([]);
+  const [chatHistory, setChatHistory] = useState([]);
+  const [chatStats, setChatStats] = useState(null);
 
   const fetchData = async () => {
     if (users.length === 0) setIsLoading(true);
