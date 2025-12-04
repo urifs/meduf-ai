@@ -54,11 +54,12 @@ const Login = () => {
         }
       });
 
-      const { access_token, user_name, user_role, expiration_date, avatar_url } = response.data;
+      const { access_token, user_name, user_email, user_role, expiration_date, avatar_url } = response.data;
 
       localStorage.setItem('isAuthenticated', 'true');
       localStorage.setItem('token', access_token);
       localStorage.setItem('userName', user_name);
+      localStorage.setItem('userEmail', user_email);
       localStorage.setItem('userRole', user_role);
       if (expiration_date) {
         localStorage.setItem('userExpiration', expiration_date);
