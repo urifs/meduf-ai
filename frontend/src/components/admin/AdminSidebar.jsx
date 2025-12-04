@@ -27,7 +27,11 @@ const AdminSidebar = ({
               </div>
             ) : (
               users.filter(u => u.role === 'ADMIN').map((admin) => (
-                <div key={admin.id} className="flex items-center justify-between pb-2 border-b last:border-0 last:pb-0">
+                <div 
+                  key={admin.id} 
+                  className="flex items-center justify-between pb-2 border-b last:border-0 last:pb-0 cursor-pointer hover:bg-slate-50 p-2 rounded-md transition-colors"
+                  onClick={() => onUserClick && onUserClick(admin)}
+                >
                   <div className="flex items-center gap-3">
                     <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
                       <Shield className="h-4 w-4" />
