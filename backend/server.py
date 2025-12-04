@@ -463,10 +463,18 @@ async def update_user_expiration(
         days_valid = data.get("days_valid", 30)
         new_expiration = datetime.now(timezone.utc) + timedelta(days=days_valid)
         
-        result = await users_collection.update_one(
-            {"email": user_id},
-            {"$set": {"expiration_date": new_expiration}}
-        )
+        # Try to find user by _id first, then by email as fallback
+        try:
+            result = await users_collection.update_one(
+                {"_id": ObjectId(user_id)},
+                {"$set": {"expiration_date": new_expiration}}
+            )
+        except:
+            # If ObjectId conversion fails, try by email
+            result = await users_collection.update_one(
+                {"email": user_id},
+                {"$set": {"expiration_date": new_expiration}}
+            )
         
         if result.modified_count == 0:
             raise HTTPException(status_code=404, detail="Usuário não encontrado")
