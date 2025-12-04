@@ -915,6 +915,51 @@ frontend:
         agent: "testing"
         comment: "✅ EMERGENT_LLM_KEY FIX VERIFIED SUCCESSFULLY: Complete end-to-end test PASSED with all success criteria met. 1) ✅ Login successful with ur1fs/@Fred1807 2) ✅ Navigation to Simple Diagnosis successful 3) ✅ Anamnese field filled with exact text: 'Paciente com dor de cabeça intensa há 2 dias e vômitos' 4) ✅ 'Gerar Análise Clínica' button clicked 5) ✅ Analysis completed in 10.1 seconds (well under 40s limit) 6) ✅ NO 'Erro ao processar análise' detected 7) ✅ COMPREHENSIVE RESULTS GENERATED: Hipóteses Diagnósticas (Enxaqueca, Cefaleia Tensional, Meningite, Hemorragia Subaracnoide, Hipertensão Intracraniana), Conduta e Investigação with detailed procedures and orientations. CRITICAL SUCCESS: Added load_dotenv() to ai_medical_consensus.py resolved EMERGENT_LLM_KEY reading issue. Backend AI engine working perfectly, medical analysis comprehensive and accurate. The reported 'Erro ao processar análise' issue has been completely resolved."
 
+  - task: "Profile Image Upload Functionality"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/Profile.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "REVIEW REQUEST TESTING: Need to test profile image upload functionality with testeonline@meduf.com/teste123. Verify image upload works, success toast appears, and image displays in profile page."
+      - working: true
+        agent: "testing"
+        comment: "✅ PROFILE IMAGE UPLOAD VERIFIED: Successfully tested image upload functionality. Login with testeonline@meduf.com successful. Navigation to /profile page working. File input found and functional. Test image (red background with 'PROFILE TEST IMAGE' text) uploaded successfully. Avatar updated in UI from default to uploaded image. Upload process working correctly."
+
+  - task: "Profile Image Persistence After Logout/Login"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/pages/Profile.jsx"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "REVIEW REQUEST TESTING: Need to test that profile images persist after logout/login cycle. Upload image, logout, login again, verify image is still present."
+      - working: false
+        agent: "testing"
+        comment: "❌ PROFILE IMAGE PERSISTENCE FAILED: Comprehensive testing shows image upload works but persistence fails. Test process: 1) Login testeonline@meduf.com ✅ 2) Navigate to profile page ✅ 3) Upload test image (blue circle with 'TEST' text) ✅ 4) Image appears in UI ✅ 5) Logout ✅ 6) Login again ✅ 7) Navigate to profile ✅ 8) Check for image ❌ FAILED. Image disappears after logout/login cycle. The avatar reverts to default state. Backend may not be properly saving avatar_url to user profile or localStorage is being cleared incorrectly."
+
+  - task: "Admin Panel - Clickable Administrators in Sidebar"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/admin/AdminSidebar.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "REVIEW REQUEST TESTING: Need to test that administrators in the admin panel sidebar are clickable and open user profile modal. Login as ur1fs/@Fred1807, navigate to admin panel, locate administrators section, click on admin entry, verify modal opens with user details."
+      - working: true
+        agent: "testing"
+        comment: "✅ CLICKABLE ADMINS FUNCTIONALITY VERIFIED: Complete testing successful. 1) Login as ur1fs/@Fred1807 ✅ 2) Auto-redirected to /admin panel ✅ 3) Found 'Administradores' section in sidebar ✅ 4) Located clickable admin entry with cursor-pointer class ✅ 5) Clicked on admin entry ✅ 6) User profile modal opened successfully ✅ 7) Modal contains all required fields: 'Perfil do Usuário' title, Nome Completo (Administrador), Email (ur1fs), Função (ADMIN), Status (Ativo), Validade da Conta (3648 dias), Data de Criação, Data de Expiração ✅ 8) Modal has action buttons: 'Alterar Validade' and 'Bloquear' ✅. All functionality working as expected."
+
 backend:
   - task: "Exam Reader - Medical Image Analysis Functionality"
     implemented: true
