@@ -8,7 +8,8 @@ const AdminSidebar = ({
   users, 
   consultations, 
   formatDate, 
-  onConsultationClick 
+  onConsultationClick,
+  onUserClick
 }) => {
   return (
     <div className="xl:col-span-1 space-y-8">
