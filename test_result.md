@@ -534,8 +534,8 @@ frontend:
 
 metadata:
   created_by: "testing_agent"
-  version: "5.1"
-  test_sequence: 18
+  version: "5.2"
+  test_sequence: 19
   run_ui: true
   test_completed: true
   all_tests_passed: true
@@ -566,6 +566,8 @@ metadata:
   admin_validity_update_flow_tested: true
   expiration_dialog_component_verified: true
   account_validity_management_working: true
+  online_users_counter_bug_fix_verified: true
+  online_users_counter_working_correctly: true
 
 test_plan:
   current_focus: []
