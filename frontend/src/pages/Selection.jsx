@@ -77,6 +77,18 @@ const Selection = () => {
       iconColor: "text-rose-600",
       path: "/toxicology",
       glow: "hover:shadow-[0_0_40px_rgba(244,63,94,0.3)]"
+    },
+    {
+      title: "Prescrição / Cálculo de Doses",
+      description: "Calculadora farmacológica",
+      detail: "Cálculos de dosagem, diluição, modo de administração e prescrição para até 10 medicamentos.",
+      icon: Calculator,
+      gradient: "from-red-500 to-rose-600",
+      hoverGradient: "hover:from-red-600 hover:to-rose-700",
+      iconBg: "bg-gradient-to-br from-red-400/20 to-rose-500/20",
+      iconColor: "text-red-600",
+      path: "/dose-calculator",
+      glow: "hover:shadow-[0_0_40px_rgba(239,68,68,0.3)]"
     }
   ];
 
