@@ -232,6 +232,37 @@ async def get_user_profile(current_user: UserInDB = Depends(get_current_active_u
     }
 
 
+@app.patch("/api/users/me")
+async def update_user_profile(
+    data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Update current user profile"""
+    try:
+        update_data = {}
+        if "name" in data:
+            update_data["name"] = data["name"]
+        if "bio" in data:
+            update_data["bio"] = data["bio"]
+        if "avatar_url" in data:
+            update_data["avatar_url"] = data["avatar_url"]
+        
+        if update_data:
+            await users_collection.update_one(
+                {"_id": ObjectId(current_user.id)},
+                {"$set": update_data}
+            )
+        
+        return {
+            "name": data.get("name", current_user.name),
+            "avatar_url": data.get("avatar_url", current_user.avatar_url),
+            "bio": data.get("bio", "")
+        }
+    except Exception as e:
+        print(f"Error updating profile: {e}")
+        raise HTTPException(status_code=500, detail="Erro ao atualizar perfil")
+
+
 @app.post("/api/users/me/avatar")
 async def upload_avatar(
     file: UploadFile = File(...),
