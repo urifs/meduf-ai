@@ -104,7 +104,8 @@ const OnlineUsersSection = ({ onUserClick }) => {
             {onlineUsers.map((user) => (
               <div 
                 key={user.id || user.email}
-                className="flex items-center justify-between p-4 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-green-300 dark:hover:border-green-700 hover:bg-green-50/30 dark:hover:bg-green-950/10 transition-all group"
+                onClick={() => onUserClick && onUserClick(user)}
+                className="flex items-center justify-between p-4 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-green-300 dark:hover:border-green-700 hover:bg-green-50/30 dark:hover:bg-green-950/10 transition-all group cursor-pointer"
               >
                 <div className="flex items-center gap-3 flex-1">
                   <div className="relative">
