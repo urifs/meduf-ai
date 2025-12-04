@@ -104,6 +104,57 @@ const UserStatsCards = ({ stats, onlineCount, monthlyUsage, chatStats }) => {
         </CardContent>
       </Card>
     </div>
+
+    {/* Chat Stats - Separate row */}
+    {chatStats && (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <Card className="border-l-4 border-l-purple-500 shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Conversas com IA</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-3xl font-bold text-purple-600">{chatStats.total_conversations}</div>
+              <MessageSquare className="h-8 w-8 text-purple-100" />
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Total de conversas realizadas
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-violet-500 shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Usuários Ativos no Chat</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-3xl font-bold text-violet-600">{chatStats.unique_users}</div>
+              <Users className="h-8 w-8 text-violet-100" />
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Usuários que usaram o chat
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-pink-500 shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Últimas 24h</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-3xl font-bold text-pink-600">{chatStats.last_24h}</div>
+              <Activity className="h-8 w-8 text-pink-100" />
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Conversas nas últimas 24 horas
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    )}
+    </>
   );
 };
 
