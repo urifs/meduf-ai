@@ -574,11 +574,13 @@ metadata:
   admin_clickable_functionality_working: true
 
 test_plan:
-  current_focus: []
-  stuck_tasks: []
+  current_focus:
+    - "Profile Image Persistence After Logout/Login"
+  stuck_tasks:
+    - "Profile Image Persistence After Logout/Login"
   test_all: false
-  test_priority: "online_users_counter_bug_fix_completed"
-  test_summary: "🎉 ONLINE USERS COUNTER BUG FIX VERIFICATION COMPLETED WITH 100% SUCCESS! Complete testing of online users counter functionality after bug fix: ✅ Authentication: Login with ur1fs/@Fred1807 successful ✅ Counter Display: 'Usuários Online' card showing 2 users (not 44 total) ✅ Text Verification: 'Nos últimos 5 minutos' text present ✅ Multiple Users Test: Second user login successful, counter increased from 2 to 3 ✅ Real-time Updates: Counter reflects actual user activity in last 5 minutes ✅ Validation Passed: Number within expected range (1-5) for truly online users ✅ Bug Fix Confirmed: Counter now correctly shows recent activity instead of total registered users. ALL SUCCESS CRITERIA MET!"
+  test_priority: "bug_fix_verification"
+  test_summary: "BUG TESTING RESULTS: 1 of 2 bugs verified as fixed. ✅ Bug 2 (Clickable Admins): WORKING - Admin entries in sidebar are clickable and open detailed user profile modal with all required information. ❌ Bug 1 (Profile Image Persistence): PARTIALLY WORKING - Image upload functionality works correctly, but images do not persist after logout/login cycle. The avatar reverts to default state, indicating a backend persistence issue."
 
 frontend:
   - task: "Toxicology Feature - Backend AI Engine Integration - Paracetamol"
