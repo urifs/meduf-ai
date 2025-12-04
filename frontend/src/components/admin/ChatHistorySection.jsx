@@ -70,7 +70,7 @@ const ChatHistorySection = ({ chatHistory, formatDate }) => {
             <p className="text-muted-foreground">Nenhuma conversa registrada ainda.</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
             {filteredChats.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-muted-foreground">Nenhuma conversa encontrada com os termos de busca.</p>
