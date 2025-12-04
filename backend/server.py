@@ -974,9 +974,14 @@ async def get_consultations(
         consultations = []
         cursor = consultations_collection.find(query, {"_id": 0}).sort("timestamp", -1).limit(limit)
         async for doc in cursor:
+            # Ensure timezone info for timestamps
+            if doc.get("timestamp"):
+                doc["timestamp"] = ensure_utc_timezone(doc["timestamp"]).isoformat()
+            if doc.get("created_at"):
+                doc["created_at"] = ensure_utc_timezone(doc["created_at"]).isoformat()
             consultations.append(doc)
         
-        return {"consultations": consultations}
+        return consultations
     except Exception as e:
         print(f"Error fetching consultations: {e}")
         raise HTTPException(status_code=500, detail=str(e))
