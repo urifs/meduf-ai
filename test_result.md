@@ -565,7 +565,7 @@ test_plan:
   stuck_tasks: []
   test_all: false
   test_priority: "completed"
-  test_summary: "COMPREHENSIVE TESTING OF 3 NEW FUNCTIONALITIES COMPLETED SUCCESSFULLY: ✅ TEST 1 - History Page Bug Fix: 'history.filter is not a function' error resolved, page loads correctly with proper empty state ✅ TEST 2 - Medical Chat Copy Button: Copy functionality working, AI responds to questions, minor visual feedback issue (button doesn't show 'Copiado!' state) ✅ TEST 3 - Admin Panel Chat History: All features working - new statistics cards (Conversas com IA: 1, Usuários Ativos: 1, Últimas 24h: 1), conversation history section with modal details, copy buttons for question/answer, search functionality. All requested features implemented and functional with only minor copy button visual feedback issue."
+  test_summary: "4 FIXES COMPREHENSIVE TESTING COMPLETED SUCCESSFULLY: ✅ FIX 1 - Página Principal Abre no Topo: Selection page opens at top (0px scroll) showing diagnostic cards, no auto-scroll to chat ✅ FIX 2 - Histórico de Conversas com IA no Menu: New menu option working, navigates to /chat-history, shows conversations, modal with copy buttons functional ✅ FIX 3 - Botão Salvar Alterações no Perfil: Profile save button working, successfully updates name and bio fields, API integration working ✅ FIX 4 - Histórico de Consultas Funcionando: History page loads without 'history.filter' error, shows proper empty state, no JavaScript errors. All fixes verified with both user types (teste.chat@meduf.com and ur1fs admin). Minor: Some non-critical frontend console errors visible but don't affect functionality."
 
 agent_communication:
     - agent: "testing"
