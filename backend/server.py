@@ -149,6 +149,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             password_hash=user["password_hash"],
             role=user.get("role", "USER"),
             avatar_url=user.get("avatar_url"),
+            bio=user.get("bio", ""),
             expiration_date=user.get("expiration_date"),
             deleted=user.get("deleted", False)
         )
