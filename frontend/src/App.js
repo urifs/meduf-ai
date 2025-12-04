@@ -88,6 +88,14 @@ function App() {
             } 
           />
           <Route 
+            path="/dose-calculator" 
+            element={
+              <ProtectedRoute>
+                <DoseCalculator />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
             path="/history" 
             element={
               <ProtectedRoute>
