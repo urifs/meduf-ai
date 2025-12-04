@@ -154,8 +154,7 @@ const Admin = () => {
         {/* Stats Cards */}
         <UserStatsCards 
           stats={stats} 
-          onlineCount={onlineCount} 
-          monthlyUsage={monthlyUsage}
+          onlineCount={onlineCount}
           chatStats={chatStats}
         />
 
