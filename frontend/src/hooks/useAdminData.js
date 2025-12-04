@@ -31,7 +31,21 @@ const useAdminData = (userRole, navigate) => {
         ...u,
         id: u._id || u.id
       }));
-      setUsers(mappedUsers);
+      
+      // Sort users: reactivated users first (by reactivated_at), then by created_at
+      const sortedUsers = mappedUsers.sort((a, b) => {
+        // If user has reactivated_at, prioritize by that (most recent first)
+        if (a.reactivated_at && b.reactivated_at) {
+          return new Date(b.reactivated_at) - new Date(a.reactivated_at);
+        }
+        if (a.reactivated_at) return -1;
+        if (b.reactivated_at) return 1;
+        
+        // Otherwise sort by created_at (newest first)
+        return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+      });
+      
+      setUsers(sortedUsers);
       
       const realConsultations = consultsRes.data.map(c => ({
         ...c,
