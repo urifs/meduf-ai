@@ -259,6 +259,7 @@ const Profile = () => {
             </form>
           </CardContent>
         </Card>
+        <FooterLogo />
       </main>
       <Toaster />
     </div>
