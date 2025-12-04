@@ -7,6 +7,7 @@ import SimpleDashboard from "@/pages/SimpleDashboard";
 import MedicationGuide from "@/pages/MedicationGuide";
 import DrugInteraction from "@/pages/DrugInteraction";
 import Toxicology from "@/pages/Toxicology";
+import DoseCalculator from "@/pages/DoseCalculator";
 import Selection from "@/pages/Selection";
 import Login from "@/pages/Login";
 import History from "@/pages/History";
