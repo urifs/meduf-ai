@@ -115,15 +115,26 @@ export const Header = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-gradient-to-r from-white/90 via-blue-50/90 to-white/90 backdrop-blur-xl supports-[backdrop-filter]:bg-white/70 dark:from-slate-950/90 dark:via-slate-900/90 dark:to-slate-950/90 shadow-sm">
       <div className="container flex h-16 items-center justify-between px-4 md:px-8">
         {/* Logo Section */}
-        <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
-            <BrainCircuit className="h-6 w-6" />
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
+              <BrainCircuit className="h-6 w-6" />
+            </div>
+            <div className="flex flex-col leading-none">
+              <span className="text-xl font-bold tracking-tight text-foreground">
+                Meduf <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Ai</span>
+              </span>
+              <span className="text-[9px] text-muted-foreground font-medium tracking-wider uppercase ml-0.5">2.0 Clinic</span>
+            </div>
           </div>
-          <div className="flex flex-col leading-none">
-            <span className="text-xl font-bold tracking-tight text-foreground">
-              Meduf <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Ai</span>
+          {/* User Watermark */}
+          <div className="hidden md:flex flex-col ml-3 pl-3 border-l border-slate-200 dark:border-slate-700 leading-none">
+            <span className="text-[10px] font-medium text-slate-600 dark:text-slate-400 truncate max-w-[150px]" title={userName}>
+              {userName}
             </span>
-            <span className="text-[9px] text-muted-foreground font-medium tracking-wider uppercase ml-0.5">2.0 Clinic</span>
+            <span className="text-[9px] text-slate-400 dark:text-slate-500 truncate max-w-[150px]" title={userEmail}>
+              {userEmail}
+            </span>
           </div>
         </div>
 
