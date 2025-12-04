@@ -50,6 +50,17 @@ const History = () => {
     }
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "-";
+      return format(date, "dd/MM/yyyy HH:mm", { locale: ptBR });
+    } catch (error) {
+      return "-";
+    }
+  };
+
   const filteredHistory = Array.isArray(history) ? history.filter(item => 
     (item.patient?.queixa && item.patient.queixa.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (item.report?.diagnoses && item.report.diagnoses[0]?.name?.toLowerCase().includes(searchTerm.toLowerCase()))
