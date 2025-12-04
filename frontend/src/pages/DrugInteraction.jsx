@@ -257,13 +257,13 @@ const DrugInteraction = () => {
       
       const mockResponse = {
         medications: activeMeds,
-        severity: safeStringify(interactionData.severity),
-        summary: safeStringify(interactionData.summary),
-        details: safeStringify(interactionData.details),
-        recommendations: safeStringify(interactionData.recommendations),
-        renal_impact: safeStringify(interactionData.renal_impact),
-        hepatic_impact: safeStringify(interactionData.hepatic_impact),
-        monitoring: safeStringify(interactionData.monitoring)
+        severity: formatValue(interactionData.severity),
+        summary: formatValue(interactionData.summary),
+        details: formatValue(interactionData.details),
+        recommendations: formatValue(interactionData.recommendations),
+        renal_impact: formatValue(interactionData.renal_impact),
+        hepatic_impact: formatValue(interactionData.hepatic_impact),
+        monitoring: formatValue(interactionData.monitoring)
       };
 
       try {
