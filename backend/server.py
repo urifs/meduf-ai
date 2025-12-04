@@ -1316,6 +1316,24 @@ async def startup_event():
     print("✅ Funcionalidades: 5 principais")
     print("=" * 80)
     
+    # Create database indexes for performance
+    print("🔧 Criando índices no MongoDB...")
+    try:
+        await users_collection.create_index("email", unique=True)
+        await users_collection.create_index("deleted")
+        await users_collection.create_index("role")
+        await users_collection.create_index("last_active")
+        await consultations_collection.create_index("user_id")
+        await consultations_collection.create_index("timestamp")
+        await consultations_collection.create_index([("user_id", 1), ("timestamp", -1)])
+        await chat_history_collection.create_index("user_id")
+        await chat_history_collection.create_index("created_at")
+        await feedbacks_collection.create_index("user_email")
+        await feedbacks_collection.create_index("timestamp")
+        print("✅ Índices criados com sucesso")
+    except Exception as e:
+        print(f"⚠️ Aviso ao criar índices: {e}")
+    
     # Iniciar task de atualização horária de alertas epidemiológicos
     from epidemiological_alerts import start_hourly_update_task, get_cached_alerts
     asyncio.create_task(start_hourly_update_task())
