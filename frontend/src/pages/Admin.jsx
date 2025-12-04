@@ -215,6 +215,12 @@ const Admin = () => {
           />
         </div>
 
+        {/* Chat History Section */}
+        <ChatHistorySection
+          chatHistory={chatHistory}
+          formatDate={formatDate}
+        />
+
         {/* Feedbacks Section */}
         <FeedbackSection
           feedbacks={feedbacks}
@@ -229,12 +235,6 @@ const Admin = () => {
             });
             setIsConsultationOpen(true);
           }}
-        />
-
-        {/* Chat History Section */}
-        <ChatHistorySection
-          chatHistory={chatHistory}
-          formatDate={formatDate}
         />
 
         {/* Modals */}
