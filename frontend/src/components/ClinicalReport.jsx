@@ -161,4 +161,4 @@ export const ClinicalReport = memo(({ data, analysisType = 'diagnosis' }) => {
       />
     </div>
   );
-};
+});
