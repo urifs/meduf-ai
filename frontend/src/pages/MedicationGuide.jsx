@@ -105,7 +105,7 @@ const MedicationGuide = () => {
                   <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
                     <Syringe className="h-5 w-5" />
                   </div>
-                  <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Guia Terapêutico</span>
+                  <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Guia Farmacológico</span>
                 </CardTitle>
                 <CardDescription className="text-base">
                   Descreva os sintomas para receber sugestões de prescrição detalhadas.
