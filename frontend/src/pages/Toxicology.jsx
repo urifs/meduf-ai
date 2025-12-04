@@ -110,7 +110,7 @@ const Toxicology = () => {
                   <div className="p-2 rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 text-white">
                     <Skull className="h-5 w-5" />
                   </div>
-                  <span className="bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">Toxicologia</span>
+                  <span className="bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">Guia Toxicológico</span>
                 </CardTitle>
                 <CardDescription className="text-base">
                   Informe a substância ingerida ou o quadro clínico para obter o protocolo de desintoxicação.
