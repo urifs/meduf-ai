@@ -1069,6 +1069,30 @@ RESPOSTA TÉCNICA:"""
         raise HTTPException(status_code=500, detail=f"Erro ao processar consulta: {str(e)}")
 
 
+# ===== USER CHAT HISTORY =====
+
+@app.get("/api/my-chat-history")
+async def get_my_chat_history(
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Get chat history for current user"""
+    try:
+        chats = await chat_history_collection.find(
+            {"user_id": current_user.id}, 
+            {"_id": 0}
+        ).sort("created_at", -1).to_list(1000)
+        
+        # Ensure timezone info
+        for chat in chats:
+            if chat.get("created_at"):
+                chat["created_at"] = ensure_utc_timezone(chat["created_at"]).isoformat()
+        
+        return chats
+    except Exception as e:
+        print(f"Error fetching user chat history: {e}")
+        raise HTTPException(status_code=500, detail="Erro ao buscar histórico de conversas")
+
+
 # ===== ADMIN CHAT HISTORY =====
 
 @app.get("/api/admin/chat-history")
