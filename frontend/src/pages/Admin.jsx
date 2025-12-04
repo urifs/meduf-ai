@@ -983,60 +983,44 @@ const Admin = () => {
           </Card>
         </div>
 
-        {/* Deleted/Expired Users Section */}
-        <div className="mt-12">
-          <Card className="shadow-lg border-2 border-red-100">
-            <CardHeader>
-              <CardTitle className="text-2xl flex items-center gap-2 text-red-700">
-                <Trash2 className="h-6 w-6" />
-                Contas Excluídas (Expiradas)
-              </CardTitle>
-              <CardDescription className="mt-2">
-                Usuários que foram automaticamente removidos após a expiração do tempo de acesso
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border max-h-[500px] overflow-y-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Nome</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Data de Criação</TableHead>
-                      <TableHead>Data de Expiração</TableHead>
-                      <TableHead>Data de Exclusão</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {deletedUsers.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                          Nenhuma conta excluída ainda.
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      deletedUsers.map((user) => (
-                        <TableRow key={user.id} className="bg-red-50/30">
-                          <TableCell className="font-medium">{user.name}</TableCell>
-                          <TableCell className="text-muted-foreground">{user.email}</TableCell>
-                          <TableCell className="text-sm">
-                            {user.created_at ? formatDate(user.created_at) : '-'}
-                          </TableCell>
-                          <TableCell className="text-sm text-red-600">
-                            {user.expiration_date ? formatDate(user.expiration_date) : '-'}
-                          </TableCell>
-                          <TableCell className="text-sm font-semibold text-red-700">
-                            {user.deleted_at ? formatDate(user.deleted_at) : '-'}
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
+        {/* Reactivation Dialog */}
+        <Dialog open={isReactivateOpen} onOpenChange={setIsReactivateOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Reativar Conta de Usuário</DialogTitle>
+              <DialogDescription>
+                Restaure o acesso de <b>{selectedUserForReactivation?.name}</b> ao sistema definindo um novo período de validade.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleReactivateUser} className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="reactivation_days">Dias de Acesso (a partir de hoje)</Label>
+                <Input 
+                  id="reactivation_days" 
+                  type="text" 
+                  placeholder="Ex: 30, 60, 365..."
+                  value={reactivationDays}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '');
+                    setReactivationDays(value ? parseInt(value) : '');
+                  }}
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  O usuário terá acesso até {reactivationDays ? new Date(Date.now() + reactivationDays * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR') : '---'}
+                </p>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsReactivateOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={isReactivating} className="bg-green-600 hover:bg-green-700">
+                  {isReactivating ? <CustomLoader size="sm" /> : "Reativar Conta"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
 
         {/* Expiration Dialog */}
         <Dialog open={isExpirationOpen} onOpenChange={setIsExpirationOpen}>
