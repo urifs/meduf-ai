@@ -134,22 +134,22 @@ const History = () => {
                       <TableCell className="font-medium text-muted-foreground">
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4" />
-                          {formatDate(entry.created_at)}
+                          {formatDate(entry.timestamp || entry.created_at)}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col">
                           <span className="font-medium flex items-center gap-1">
-                            <User className="h-3 w-3" /> {entry.patient.sexo || 'N/I'}, {entry.patient.idade || 'N/I'} anos
+                            <User className="h-3 w-3" /> {entry.patient?.sexo || 'N/I'}, {entry.patient?.idade || 'N/I'}
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell className="hidden md:table-cell max-w-xs truncate" title={entry.patient.queixa}>
-                        {entry.patient.queixa}
+                      <TableCell className="hidden md:table-cell max-w-xs truncate" title={entry.patient?.queixa}>
+                        {entry.patient?.queixa || '-'}
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className="bg-primary/5 border-primary/20 text-primary hover:bg-primary/10">
-                          {entry.report.diagnoses[0].name}
+                          {entry.report?.diagnoses?.[0]?.name || entry.report?.prescription ? 'Prescrição/Doses' : 'Análise'}
                         </Badge>
                       </TableCell>
                       <TableCell className="hidden sm:table-cell">
