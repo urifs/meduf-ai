@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { AlertTriangle, CheckCircle2, Pill, ClipboardList, BrainCircuit, Activity } from 'lucide-react';
 import { ResultActions } from '@/components/ResultActions';
 
-export const ClinicalReport = ({ data, analysisType = 'diagnosis' }) => {
+export const ClinicalReport = memo(({ data, analysisType = 'diagnosis' }) => {
   const reportRef = React.useRef(null);
 
   if (!data) {
