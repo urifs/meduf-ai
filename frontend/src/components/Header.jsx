@@ -19,13 +19,28 @@ export const Header = memo(() => {
   const userEmail = localStorage.getItem('userEmail') || '';
   const userRole = localStorage.getItem('userRole');
   const userExpiration = localStorage.getItem('userExpiration');
-  const userAvatar = localStorage.getItem('userAvatar');
+  const [userAvatar, setUserAvatar] = useState(localStorage.getItem('userAvatar'));
   const [timeLeft, setTimeLeft] = useState(null);
   const [outbreaks, setOutbreaks] = useState({
     brazil: [],
     world: []
   });
   const [alertsLoading, setAlertsLoading] = useState(true);
+
+  // Listen for avatar updates
+  useEffect(() => {
+    const handleAvatarUpdate = () => {
+      setUserAvatar(localStorage.getItem('userAvatar'));
+    };
+    
+    window.addEventListener('avatarUpdated', handleAvatarUpdate);
+    window.addEventListener('storage', handleAvatarUpdate);
+    
+    return () => {
+      window.removeEventListener('avatarUpdated', handleAvatarUpdate);
+      window.removeEventListener('storage', handleAvatarUpdate);
+    };
+  }, []);
 
   // Helper to resolve avatar URL
   const getAvatarUrl = (url) => {
