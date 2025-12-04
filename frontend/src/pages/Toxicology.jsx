@@ -55,7 +55,7 @@ const Toxicology = () => {
       try {
         await api.post('/consultations', {
           patient: { 
-            queixa: `[Toxicologia] ${substance}`, 
+            queixa: `[Guia Toxicológico] ${substance}`, 
             idade: "N/I", 
             sexo: "N/I" 
           },
