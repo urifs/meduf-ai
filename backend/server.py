@@ -426,7 +426,7 @@ async def create_user(
             "username": user_data.get("name", user_data.get("email")),
             "name": user_data.get("name", user_data.get("email")),
             "email": user_data.get("email"),
-            "password": get_password_hash(user_data.get("password")),
+            "password_hash": get_password_hash(user_data.get("password")),
             "role": user_data.get("role", "USER"),
             "expiration_date": expiration_date,
             "created_at": datetime.now(timezone.utc),
