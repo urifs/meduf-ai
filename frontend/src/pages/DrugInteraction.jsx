@@ -232,15 +232,24 @@ const DrugInteraction = () => {
       clearInterval(progressInterval);
       setProgress(100);
       
+      // Ensure all fields are strings, not objects
+      const safeStringify = (value) => {
+        if (typeof value === 'string') return value;
+        if (typeof value === 'object' && value !== null) {
+          return JSON.stringify(value, null, 2);
+        }
+        return String(value || '');
+      };
+      
       const mockResponse = {
         medications: activeMeds,
-        severity: interactionData.severity,
-        summary: interactionData.summary,
-        details: interactionData.details,
-        recommendations: interactionData.recommendations,
-        renal_impact: interactionData.renal_impact,
-        hepatic_impact: interactionData.hepatic_impact,
-        monitoring: interactionData.monitoring
+        severity: safeStringify(interactionData.severity),
+        summary: safeStringify(interactionData.summary),
+        details: safeStringify(interactionData.details),
+        recommendations: safeStringify(interactionData.recommendations),
+        renal_impact: safeStringify(interactionData.renal_impact),
+        hepatic_impact: safeStringify(interactionData.hepatic_impact),
+        monitoring: safeStringify(interactionData.monitoring)
       };
 
       try {
