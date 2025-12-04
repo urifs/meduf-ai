@@ -47,7 +47,8 @@ function App() {
     <ThemeProvider>
       <div className="App">
         <BrowserRouter>
-          <Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           
