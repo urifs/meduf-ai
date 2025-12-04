@@ -5,7 +5,7 @@ import { Users, Activity, Shield, FileText, UserX, TrendingUp, MessageSquare } f
 const UserStatsCards = ({ stats, onlineCount, chatStats }) => {
   return (
     <>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
       <Card className="border-l-4 border-l-blue-500 shadow-sm">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">Total de Usuários</CardTitle>
