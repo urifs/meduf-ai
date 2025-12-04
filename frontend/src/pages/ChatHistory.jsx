@@ -182,7 +182,7 @@ const ChatHistory = () => {
                         </div>
                       </div>
                       <Badge variant="outline" className="text-xs">
-                        {selectedChat.model || 'gemini-2.0-flash'}
+                        Meduf 2.0 Clinic
                       </Badge>
                     </div>
                   </CardContent>
