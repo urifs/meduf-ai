@@ -1034,8 +1034,6 @@ PERGUNTA DO MÉDICO:
 RESPOSTA TÉCNICA:"""
 
         # Use Gemini 2.0 Flash
-        from emergentintegrations.llm.chat import LlmChat, UserMessage
-        
         chat = LlmChat(provider="google", model="gemini-2.0-flash-exp")
         messages = [UserMessage(content=full_prompt)]
         response = await chat.ainvoke(messages)
