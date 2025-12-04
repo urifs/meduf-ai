@@ -74,6 +74,8 @@ const useAdminData = (userRole, navigate) => {
       });
       
       setDeletedUsers(deletedRes.data || []);
+      setChatHistory(chatHistoryRes.data || []);
+      setChatStats(chatStatsRes.data || null);
       setLastUpdated(new Date());
       
     } catch (error) {
