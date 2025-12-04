@@ -596,9 +596,16 @@ async def get_online_stats(current_user: UserInDB = Depends(get_current_active_u
     if current_user.role != "ADMIN":
         raise HTTPException(status_code=403, detail="Admin only")
     
-    # Simple mock - return count of active users
-    count = await users_collection.count_documents({"deleted": {"$ne": True}})
-    return {"online": count}
+    # Count users who have valid expiration dates and are not deleted
+    now = datetime.now(timezone.utc)
+    count = await users_collection.count_documents({
+        "deleted": {"$ne": True},
+        "$or": [
+            {"expiration_date": {"$exists": False}},
+            {"expiration_date": {"$gte": now}}
+        ]
+    })
+    return {"online_count": count, "online": count}
 
 
 @app.get("/api/admin/usage-stats/monthly")
