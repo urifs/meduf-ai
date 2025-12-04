@@ -29,7 +29,8 @@ const Profile = () => {
         const response = await api.get('/users/me');
         setUser({
           name: response.data.name,
-          avatar_url: response.data.avatar_url || ''
+          avatar_url: response.data.avatar_url || '',
+          bio: response.data.bio || ''
         });
         // Update localStorage
         localStorage.setItem('userName', response.data.name);
