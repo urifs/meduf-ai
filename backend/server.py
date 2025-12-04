@@ -1033,8 +1033,13 @@ PERGUNTA DO MÉDICO:
 
 RESPOSTA TÉCNICA:"""
 
-        # Use Gemini 2.0 Flash
-        chat = LlmChat(provider="google", model="gemini-2.0-flash-exp")
+        # Use Gemini 2.0 Flash with Emergent Universal Key
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"medical_chat_{current_user.id}",
+            system_message=system_prompt
+        ).with_model("gemini", "gemini-2.0-flash-exp")
+        
         messages = [UserMessage(content=full_prompt)]
         response = await chat.ainvoke(messages)
         
