@@ -357,3 +357,143 @@ async def get_ai_consensus_drug_interaction(medications):
 async def get_ai_consensus_toxicology(substance):
     """Consensus toxicology using Gemini 2.0 Flash"""
     return await analyze_toxicology(substance)
+
+
+async def analyze_dose_calculator(patient_data: Dict[str, Any], medications: List[Dict[str, str]]) -> Dict[str, Any]:
+    """
+    Calcula doses farmacológicas, diluições e prescrições
+    
+    Args:
+        patient_data: Dados opcionais do paciente (peso, idade, altura, condições especiais)
+        medications: Lista de medicações com nome, via (opcional) e indicação (opcional)
+        
+    Returns:
+        Dict com prescrição detalhada formatada em HTML
+    """
+    try:
+        # Create chat instance with Gemini 2.0 Flash
+        chat = LlmChat(
+            api_key=EMERGENT_KEY,
+            system_message="Você é um farmacologista clínico especializado em cálculos de dose. Forneça prescrições detalhadas, técnicas e completas para médicos."
+        ).with_model("gemini", GEMINI_MODEL)
+        
+        # Build patient context
+        patient_context = ""
+        if patient_data.get("weight"):
+            patient_context += f"\n- Peso: {patient_data['weight']} kg"
+        if patient_data.get("age"):
+            patient_context += f"\n- Idade: {patient_data['age']}"
+        if patient_data.get("height"):
+            patient_context += f"\n- Altura: {patient_data['height']} cm"
+        if patient_data.get("specialConditions"):
+            patient_context += f"\n- Condições especiais: {patient_data['specialConditions']}"
+        
+        # Build medications list
+        meds_text = ""
+        for idx, med in enumerate(medications, 1):
+            meds_text += f"\n{idx}. {med['name']}"
+            if med.get('route'):
+                meds_text += f" - Via: {med['route']}"
+            if med.get('indication'):
+                meds_text += f" - Indicação: {med['indication']}"
+        
+        prompt = f"""Analise e forneça prescrição farmacológica COMPLETA E DETALHADA para as seguintes medicações:
+
+**DADOS DO PACIENTE:**{patient_context if patient_context else "\n- Dados não informados"}
+
+**MEDICAÇÕES:**{meds_text}
+
+**RESPONDA EM HTML FORMATADO COM:**
+
+Para CADA medicação, forneça uma seção estruturada com:
+
+<div class="medication-section">
+<h3>🔹 [Nome da Medicação]</h3>
+
+<div class="dosage-info">
+<h4>💊 Dosagem e Prescrição</h4>
+<ul>
+  <li><strong>Dose padrão adulto:</strong> [dose com unidade]</li>
+  <li><strong>Dose pediátrica:</strong> [cálculo por kg/dia ou mg/kg] - SEMPRE incluir</li>
+  <li><strong>Dose para idosos:</strong> [ajustes necessários] - SEMPRE incluir</li>
+  <li><strong>Dose para o paciente:</strong> [cálculo específico baseado nos dados fornecidos]</li>
+</ul>
+</div>
+
+<div class="administration-info">
+<h4>💉 Via e Modo de Administração</h4>
+<ul>
+  <li><strong>Via recomendada:</strong> [oral/EV/IM/SC/tópica]</li>
+  <li><strong>Diluição (se EV):</strong> [detalhes completos de diluição: concentração, diluente, volume]</li>
+  <li><strong>Velocidade de infusão:</strong> [ml/h ou tempo de infusão]</li>
+  <li><strong>Posologia:</strong> [intervalo entre doses, duração do tratamento]</li>
+</ul>
+</div>
+
+<div class="special-considerations">
+<h4>⚠️ Considerações Especiais</h4>
+<ul>
+  <li><strong>Pediatria:</strong> [cuidados específicos para crianças]</li>
+  <li><strong>Geriatria:</strong> [cuidados para idosos, ajuste renal]</li>
+  <li><strong>Gestação/Lactação:</strong> [categoria de risco, recomendações]</li>
+  <li><strong>Insuficiência renal/hepática:</strong> [ajustes de dose necessários]</li>
+</ul>
+</div>
+
+<div class="contraindications">
+<h4>🚫 Contraindicações e Interações</h4>
+<ul>
+  <li><strong>Contraindicações absolutas:</strong> [listar]</li>
+  <li><strong>Contraindicações relativas:</strong> [listar]</li>
+  <li><strong>Interações importantes:</strong> [com outros medicamentos da lista ou classes importantes]</li>
+</ul>
+</div>
+
+<div class="monitoring">
+<h4>📊 Monitoramento</h4>
+<ul>
+  <li>[Parâmetros laboratoriais ou clínicos a monitorar]</li>
+  <li>[Sinais de toxicidade ou efeitos adversos importantes]</li>
+</ul>
+</div>
+</div>
+
+<hr/>
+
+**IMPORTANTE:**
+- Use linguagem técnica para médicos
+- Forneça cálculos precisos baseados nos dados do paciente
+- SEMPRE inclua informações pediátricas E geriátricas
+- Seja específico em diluições e velocidades de infusão
+- Considere todas as condições especiais mencionadas
+- Formate em HTML limpo e bem estruturado
+- Use <strong> para destacar termos importantes
+- Use listas <ul> para organização
+"""
+        
+        response = await chat.send_message(UserMessage(text=prompt))
+        prescription_html = response.strip()
+        
+        # Remove markdown code blocks if present
+        if prescription_html.startswith("```html"):
+            prescription_html = prescription_html.split("```html")[1].split("```")[0].strip()
+        elif prescription_html.startswith("```"):
+            prescription_html = prescription_html.split("```")[1].split("```")[0].strip()
+        
+        return {
+            "prescription": prescription_html,
+            "medications_count": len(medications),
+            "model": "Meduf 2.0 Clinic"
+        }
+        
+    except Exception as e:
+        print(f"Error in analyze_dose_calculator: {e}")
+        return {
+            "prescription": f"<div class='error'><p>❌ Erro ao calcular prescrição: {str(e)}</p><p>Por favor, tente novamente ou consulte referências farmacológicas.</p></div>",
+            "error": str(e)
+        }
+
+
+async def get_ai_consensus_dose_calculator(patient_data, medications):
+    """Consensus dose calculator using Gemini 2.0 Flash"""
+    return await analyze_dose_calculator(patient_data, medications)
