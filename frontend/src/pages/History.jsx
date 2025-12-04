@@ -166,7 +166,12 @@ const History = () => {
                             </DialogTrigger>
                             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                               <DialogHeader>
-                                <DialogTitle>Detalhes da Análise</DialogTitle>
+                                <DialogTitle className="flex items-center justify-between">
+                                  <span>Detalhes da Análise</span>
+                                  <Badge variant="secondary">
+                                    {entry.model || 'Meduf 2.0 Clinic'}
+                                  </Badge>
+                                </DialogTitle>
                                 <DialogDescription>
                                   Realizada em {entry.created_at ? (() => {
                                     try {
