@@ -181,8 +181,8 @@ const MedicalChat = () => {
           
           {isLoading && (
             <div className="flex gap-3">
-              <div className="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-purple-600">
-                <Bot className="h-4 w-4 text-white" />
+              <div className="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-600 shadow-sm">
+                <BrainCircuit className="h-4 w-4 text-white" />
               </div>
               <div className="flex-1">
                 <div className="inline-block p-3 rounded-lg bg-slate-100 dark:bg-slate-800">
