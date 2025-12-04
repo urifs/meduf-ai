@@ -277,6 +277,7 @@ const Admin = () => {
           }}
           onToggleStatus={handleToggleStatus}
         />
+        <FooterLogo />
       </main>
     </div>
   );
