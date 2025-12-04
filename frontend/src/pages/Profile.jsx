@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Header } from '@/components/Header';
+import FooterLogo from '@/components/FooterLogo';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
