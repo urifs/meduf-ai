@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { BrainCircuit } from 'lucide-react';
 
-const FooterLogo = () => {
+const FooterLogo = memo(() => {
   return (
     <div className="mt-16 mb-12 flex justify-center animate-fade-in">
       <div className="flex items-center gap-3 animate-pulse-slow">
@@ -17,6 +17,6 @@ const FooterLogo = () => {
       </div>
     </div>
   );
-};
+});
 
 export default FooterLogo;
