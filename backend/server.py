@@ -1098,9 +1098,12 @@ async def get_all_chat_history(
 
 @app.get("/api/admin/chat-history/stats")
 async def get_chat_history_stats(
-    current_user: UserInDB = Depends(get_current_admin_user)
+    current_user: UserInDB = Depends(get_current_active_user)
 ):
     """Get chat history statistics"""
+    if current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
     try:
         total_chats = await chat_history_collection.count_documents({})
         
