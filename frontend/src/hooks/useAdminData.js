@@ -105,7 +105,6 @@ const useAdminData = (userRole, navigate) => {
     onlineCount,
     isLoading,
     lastUpdated,
-    monthlyUsage,
     deletedUsers,
     chatHistory,
     chatStats,
