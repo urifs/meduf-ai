@@ -126,7 +126,16 @@ const Profile = () => {
       const newAvatarUrl = response.data.avatar_url;
       setUser(prev => ({ ...prev, avatar_url: newAvatarUrl }));
       localStorage.setItem('userAvatar', newAvatarUrl);
+      
+      // Dispatch custom event to update Header
+      window.dispatchEvent(new Event('avatarUpdated'));
+      
       toast.success("Foto de perfil atualizada!");
+      
+      // Force page reload to ensure all components see the new avatar
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       console.error("Upload error:", error);
       toast.error("Erro ao fazer upload da imagem.");
