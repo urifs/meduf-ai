@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Header } from '@/components/Header';
+import FooterLogo from '@/components/FooterLogo';
 import { AnalysisProgress } from '@/components/AnalysisProgress';
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
