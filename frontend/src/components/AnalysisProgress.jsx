@@ -27,7 +27,7 @@ export const AnalysisProgress = React.memo(({ progress, colorScheme = "blue" }) 
           </div>
           <Progress 
             value={progress} 
-            className={`h-3 ${colors.bg} [&>div]:bg-gradient-to-r [&>div]:${colors.gradient} shadow-lg`} 
+            className="h-3 shadow-lg" 
           />
         </div>
       </CardContent>
