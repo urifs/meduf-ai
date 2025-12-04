@@ -227,7 +227,8 @@ async def get_user_profile(current_user: UserInDB = Depends(get_current_active_u
         "name": current_user.name,
         "email": current_user.email,
         "role": current_user.role,
-        "avatar_url": current_user.avatar_url or ""
+        "avatar_url": current_user.avatar_url or "",
+        "bio": getattr(current_user, 'bio', '')
     }
 
 
