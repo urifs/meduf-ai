@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Activity, Shield, FileText, Database, TrendingUp } from 'lucide-react';
+import { Users, Activity, Shield, FileText, UserX, TrendingUp } from 'lucide-react';
 
 const UserStatsCards = ({ stats, onlineCount, monthlyUsage }) => {
   return (
