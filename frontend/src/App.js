@@ -95,6 +95,14 @@ function App() {
             } 
           />
           <Route 
+            path="/chat-history" 
+            element={
+              <ProtectedRoute>
+                <ChatHistory />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
             path="/profile" 
             element={
               <ProtectedRoute>
