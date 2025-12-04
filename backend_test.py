@@ -10,7 +10,7 @@ import json
 from datetime import datetime
 
 # Configuration - Use production URL from frontend .env
-BACKEND_URL = "https://meduf-ai-2.preview.emergentagent.com/api"
+BACKEND_URL = "https://meduf-ai-doctor.preview.emergentagent.com/api"
 TEST_USERNAME = "ur1fs"
 TEST_PASSWORD = "@Fred1807"
 

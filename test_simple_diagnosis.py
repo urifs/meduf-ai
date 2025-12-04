@@ -5,7 +5,7 @@ Test Simple Diagnosis endpoint
 import requests
 import time
 
-BACKEND_URL = "https://meduf-ai-2.preview.emergentagent.com/api"
+BACKEND_URL = "https://meduf-ai-doctor.preview.emergentagent.com/api"
 TEST_USERNAME = "ur1fs"
 TEST_PASSWORD = "@Fred1807"
 
