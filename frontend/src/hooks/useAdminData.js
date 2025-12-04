@@ -58,7 +58,6 @@ const useAdminData = (userRole, navigate) => {
       setConsultations(realConsultations);
       
       setOnlineCount(onlineRes.data.online_count);
-      setMonthlyUsage(monthlyRes.data);
       
       const feedbackData = feedbacksRes.data || [];
       setFeedbacks(feedbackData);
