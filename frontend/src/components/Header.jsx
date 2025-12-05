@@ -143,7 +143,7 @@ export const Header = memo(() => {
               <span className="text-xl font-bold tracking-tight text-foreground">
                 Meduf <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Ai</span>
               </span>
-              <span className="text-[9px] text-muted-foreground font-medium tracking-wider uppercase ml-0.5">2.0 Clinic</span>
+              <span className="text-[9px] text-muted-foreground font-medium tracking-wider uppercase ml-0.5">2.5 Clinic</span>
             </div>
           </div>
           {/* User Watermark */}
