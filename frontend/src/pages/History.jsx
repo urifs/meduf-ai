@@ -154,7 +154,7 @@ const History = () => {
                       </TableCell>
                       <TableCell className="hidden sm:table-cell">
                         <Badge variant="secondary" className="text-xs">
-                          {entry.model || 'Meduf 2.0 Clinic'}
+                          {entry.model || 'Meduf 2.5 Clinic'}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
@@ -170,7 +170,7 @@ const History = () => {
                                 <DialogTitle className="flex items-center justify-between">
                                   <span>Detalhes da Análise</span>
                                   <Badge variant="secondary">
-                                    {entry.model || 'Meduf 2.0 Clinic'}
+                                    {entry.model || 'Meduf 2.5 Clinic'}
                                   </Badge>
                                 </DialogTitle>
                                 <DialogDescription>
