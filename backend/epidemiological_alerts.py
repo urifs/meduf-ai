@@ -58,7 +58,7 @@ Responda APENAS com o JSON, sem texto adicional."""
 
     try:
         # Usar Gemini 2.0 Flash via Emergent Integrations
-        chat = LlmChat(provider="google", model="gemini-2.0-flash-exp")
+        chat = LlmChat(provider="google", model="gemini-2.5-flash")
         messages = [UserMessage(content=prompt)]
         response = await chat.ainvoke(messages)
         
