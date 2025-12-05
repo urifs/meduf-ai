@@ -1088,7 +1088,7 @@ async def create_consultation(
             "timestamp": datetime.now(timezone.utc),
             "patient": data.get("patient", {}),
             "report": data.get("report", {}),
-            "model": "Meduf 2.0 Clinic"
+            "model": "Meduf 2.5 Clinic"
         }
         
         result = await consultations_collection.insert_one(consultation)
@@ -1195,13 +1195,13 @@ RESPOSTA TÉCNICA:"""
             "user_message": user_message,
             "ai_response": response,
             "created_at": datetime.now(timezone.utc),
-            "model": "Meduf 2.0 Clinic"
+            "model": "Meduf 2.5 Clinic"
         }
         await chat_history_collection.insert_one(chat_entry)
         
         return {
             "response": response,
-            "model": "Meduf 2.0 Clinic"
+            "model": "Meduf 2.5 Clinic"
         }
         
     except Exception as e:
