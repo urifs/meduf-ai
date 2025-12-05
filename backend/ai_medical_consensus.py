@@ -585,7 +585,7 @@ Para CADA medicação, crie uma seção detalhada seguindo este template:
         return {
             "prescription": prescription_html,
             "medications_count": len(medications),
-            "model": "Meduf 2.0 Clinic"
+            "model": "Meduf 2.5 Clinic"
         }
         
     except Exception as e:
