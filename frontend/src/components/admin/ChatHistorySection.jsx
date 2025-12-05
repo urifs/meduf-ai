@@ -113,7 +113,7 @@ const ChatHistorySection = ({ chatHistory, formatDate }) => {
                             {formatDate(chat.created_at)}
                           </div>
                           <Badge variant="secondary" className="text-xs">
-                            Meduf 2.0 Clinic
+                            Meduf 2.5 Clinic
                           </Badge>
                         </div>
                       </div>
@@ -144,7 +144,7 @@ const ChatHistorySection = ({ chatHistory, formatDate }) => {
                                 {formatDate(chat.created_at)}
                               </p>
                               <Badge variant="outline" className="text-xs mt-1">
-                                Meduf 2.0 Clinic
+                                Meduf 2.5 Clinic
                               </Badge>
                             </div>
                           </div>
