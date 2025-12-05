@@ -50,7 +50,7 @@ def count_tokens(text: str) -> int:
     return len(text) // 4
 
 
-def calculate_cost(input_tokens: int, output_tokens: int, model: str = "gemini-2.0-flash") -> float:
+def calculate_cost(input_tokens: int, output_tokens: int, model: str = "gemini-2.5-flash") -> float:
     """
     Calculate cost in USD based on token usage and model
     """
