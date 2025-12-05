@@ -1,6 +1,6 @@
 """
 AI Medical Consensus Engine
-Uses Gemini 2.0 Flash for medical diagnosis
+Uses Gemini 2.5 Flash for medical diagnosis
 Production-ready implementation with Emergent Universal Key
 """
 import os
@@ -18,8 +18,8 @@ EMERGENT_KEY = os.environ.get("EMERGENT_LLM_KEY")
 if not EMERGENT_KEY:
     raise ValueError("EMERGENT_LLM_KEY environment variable is required but not set")
 
-# Gemini 2.0 Flash model
-GEMINI_MODEL = "gemini-2.0-flash"
+# Gemini 2.5 Flash model (latest and fastest)
+GEMINI_MODEL = "gemini-2.5-flash"
 
 MEDICAL_SYSTEM_PROMPT = """Você é um assistente clínico especializado para MÉDICOS PROFISSIONAIS. Este sistema é usado por médicos durante consultas. Forneça análise técnica detalhada:
 
