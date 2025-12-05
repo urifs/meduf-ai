@@ -96,7 +96,7 @@ const MedicalChat = () => {
           <div>
             <CardTitle className="text-2xl">
               <span className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
-                Consulta Livre com Meduf 2.0 Clinic
+                Consulta Livre com Meduf 2.5 Clinic
               </span>
             </CardTitle>
             <CardDescription className="text-sm mt-1">
