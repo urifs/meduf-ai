@@ -178,7 +178,7 @@ const ChatHistory = () => {
                             </Button>
                           </div>
                           <Badge variant="secondary" className="text-xs">
-                            Meduf 2.0 Clinic
+                            Meduf 2.5 Clinic
                           </Badge>
                         </div>
                       </div>
