@@ -70,7 +70,7 @@ async def track_usage(
     consultation_type: str,
     input_text: str,
     output_text: str,
-    model: str = "gemini-2.0-flash"
+    model: str = "gemini-2.5-flash"
 ):
     """
     Track API usage and cost for a consultation
